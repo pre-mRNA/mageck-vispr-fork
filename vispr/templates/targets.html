@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="margin-bottom: 10px;">Results for {{ selection }} selection</div>
+            <table id="targets" class="table table-striped">
+                <thead>
+                    <th data-dynatable-column="id">Target</th>
+                    <th data-dynatable-column="lo.{{ selection[:3] }}">RRA-score</th>
+                    <th data-dynatable-column="p.{{ selection[:3] }}">p-value</th>
+                    <th data-dynatable-column="fdr.{{ selection[:3] }}">FDR</th>
+                <thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>        
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div id="score-plot" class="plot"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="margin-bottom: 10px;">RNA counts</div>
+                    <div id="rna-plot" class="plot parcoords" style="width: 100%; height: 300px;">Click table row to select target.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+vg.parse.spec("/plt/rra/{{ selection }}", function(chart) {
+    chart({el: "#score-plot"}).update();
+});
+
+$("#targets").dynatable({
+    dataset: {
+        ajax: true,
+        ajaxUrl: "/tbl/targets/{{ selection }}",
+        ajaxOnLoad: true,
+        records: []
+    }
+}).on("click", "tr", function() {
+    var target = $(this).children(":first").html();
+
+    d3.json("/tbl/rnas/" + target, function(error, data) {
+        if (error) return console.warn(error);
+        $("#rna-plot").empty();
+
+        var names = data.map(function(rec) { return rec.sgRNA });
+        var samples = d3.keys(data[0]);
+        console.log(samples);
+        var colors = d3.scale.category10().domain(names);
+
+        var plt = d3.parcoords()("#rna-plot")
+          .data(data)
+          .margin({ top: 24, left: 150, bottom: 12, right: 0 })
+          .color(function(record) { return colors(record.sgRNA) })
+          .render()
+          .createAxes()
+          .brushMode("1D-axes")
+          .reorderable()
+          .interactive();
+
+        plt.svg.selectAll("text").style("font-size", "10px");
+        $("#rna-plot svg :contains(sgRNA)").css("font-weight", "normal");
+    });
+});
+
+</script>
+{% endblock %}

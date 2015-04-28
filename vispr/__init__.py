@@ -6,13 +6,27 @@ import vincent
 from vispr.version import __version__
 
 
-class UserError(Exception):
+class VisprError(Exception):
     pass
 
 
-class GeneResults:
-    """Keep and display gene results."""
+class Results:
+    def __init__(self, config):
+        self.targets = {}
+        self.rnas = {}
+        try:
+            for screen, files in config.items():
+                self.targets[screen] = TargetResults(files["feature_results"])
+                self.rnas[screen] = RNAResults(files["rna_counts"])
+        except KeyError:
+            raise VisprError("No results for screen {}".format(screen))
 
+    @property
+    def screens(self):
+        return self.targets.keys()
+
+
+class AbstractResults:
     def __init__(self, dataframe):
         """
         Arguments:
@@ -24,6 +38,10 @@ class GeneResults:
 
     def __getitem__(self, slice):
         return self.df.__getitem__(slice)
+
+
+class TargetResults(AbstractResults):
+    """Keep and display feature results."""
 
     def plot_rra(self, positive=True):
         """
@@ -43,7 +61,12 @@ class GeneResults:
 
         # format plot
         plt.axes[0].ticks = 1
-        plt.axis_titles(x="Genes", y="RRA score ({} selection)".format("positive" if positive else "negative"))
+        plt.axis_titles(x="Targets", y="RRA-score")
         plt.colors(brew='Set1')
 
         return plt
+
+
+class RNAResults(AbstractResults):
+    def by_target(self, target):
+        return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"]

@@ -1,0 +1,5 @@
+{
+    "records": {{ records }},
+    "queryRecordCount": {{ records|length }},
+    "totalRecordCount": {{ records|length }}
+}

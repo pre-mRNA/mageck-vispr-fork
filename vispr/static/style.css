@@ -1,5 +1,5 @@
 #content {
-    padding-top: 40px;
+    margin-top: 60px;
 }
 
 .plot {
@@ -8,4 +8,10 @@
     width: 300px;
 }
 
+#score-plot {
+    height: 255px;
+}
 
+#rna-plot {
+    height: 300px;
+}
