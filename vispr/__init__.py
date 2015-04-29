@@ -1,7 +1,13 @@
 import json
+from functools import lru_cache
 
+import numpy as np
 import pandas as pd
 import vincent
+from vincent.marks import MarkProperties, MarkRef, Mark
+from vincent.transforms import Transform
+from vincent.properties import PropertySet
+from vincent.values import ValueRef
 
 from vispr.version import __version__
 
@@ -43,28 +49,59 @@ class AbstractResults:
 class TargetResults(AbstractResults):
     """Keep and display feature results."""
 
-    def plot_rra(self, positive=True):
+    @lru_cache()
+    def get_pvals(self, positive=True):
+        # select column and sort
+        col = "p.{}".format("pos" if positive else "neg")
+        pvals = -np.log10(self.df[[col]])
+        data = pd.concat([self.df[["id"]], pvals], axis=1).sort(col, ascending=False)#.reset_index(drop=True)
+        return data, col
+
+    def plot_pvals(self, positive=True):
         """
         Plot the gene ranking in form of their p-values as line plot.
 
         Arguments
         positive -- if true, plot positive selection scores, else negative selection
         """
-        # select column and sort
-        col = "lo.{}".format("pos" if positive else "neg")
-        rra = self.df[["id", col]].sort(col, ascending=False).reset_index(drop=True)
+        data, col = self.get_pvals(positive=positive)
 
         # create plot
-        plt = vincent.Line(rra, columns=[col], width=300, height=200)
+        plt = vincent.Line(data, columns=[col], width=300, height=200)
 
-        print(plt.to_json())
+        # Circles for each data point
+        from_ = MarkRef(
+            data='table',
+            transform=[Transform(type='facet', keys=['data.idx'])])
+        enter_props = PropertySet(
+            x=ValueRef(scale='x', field="data.idx"),
+            y=ValueRef(scale='y', field="data.val"),
+            size=ValueRef(value=100),
+            opacity=ValueRef(value=0),
+            fill=ValueRef(scale="color", field='data.idx'))
+        update_props = PropertySet(
+            opacity=ValueRef(value=0)
+        )
+        hover_props = PropertySet(
+            opacity=ValueRef(value=1)
+        )
+        marks = [Mark(type='symbol',
+                      properties=MarkProperties(enter=enter_props, update=update_props, hover=hover_props))]
+        mark_group = Mark(type='group', from_=from_, marks=marks)
+        plt.marks.append(mark_group)
 
         # format plot
         plt.axes[0].ticks = 1
-        plt.axis_titles(x="Targets", y="RRA-score")
+        plt.axis_titles(x="Targets", y="-log10 p-value")
         plt.colors(brew='Set1')
 
         return plt
+
+    def get_pvals_idx(self, target, positive=True):
+        data, _ = self.get_pvals(positive=positive)
+        idx = data.index.values[(data["id"] == target).values]
+        assert len(idx) == 1
+        return int(idx[0])
 
 
 class RNAResults(AbstractResults):

@@ -23,9 +23,14 @@ def targets(selection):
     )
 
 
-@app.route("/plt/rra/<selection>")
-def plt_rra(selection):
-    return app.results.targets[get_screen()].plot_rra(positive=selection == "positive").to_json()
+@app.route("/plt/pvals/<selection>")
+def plt_pvals(selection):
+    return app.results.targets[get_screen()].plot_pvals(positive=selection == "positive").to_json()
+
+
+@app.route("/idx/pvals/<selection>/<target>")
+def idx_pvals(selection, target):
+    return str(app.results.targets[get_screen()].get_pvals_idx(target))
 
 
 @app.route("/tbl/targets/<selection>", methods=["GET"])
@@ -35,6 +40,9 @@ def tbl_targets(selection):
 
     # sort and slice records
     records = app.results.targets[get_screen()][:]
+    total_count = records.shape[0]
+    filter_count = total_count  # TODO add fitlering
+
     columns, ascending = get_sorting()
     if columns:
         records = records.sort(columns, ascending=ascending)
@@ -44,7 +52,9 @@ def tbl_targets(selection):
 
     return render_template(
         "dyntable.json",
-        records=records.to_json(orient="records")
+        records=records.to_json(orient="records"),
+        filter_count=filter_count,
+        total_count=total_count,
     )
 
 

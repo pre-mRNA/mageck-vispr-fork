@@ -15,3 +15,8 @@
 #rna-plot {
     height: 300px;
 }
+
+.table-striped td, .table-striped th {
+    border-top: none !important;
+    border-bottom: none !important;
+}
