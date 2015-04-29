@@ -1,3 +1,6 @@
+# coding: utf-8
+from __future__ import absolute_import, division, print_function
+
 import re, json
 
 from flask import Flask, render_template, request, session
@@ -30,7 +33,7 @@ def plt_pvals(selection):
 
 @app.route("/idx/pvals/<selection>/<target>")
 def idx_pvals(selection, target):
-    return str(app.results.targets[get_screen()].get_pvals_idx(target))
+    return str(app.results.targets[get_screen()].get_pvals_idx(target, positive=selection == "positive"))
 
 
 @app.route("/tbl/targets/<selection>", methods=["GET"])
@@ -41,7 +44,7 @@ def tbl_targets(selection):
     # sort and slice records
     records = app.results.targets[get_screen()][:]
     total_count = records.shape[0]
-    filter_count = total_count  # TODO add fitlering
+    filter_count = total_count  # TODO add filtering
 
     columns, ascending = get_sorting()
     if columns:
@@ -52,7 +55,7 @@ def tbl_targets(selection):
 
     return render_template(
         "dyntable.json",
-        records=records.to_json(orient="records"),
+        records=records.to_json(orient="records", double_precision=15),
         filter_count=filter_count,
         total_count=total_count,
     )

@@ -1,13 +1,12 @@
 # coding: utf-8
+from __future__ import absolute_import, division, print_function
 
 import sys
 
-from setuptools import setup
-
-
-if sys.version_info < (3,3):
-    sys.stdout.write("At least Python 3.3 is required.\n")
-    sys.exit(1)
+try:
+    from setuptools import setup
+except ImportError:
+    print("Could not load setuptools. Please install the setuptools package.", file=sys.stderr)
 
 
 # load version info
@@ -24,9 +23,9 @@ setup(
     url="",
     packages=["vispr"],
     zip_safe=True,
-    install_requires=["pandas", "flask", "vincent"],
+    install_requires=["pandas", "flask", "vincent", "pyyaml", "numpy", "nose"],
     entry_points={"console_scripts": ["vispr = vispr.cli:main"]},
-    package_data={'': ['*.html']},
+    package_data={"": ["*.html"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         #"Development Status :: 5 - Production/Stable",
@@ -35,6 +34,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 2",
         "Topic :: Scientific/Engineering :: Bio-Informatics"
     ]
 )

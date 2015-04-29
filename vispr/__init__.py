@@ -1,5 +1,15 @@
+# coding: utf-8
+from __future__ import absolute_import, division, print_function
+
 import json
-from functools import lru_cache
+try:
+    from functools import lru_cache
+except ImportError:
+    # dummy cache, i.e. Python 2 version will be a bit slower.
+    def lru_cache():
+        def dummy(func):
+            return func
+        return dummy
 
 import numpy as np
 import pandas as pd
@@ -22,7 +32,7 @@ class Results:
         self.rnas = {}
         try:
             for screen, files in config.items():
-                self.targets[screen] = TargetResults(files["feature_results"])
+                self.targets[screen] = TargetResults(files["target_results"])
                 self.rnas[screen] = RNAResults(files["rna_counts"])
         except KeyError:
             raise VisprError("No results for screen {}".format(screen))
@@ -39,7 +49,7 @@ class AbstractResults:
         dataframe -- a pandas data frame or its path consisting of per gene results as produced by MAGeCK
         """
         if isinstance(dataframe, str):
-            dataframe = pd.read_table(dataframe)
+            dataframe = pd.read_table(dataframe, na_filter=False)
         self.df = dataframe
 
     def __getitem__(self, slice):
@@ -54,7 +64,7 @@ class TargetResults(AbstractResults):
         # select column and sort
         col = "p.{}".format("pos" if positive else "neg")
         pvals = -np.log10(self.df[[col]])
-        data = pd.concat([self.df[["id"]], pvals], axis=1).sort(col, ascending=False)#.reset_index(drop=True)
+        data = pd.concat([self.df[["id"]], pvals], axis=1).sort(col, ascending=False).reset_index(drop=True)
         return data, col
 
     def plot_pvals(self, positive=True):
@@ -93,7 +103,6 @@ class TargetResults(AbstractResults):
         # format plot
         plt.axes[0].ticks = 1
         plt.axis_titles(x="Targets", y="-log10 p-value")
-        plt.colors(brew='Set1')
 
         return plt
 
@@ -106,4 +115,5 @@ class TargetResults(AbstractResults):
 
 class RNAResults(AbstractResults):
     def by_target(self, target):
+        print(target)
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"]

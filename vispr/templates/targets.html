@@ -50,6 +50,7 @@ var dt = $("#targets").dynatable({
         ajax: true,
         ajaxUrl: "/tbl/targets/{{ selection }}",
         ajaxOnLoad: true,
+        perPageDefault: 20,
         records: [],
         inputs: {
             paginationClass: 'pagination',

@@ -1,3 +1,6 @@
+# coding: utf-8
+from __future__ import absolute_import, division, print_function
+
 import argparse
 import logging
 import sys
@@ -7,11 +10,15 @@ import random
 import yaml
 
 from vispr import TargetResults, Results, VisprError
+from vispr.server import app
 
 
-def write_plot(plt, path):
-    with open(path, "w") as f:
-        f.write(plt.to_json())
+def init_server(config):
+    with open(config) as f:
+        config = yaml.load(f)
+    app.results = Results(config)
+    app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
+    app.run()
 
 
 def main():
@@ -29,13 +36,7 @@ def main():
     )
 
     try:
-        from vispr.server import app
-
-        with open(args.config) as f:
-            config = yaml.load(f)
-        app.results = Results(config)
-        app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
-        app.run()
+        init_server(args.config)
     except VisprError as e:
         logging.error(e)
         exit(1)

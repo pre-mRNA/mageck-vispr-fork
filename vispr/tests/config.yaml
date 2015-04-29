@@ -1,0 +1,3 @@
+leukemia:
+  target_results: gene_summary.txt
+  rna_counts: normalized.txt

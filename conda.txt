@@ -1,0 +1,6 @@
+setuptools
+flask
+numpy
+pandas
+pyyaml
+nose
