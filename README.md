@@ -6,19 +6,21 @@ There are two ways to test VISPR.
 
 Open a terminal in this directory and issue
 
-    python setup.py test
+    python setup.py nosetests
 
 If you can choose, use Python 3 for VISPR, because it will be faster.
 
-# I don't have a working Python installation
+## I don't have a working Python installation
 
-Install miniconda for Python 3.4 from here:
+Install Miniconda for Python 3 from here:
 http://conda.pydata.org/miniconda.html
+This will install a minimal Python 3, together with the conda
+package manager.
 
-Then, open a terminal in this directory and issue
+Then, open a terminal in this directory and execute
 
     conda install --file conda.txt
 
 to install all required packages.
-Then, follow the procedure described under
-"I have a working Pyhton installation".
+Finally, follow the procedure described under
+"I have a working Python installation".
