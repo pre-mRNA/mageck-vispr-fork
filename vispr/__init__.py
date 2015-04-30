@@ -77,7 +77,7 @@ class TargetResults(AbstractResults):
         data, col = self.get_pvals(positive=positive)
 
         # create plot
-        plt = vincent.Line(data, columns=[col], width=300, height=200)
+        plt = vincent.Line(data, columns=[col], width=250, height=200)
 
         # Circles for each data point
         from_ = MarkRef(
@@ -105,6 +105,20 @@ class TargetResults(AbstractResults):
         plt.axis_titles(x="Targets", y="-log10 p-value")
 
         return plt
+
+    def plot_pval_hist(self, positive=True):
+        data, col = self.get_pvals(positive=positive)
+        hist, edges = np.histogram(data[col], bins=15)
+        x = (edges[:-1] + edges[1:]) / 2
+        x = np.round(2)
+
+        data = pd.DataFrame({"pval": x, "count": hist})
+        plt = vincent.Bar(data, width=250, height=200, key_on="pval")
+        plt.axis_titles(x="p-value", y="count")
+        plt.axes[1].title_offset = 50
+        print(plt.to_json())
+        return plt
+        
 
     def get_pvals_idx(self, target, positive=True):
         data, _ = self.get_pvals(positive=positive)

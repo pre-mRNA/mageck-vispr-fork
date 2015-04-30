@@ -22,7 +22,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default">
-                    <div id="score-plot" class="plot"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="score-plot" class="plot"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="pval-hist-plot" class="plot"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -41,6 +48,12 @@
 var plt_pval = null;
 vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
     plt_pval = chart({el: "#score-plot"});
+    plt_pval.update();
+});
+
+
+vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
+    plt_pval = chart({el: "#pval-hist-plot"});
     plt_pval.update();
 });
 

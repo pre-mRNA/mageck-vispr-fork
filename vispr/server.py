@@ -36,6 +36,12 @@ def idx_pvals(selection, target):
     return str(app.results.targets[get_screen()].get_pvals_idx(target, positive=selection == "positive"))
 
 
+@app.route("/plt/pvalhist/<selection>")
+def plt_pval_hist(selection):
+    plt = app.results.targets[get_screen()].plot_pval_hist(positive=selection == "positive").to_json()
+    return plt
+
+
 @app.route("/tbl/targets/<selection>", methods=["GET"])
 def tbl_targets(selection):
     offset = int(request.args.get("offset", 0))
