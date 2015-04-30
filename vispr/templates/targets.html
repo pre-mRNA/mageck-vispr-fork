@@ -23,10 +23,10 @@
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <div id="score-plot" class="plot"></div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-7">
                             <div id="pval-hist-plot" class="plot"></div>
                         </div>
                     </div>
@@ -53,8 +53,7 @@ vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
 
 
 vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
-    plt_pval = chart({el: "#pval-hist-plot"});
-    plt_pval.update();
+    chart({el: "#pval-hist-plot"}).update();
 });
 
 
@@ -100,6 +99,7 @@ dt.on("dynatable:afterUpdate", function() {
               .margin({ top: 24, left: 150, bottom: 12, right: 0 })
               .color(function(record) { return colors(record.sgRNA) })
               .render()
+              .commonScale()
               .createAxes()
               .brushMode("1D-axes")
               .reorderable()
