@@ -4,3 +4,4 @@ numpy
 pandas
 pyyaml
 nose
+scikit-learn
