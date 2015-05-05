@@ -20,3 +20,8 @@
     border-top: none !important;
     border-bottom: none !important;
 }
+
+#frontpage {
+    text-align: center;
+    padding-top: 150px;
+}

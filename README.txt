@@ -3,8 +3,8 @@ VISPR - A visualization server for CRISPR data.
 
 There are two ways to test VISPR.
 
-Testing VISPR with the Miniconda Python distribution
-----------------------------------------------------
+Installing VISPR with the Miniconda Python distribution
+-------------------------------------------------------
 
 Install Miniconda for Python 3 from here:
 
@@ -18,19 +18,36 @@ Then, open a terminal in this directory and execute
     conda install --file conda.txt
 
 to install all required packages.
-Then, issue
+Install VISPR with
 
-    python setup.py nosetests
+    python setup.py install
 
-to run a test instance of VISPR.
+See below for running a test instance of VISPR.
 
+Installing VISPR with another Python distribution (for experts)
+---------------------------------------------------------------
 
-Testing VISPR with another Python distribution (for experts)
-------------------------------------------------------------
+Make sure that you have numpy and pandas installed. Else, their
+automatic compilation with the command below would take very long.
+Then, you can issue
 
-Make sure that you have numpy and nose installed. Then, you can
-issue
+    python setup.py install
 
-    python setup.py nosetests
+or
 
-which will install remaining dependencies locally.
+    python setup.py install --user
+
+if you want to install VISPR to your home folder.
+All remaining dependencies will be installed automatically.
+
+Running VISPR
+-------------
+
+After successful installation, you can run VISPR by executing the command
+
+    vispr server <path/to/config.yaml>
+
+If you only want to test VISPR, you can run a test instance with example
+data by executing
+
+    vispr test

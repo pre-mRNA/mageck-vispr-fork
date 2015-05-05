@@ -1,0 +1,5 @@
+recursive-include vispr/templates *
+recursive-include vispr/static *
+recursive-include vispr/tests *.csv
+recursive-include vispr/tests *.txt
+recursive-include vispr/tests *.yaml

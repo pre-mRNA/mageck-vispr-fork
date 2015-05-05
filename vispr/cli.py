@@ -6,6 +6,7 @@ import logging
 import sys
 import string
 import random
+import os
 
 import yaml
 
@@ -14,8 +15,6 @@ from vispr.server import app
 
 
 def init_server(config):
-    with open(config) as f:
-        config = yaml.load(f)
     app.results = Results(config)
     app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
     app.run()
@@ -25,7 +24,12 @@ def main():
     # create arg parser
     parser = argparse.ArgumentParser("An HTML5-based interactive visualization of CRISPR/Cas9 screen data.")
     parser.add_argument("--debug", action="store_true", help="Print debug info.")
-    parser.add_argument("config", help="YAML config file containing results.")
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    server = subparsers.add_parser("server")
+    server.add_argument("config", help="YAML config file containing results.")
+
+    test = subparsers.add_parser("test")
 
     args = parser.parse_args()
 
@@ -36,7 +40,20 @@ def main():
     )
 
     try:
-        init_server(args.config)
+        if args.subcommand == "server":
+            with open(config) as f:
+                config = yaml.load(f)
+                init_server(config)
+        elif args.subcommand == "test":
+            os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
+            with open("config.yaml") as f:
+                config = yaml.load(f)
+                print("", file=sys.stderr)
+                print("Server starting. Please open http://localhost:5000 in your browser.", file=sys.stderr)
+                init_server(config)
+        else:
+            parser.print_help()
+            exit(1)
     except VisprError as e:
         logging.error(e)
         exit(1)
