@@ -13,6 +13,7 @@ except ImportError:
 
 import numpy as np
 import pandas as pd
+from flask import render_template
 import vincent
 from vincent.marks import MarkProperties, MarkRef, Mark
 from vincent.transforms import Transform
@@ -123,7 +124,6 @@ class TargetResults(AbstractResults):
         plt.axes[0].offset = 3
         plt.axes[1].offset = 3
         return plt
-        
 
     def get_pvals_idx(self, target, positive=True):
         data, _ = self.get_pvals(positive=positive)
@@ -134,5 +134,19 @@ class TargetResults(AbstractResults):
 
 class RNAResults(AbstractResults):
     def by_target(self, target):
-        print(target)
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"]
+
+    def plot_normalization(self):
+        counts = self.df.ix[:, 2:]
+        print(counts)
+        data = pd.DataFrame({
+            "label": counts.columns,
+            "median": counts.median(),
+            "lo":     counts.quantile(0.25),
+            "hi":     counts.quantile(0.75),
+            "min":    counts.min(),
+            "max":    counts.max(),
+        })
+        print(data)
+        height = data.shape[0] * 15
+        return render_template("plots/normalization.json", data=data.to_json(orient="records"), height=height)

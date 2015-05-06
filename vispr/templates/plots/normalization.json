@@ -1,0 +1,110 @@
+{
+  "width": 300,
+  "height": {{ height }},
+  "data": [
+    {
+      "name": "counts",
+      "values": {{ data }}
+    }
+  ],
+  "scales": [
+    {
+      "name": "y",
+      "type": "ordinal",
+      "range": "height",
+      "domain": {"data": "counts", "field": "index"}
+    },
+    {
+      "name": "x",
+      "range": [100, 300],
+      "nice": true,
+      "zero": true,
+      "domain": {"data": "counts", "field": "data.max"}
+    }
+  ],
+  "axes": [
+    {"type": "x", "scale": "x", "ticks": 6}
+  ],
+  "marks": [
+    {
+      "type": "text",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"scale": "y", "field": "index"},
+          "baseline": {"value": "middle"},
+          "fill": {"value": "#000"},
+          "text": {"field": "data.label"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.min"},
+          "x2": {"scale": "x", "field": "data.max"},
+          "y": {"scale": "y", "field": "index", "offset": -1},
+          "height": {"value": 1},
+          "fill": {"value": "black"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.min"},
+          "y": {"scale": "y", "field": "index", "offset": -2},
+          "height": {"value": 3},
+          "width": {"value": 1},
+          "fill": {"value": "black"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.max"},
+          "y": {"scale": "y", "field": "index", "offset": -2},
+          "height": {"value": 3},
+          "width": {"value": 1},
+          "fill": {"value": "black"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.lo"},
+          "x2": {"scale": "x", "field": "data.hi"},
+          "y": {"scale": "y", "field": "index", "offset": -5},
+          "height": {"value": 10},
+          "fill": {"value": "white"},
+          "stroke": {"value": "black"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.median"},
+          "x2": {"scale": "x", "field": "data.median"},
+          "y": {"scale": "y", "field": "index", "offset": -5},
+          "height": {"value": 10},
+          "fill": {"value": "white"},
+          "stroke": {"value": "black"}
+        }
+      }
+    }
+  ]
+}

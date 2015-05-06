@@ -25,6 +25,10 @@ def targets(selection):
         selection=selection,
     )
 
+@app.route("/qc/normalization")
+def normalization():
+    return render_template("normalization.html")
+
 
 @app.route("/plt/pvals/<selection>")
 def plt_pvals(selection):
@@ -77,6 +81,13 @@ def tbl_rnas(target):
         dimensions=json.dumps(list(table.columns)),
         values=table.to_json(orient="values")
     )
+
+
+@app.route("/plt/normalization")
+def plt_normalization():
+    plt = app.results.rnas[get_screen()].plot_normalization()
+    print(plt)
+    return plt
 
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):

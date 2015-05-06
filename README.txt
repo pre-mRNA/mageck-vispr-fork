@@ -45,9 +45,24 @@ Running VISPR
 
 After successful installation, you can run VISPR by executing the command
 
-    vispr server <path/to/config.yaml>
+    vispr server path/to/config.yaml
 
+See below for the config file format.
 If you only want to test VISPR, you can run a test instance with example
 data by executing
 
     vispr test
+
+
+Config file format
+------------------
+
+The config file has to be in YAML format. It has to contain a section for
+each experiment. Each experiment contains two entries, one pointing to the
+target (or gene) result file provided by "MAGeCK test", one pointing to a
+file with normalized read counts as provided by "MAGeCK count":
+
+    myexperiment:
+        target_results: gene_summary.txt
+        rna_counts: normalized_counts.txt
+
