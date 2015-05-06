@@ -1,5 +1,6 @@
 recursive-include vispr/templates *
 recursive-include vispr/static *
-recursive-include vispr/tests *.csv
-recursive-include vispr/tests *.txt
-recursive-include vispr/tests *.yaml
+include vispr/tests *.csv
+include vispr/tests *.txt
+include vispr/tests *.yaml
+include . conda.txt
