@@ -72,7 +72,15 @@ var dt = $("#targets").dynatable({
 });
 
 dt.on("dynatable:afterUpdate", function() {
-    console.log($("#targets tr td:last-child"));
+{% if False %}
+    $("#targets tr td:first-child").each(function(idx, cell) {
+        var target = $(cell).html();
+        $(cell).html(
+            '<a target="_blank" href="http://www.ensembl.org/{{ species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
+        );
+    });
+{% endif %}
+
     $("#targets tr td:last-child").html(
         '<a href="#" class="btn-plt-rnas" data-toggle="tooltip" data-placement="top" title="Display RNA counts.">\
             <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>\
@@ -81,6 +89,7 @@ dt.on("dynatable:afterUpdate", function() {
             <span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span>\
         </a>'
     );
+
     $(".btn-plt-rnas").tooltip().click(function() {
         var target = $(this).parent().parent().children(":first").html();
 

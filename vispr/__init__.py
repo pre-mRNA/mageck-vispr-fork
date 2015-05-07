@@ -33,12 +33,18 @@ class Results:
     def __init__(self, config):
         self.targets = {}
         self.rnas = {}
+        self.is_genes = {}
+        self.species = {}
         try:
-            for screen, files in config.items():
-                self.targets[screen] = TargetResults(files["target_results"])
-                self.rnas[screen] = RNAResults(files["rna_counts"])
-        except KeyError:
-            raise VisprError("No results for screen {}".format(screen))
+            for screen, cfg in config.items():
+                self.targets[screen] = TargetResults(cfg["target_results"])
+                self.rnas[screen] = RNAResults(cfg["rna_counts"])
+                is_genes = cfg.get("genes", False)
+                self.is_genes[screen] = is_genes
+                if is_genes:
+                    self.species[screen] = cfg["species"]
+        except KeyError as e:
+            raise VisprError("No results for screen {}: {}".format(screen, e))
 
     @property
     def screens(self):

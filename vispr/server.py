@@ -23,6 +23,8 @@ def targets(selection):
         screens=app.results.screens,
         screen=get_screen(),
         selection=selection,
+        is_genes=app.results.is_genes[get_screen()],
+        species=app.results.species[get_screen()],
     )
 
 @app.route("/qc")
