@@ -72,7 +72,7 @@ var dt = $("#targets").dynatable({
 });
 
 dt.on("dynatable:afterUpdate", function() {
-{% if False %}
+{% if is_genes %}
     $("#targets tr td:first-child").each(function(idx, cell) {
         var target = $(cell).html();
         $(cell).html(
@@ -91,7 +91,7 @@ dt.on("dynatable:afterUpdate", function() {
     );
 
     $(".btn-plt-rnas").tooltip().click(function() {
-        var target = $(this).parent().parent().children(":first").html();
+        var target = $(this).parent().parent().children(":first").children(":first").html();
 
         d3.json("/tbl/rnas/" + target, function(error, data) {
             if (error) return console.warn(error);
@@ -119,7 +119,7 @@ dt.on("dynatable:afterUpdate", function() {
         });
     });
     $(".btn-show-pval").tooltip().click(function() {
-        var target = $(this).parent().parent().children(":first").html();
+        var target = $(this).parent().parent().children(":first").children(":first").html();
 
         d3.json("/idx/pvals/{{ selection }}/" + target, function(error, idx) {
             var item = plt_pval.model().scene().items[0].items[1].items[idx].items[0].items[0];
