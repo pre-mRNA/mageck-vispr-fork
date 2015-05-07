@@ -115,7 +115,9 @@ dt.on("dynatable:afterUpdate", function() {
               .render();
 
             plt.svg.selectAll("text").style("font-size", "10px");
-            $("#rna-plot svg :contains(sgRNA)").css("font-weight", "normal");
+            $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
+            $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
+            $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
         });
     });
     $(".btn-show-pval").tooltip().click(function() {

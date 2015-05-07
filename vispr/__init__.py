@@ -142,7 +142,8 @@ class TargetResults(AbstractResults):
 
 class RNAResults(AbstractResults):
     def by_target(self, target):
-        return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"]
+        first_sample = self.df.columns[2]
+        return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"].sort(first_sample)
 
     def plot_normalization(self):
         counts = self.counts
