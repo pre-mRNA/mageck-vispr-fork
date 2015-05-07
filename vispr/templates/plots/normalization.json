@@ -87,8 +87,8 @@
           "x2": {"scale": "x", "field": "data.hi"},
           "y": {"scale": "y", "field": "index", "offset": -5},
           "height": {"value": 10},
-          "fill": {"value": "white"},
-          "stroke": {"value": "black"}
+          "fill": {"value": "steelblue"},
+          "stroke": {"value": "transparent"}
         }
       }
     },

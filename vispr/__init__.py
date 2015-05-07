@@ -13,7 +13,9 @@ except ImportError:
 
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
 from flask import render_template
+
 import vincent
 from vincent.marks import MarkProperties, MarkRef, Mark
 from vincent.transforms import Transform
@@ -137,8 +139,7 @@ class RNAResults(AbstractResults):
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"]
 
     def plot_normalization(self):
-        counts = self.df.ix[:, 2:]
-        print(counts)
+        counts = self.counts
         data = pd.DataFrame({
             "label": counts.columns,
             "median": counts.median(),
@@ -147,6 +148,21 @@ class RNAResults(AbstractResults):
             "min":    counts.min(),
             "max":    counts.max(),
         })
-        print(data)
         height = data.shape[0] * 15
         return render_template("plots/normalization.json", data=data.to_json(orient="records"), height=height)
+
+    @property
+    def counts(self):
+        return self.df.ix[:, 2:]
+
+    def plot_pca(self):
+        counts = self.counts.transpose()
+        pca = PCA(n_components=3)
+        data = pd.DataFrame(pca.fit_transform(counts))
+        min_coeff = data.min().min()
+        max_coeff = data.max().max()
+        fields = ["PC{} ({:.0%})".format(i + 1, expl_var) for i, expl_var in enumerate(pca.explained_variance_ratio_)]
+        data.columns = fields
+        data["sample"] = counts.index
+        plt = render_template("plots/pca.json", data=data.to_json(orient="records"), fields=json.dumps(fields), min_coeff=min_coeff, max_coeff=max_coeff)
+        return plt

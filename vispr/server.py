@@ -25,9 +25,9 @@ def targets(selection):
         selection=selection,
     )
 
-@app.route("/qc/normalization")
-def normalization():
-    return render_template("normalization.html")
+@app.route("/qc")
+def qc():
+    return render_template("qc.html")
 
 
 @app.route("/plt/pvals/<selection>")
@@ -86,7 +86,12 @@ def tbl_rnas(target):
 @app.route("/plt/normalization")
 def plt_normalization():
     plt = app.results.rnas[get_screen()].plot_normalization()
-    print(plt)
+    return plt
+
+
+@app.route("/plt/pca")
+def plt_pca():
+    plt = app.results.rnas[get_screen()].plot_pca()
     return plt
 
 

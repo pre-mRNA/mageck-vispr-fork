@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4" style="min-width: 311px">
+        <div class="panel panel-default">
+            <div class="panel-heading">Normalized read count distributions</div>
+            <div id="normalization-plot" class="plot"></div>
+        </div>
+    </div>
+    <div class="col-md-8" style="min-width: 686px">
+        <div class="panel panel-default">
+            <div class="panel-heading">Principal component analysis</div>
+            <div id="pca-plot" class="plot"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+vg.parse.spec("/plt/normalization", function(chart) {
+    vega_draw(chart, "#normalization-plot");
+});
+vg.parse.spec("/plt/pca", function(chart) {
+    vega_draw(chart, "#pca-plot");
+});
+</script>
+{% endblock %}

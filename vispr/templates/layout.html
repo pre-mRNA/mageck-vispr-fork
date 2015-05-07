@@ -16,6 +16,13 @@
 
 <link rel="stylesheet" href="/static/style.css">
 
+<script>
+function vega_draw(chart, el) {
+    var plt = chart({el: el}).update();
+    return plt;
+}
+</script>
+
 </head>
 <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -52,12 +59,7 @@
 {% endfor %}
                 </ul>
             </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Quality Control <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a href="/qc/normalization">normalization</a></li>
-                </ul>
-            </li>
+            <li><a href="/qc">Quality Control</a></li>
           </ul>
         </div>
       </div>

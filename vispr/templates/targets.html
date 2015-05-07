@@ -23,10 +23,10 @@
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-5" style="min-width: 290px">
                             <div id="score-plot" class="plot"></div>
                         </div>
-                        <div class="col-md-7">
+                        <div class="col-md-7" style="min-width: 340px">
                             <div id="pval-hist-plot" class="plot"></div>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-heading" style="margin-bottom: 10px;">RNA counts</div>
-                    <div id="rna-plot" class="plot parcoords" style="width: 100%; height: 300px;"></div>
+                    <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
                 </div>
             </div>
         </div>
@@ -47,13 +47,12 @@
 <script>
 var plt_pval = null;
 vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
-    plt_pval = chart({el: "#score-plot"});
-    plt_pval.update();
+    plt_pval = vega_draw(chart, "#score-plot");
 });
 
 
 vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
-    chart({el: "#pval-hist-plot"}).update();
+    vega_draw(chart, "#pval-hist-plot");
 });
 
 
@@ -96,7 +95,7 @@ dt.on("dynatable:afterUpdate", function() {
 
             var plt = d3.parcoords()("#rna-plot")
               .data(data)
-              .margin({ top: 24, left: 150, bottom: 12, right: 0 })
+              .margin({ top: 24, left: 80, bottom: 12, right: 0 })
               .color(function(record) { return colors(record.sgRNA) })
               .render()
               .commonScale()
