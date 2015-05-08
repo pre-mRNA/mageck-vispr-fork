@@ -11,12 +11,25 @@
                     <th data-dynatable-column="lo.{{ selection[:3] }}">RRA-score</th>
                     <th data-dynatable-column="p.{{ selection[:3] }}">p-value</th>
                     <th data-dynatable-column="fdr.{{ selection[:3] }}">FDR</th>
-                    <th style="text-align: right;"></th>
+                    <th style="text-align: right;" data-dynatable-no-sort="true">
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
+                                Selection
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="selection-menu">
+                                {% if is_genes %}
+                                    <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                                {% endif %}
+                                <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+                            </ul>
+                        </div>
+                    </th>
                 <thead>
                 <tbody>
                 </tbody>
             </table>
-        </div>        
+        </div>
     </div>
     <div class="col-md-6">
         <div class="row">
@@ -45,16 +58,16 @@
 </div>
 
 <script>
+var selected = {};
+
 var plt_pval = null;
 vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
     plt_pval = vega_draw(chart, "#score-plot");
 });
 
-
 vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
     vega_draw(chart, "#pval-hist-plot");
 });
-
 
 var dt = $("#targets").dynatable({
     dataset: {
@@ -71,27 +84,36 @@ var dt = $("#targets").dynatable({
     }
 });
 
+// Perform actions when paging the table.
 dt.on("dynatable:afterUpdate", function() {
-{% if is_genes %}
-    $("#targets tr td:first-child").each(function(idx, cell) {
-        var target = $(cell).html();
+    {% if is_genes %}
+        $("#targets tr td:first-child").each(function(idx, cell) {
+            var target = $(cell).html();
+            $(cell).html(
+                '<a target="_blank" href="http://www.ensembl.org/{{ species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
+            );
+        });
+    {% endif %}
+
+    $("#targets tr td:last-child").each(function(idx, cell) {
+        var target = $(cell).parent().children(":first").children(":first").html();
+        console.log(target);
         $(cell).html(
-            '<a target="_blank" href="http://www.ensembl.org/{{ species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
+            '<div class="btn-group" role="group" aria-label="...">' +
+            '<button type="button" class="btn btn-default btn-plt-rnas" name="' + target + '">RNA counts</button>' +
+            '<button type="button" class="btn btn-default btn-select-target" name="' + target + '">Select</button>' +
+            '</div>'
         );
     });
-{% endif %}
 
-    $("#targets tr td:last-child").html(
-        '<a href="#" class="btn-plt-rnas" data-toggle="tooltip" data-placement="top" title="Display RNA counts.">\
-            <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>\
-        </a>&nbsp;\
-        <a href="#" class="btn-show-pval" data-toggle="tooltip" data-placement="top" title="Highlight p-value in distribution.">\
-            <span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span>\
-        </a>'
-    );
 
+    // Display parallel coordinates plot of RNA counts.
     $(".btn-plt-rnas").tooltip().click(function() {
-        var target = $(this).parent().parent().children(":first").children(":first").html();
+        var target = $(this).attr("name");
+        console.log(target);
+
+        $(".btn-plt-rnas").removeClass("active");
+        $(this).addClass("active");
 
         d3.json("/tbl/rnas/" + target, function(error, data) {
             if (error) return console.warn(error);
@@ -99,7 +121,6 @@ dt.on("dynatable:afterUpdate", function() {
 
             var names = data.map(function(rec) { return rec.sgRNA });
             var samples = d3.keys(data[0]);
-            console.log(samples);
             var colors = d3.scale.category10().domain(names);
 
             var plt = d3.parcoords()("#rna-plot")
@@ -120,16 +141,43 @@ dt.on("dynatable:afterUpdate", function() {
             $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
         });
     });
-    $(".btn-show-pval").tooltip().click(function() {
-        var target = $(this).parent().parent().children(":first").children(":first").html();
 
-        d3.json("/idx/pvals/{{ selection }}/" + target, function(error, idx) {
-            var item = plt_pval.model().scene().items[0].items[1].items[idx].items[0].items[0];
-            console.log(idx);
-            plt_pval.update();
-            plt_pval.update({props:"hover", items: item});
-        });
+    // Display gene in hockey stick and update "selected".
+    $(".btn-select-target").tooltip().click(function() {
+        var target = $(this).attr("name"); //$(this).parent().parent().children(":first").children(":first").html();
+
+        if(!$(this).hasClass("active")) {
+            $(this).addClass("active");
+            selected[target] = true;
+            d3.json("/idx/pvals/{{ selection }}/" + target, function(error, idx) {
+                var item = plt_pval.model().scene().items[0].items[1].items[idx].items[0].items[0];
+                plt_pval.update();
+                plt_pval.update({props:"hover", items: item});
+            });
+        }
+        else {
+            $(this).removeClass("active");
+            delete selected[target];
+        }
     });
+});
+
+// Show selected genes in GeneMANIA.
+$("#btn-genemania").click(function() {
+    var url = "http://genemania.org/link?o=human&g=";
+    var genes = [];
+    for(gene in selected) {
+        genes.push(gene);
+    }
+    window.open(encodeURI(url + genes.join("|")), '_blank');
+});
+
+// Deselect all genes.
+$("#btn-deselect").click(function() {
+    for(target in selected) {
+        delete selected[target];
+    }
+    $(".btn-select-target").removeClass("active");
 });
 
 </script>
