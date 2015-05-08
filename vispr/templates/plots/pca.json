@@ -1,0 +1,187 @@
+{
+  "width": 600,
+  "height": 600,
+  "data": [
+    {
+      "name": "pca",
+      "values": {{ data }}
+    },
+    {
+      "name": "fields",
+      "values": {{ fields }}
+    }
+  ],
+  "scales": [
+    {
+      "name": "gx",
+      "type": "ordinal",
+      "range": "width",
+      "round": true,
+      "domain": {
+        "data": "fields",
+        "field": "data"
+      }
+    },
+    {
+      "name": "gy",
+      "type": "ordinal",
+      "range": "height",
+      "round": true,
+      "domain": {
+        "data": "fields",
+        "field": "data"
+      }
+    },
+    {
+      "name": "c",
+      "type": "ordinal",
+      "domain": {
+        "data": "pca",
+        "field": "data.sample"
+      },
+      "range": "category20"
+    }
+  ],
+  "legends": [
+    {
+      "fill": "c",
+      "title": "Samples",
+      "offset": 10,
+      "properties": {
+        "symbols": {
+          "stroke": {
+            "value": "transparent"
+          }
+        }
+      }
+    }
+  ],
+  "marks": [
+    {
+      "type": "group",
+      "from": {
+        "data": "fields",
+        "transform": [
+          {
+            "type": "cross",
+            "diagonal": false
+          }
+        ]
+      },
+      "properties": {
+        "enter": {
+          "x": {
+            "scale": "gx",
+            "field": "a.data"
+          },
+          "y": {
+            "scale": "gy",
+            "field": "b.data"
+          },
+          "width": {
+            "scale": "gx",
+            "band": true,
+            "offset": -70
+          },
+          "height": {
+            "scale": "gy",
+            "band": true,
+            "offset": -70
+          }
+        }
+      },
+      "scales": [
+        {
+          "name": "x",
+          "range": "width",
+          "nice": true,
+          "domain": [{{ min_coeff }}, {{ max_coeff }}]
+        },
+        {
+          "name": "y",
+          "range": "height",
+          "nice": true,
+          "domain": [{{ min_coeff }}, {{ max_coeff }}]
+        }
+      ],
+      "axes": [
+        {
+          "type": "x",
+          "scale": "x",
+          "ticks": 3
+        },
+        {
+          "type": "y",
+          "scale": "y",
+          "ticks": 3
+        }
+      ],
+      "marks": [
+        {
+          "type": "symbol",
+          "from": {
+            "data": "pca"
+          },
+          "properties": {
+            "enter": {
+              "x": {
+                "scale": "x",
+                "field": {
+                  "group": "a.data"
+                }
+              },
+              "y": {
+                "scale": "y",
+                "field": {
+                  "group": "b.data"
+                }
+              },
+              "fill": {
+                "scale": "c",
+                "field": "data.sample"
+              },
+              "stroke": {
+                "value": "transparent"
+              }
+            },
+            "update": {
+              "size": {
+                "value": 36
+              }
+            },
+            "hover": {
+              "size": {
+                "value": 100
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "from": {
+        "data": "fields"
+      },
+      "properties": {
+        "enter": {
+          "x": {
+            "scale": "gx",
+            "field": "data",
+            "offset": 25
+          },
+          "y": {
+            "scale": "gy",
+            "field": "data",
+            "offset": 65
+          },
+          "text": {
+            "field": "data"
+          },
+          "baseline": {"value": "middle"},
+          "fill": {"value": "#000"}
+        }
+      }
+    }
+  ]
+}

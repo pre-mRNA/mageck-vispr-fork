@@ -157,14 +157,16 @@ dt.on("dynatable:afterUpdate", function() {
               .brushMode("1D-axes")
               .reorderable()
               .commonScale()
+              .interactive()
               .render();
-            /*if(sample_order) {
+
+            if(sample_order != null) {
                 plt_rna.dimensions(sample_order);
             }
-            sample_order = plt_rna.dimensions();
+
             plt_rna.on("render", function() {
                 sample_order = plt_rna.dimensions();
-            });*/
+            });
 
             plt_rna.svg.selectAll("text").style("font-size", "10px");
             $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
