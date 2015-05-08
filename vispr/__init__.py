@@ -108,11 +108,13 @@ class TargetResults(AbstractResults):
     def plot_pval_hist(self, positive=True):
         data = self.get_pvals(positive=positive)
         edges = np.arange(0, 1.1, 0.1)
-        hist, _ = np.histogram(data.ix[:, 1], bins=edges)
-        x = (edges[:-1] + edges[1:]) / 2
-        x = np.round(x, 2)
+        counts, _ = np.histogram(data.ix[:, 1], bins=edges)
+        bins = (edges[:-1] + edges[1:]) / 2
+        bins = np.round(bins, 2)
 
-        data = pd.DataFrame({"pval": x, "count": hist})
+        hist = pd.DataFrame({"bin": bins, "count": counts})
+        return render_template("plots/pval_hist.json", hist=hist.to_json(orient="records"))
+
         plt = vincent.Bar(data, width=270, height=200, key_on="pval")
         plt.axis_titles(x="p-value", y="count")
         plt.axes[1].title_offset = 50

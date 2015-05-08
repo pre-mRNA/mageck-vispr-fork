@@ -15,7 +15,7 @@ package manager.
 
 Then, open a terminal in this directory and execute
 
-    conda install --file conda.txt
+    conda install --file requirements.txt
 
 to install all required packages.
 Install VISPR with

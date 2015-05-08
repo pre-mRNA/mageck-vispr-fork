@@ -47,7 +47,8 @@ def idx_pvals(selection, target):
 
 @app.route("/plt/pvalhist/<selection>")
 def plt_pval_hist(selection):
-    plt = app.results.targets[get_screen()].plot_pval_hist(positive=selection == "positive").to_json()
+    plt = app.results.targets[get_screen()].plot_pval_hist(positive=selection == "positive")
+    print(plt)
     return plt
 
 
