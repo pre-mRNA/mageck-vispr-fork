@@ -16,12 +16,6 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from flask import render_template
 
-import vincent
-from vincent.marks import MarkProperties, MarkRef, Mark
-from vincent.transforms import Transform
-from vincent.properties import PropertySet
-from vincent.values import ValueRef
-
 from vispr.version import __version__
 
 
@@ -114,14 +108,6 @@ class TargetResults(AbstractResults):
 
         hist = pd.DataFrame({"bin": bins, "count": counts})
         return render_template("plots/pval_hist.json", hist=hist.to_json(orient="records"))
-
-        plt = vincent.Bar(data, width=270, height=200, key_on="pval")
-        plt.axis_titles(x="p-value", y="count")
-        plt.axes[1].title_offset = 50
-        plt.axes[0].ticks = 5
-        plt.axes[0].offset = 3
-        plt.axes[1].offset = 3
-        return plt
 
     def get_pvals_idx(self, target, positive=True):
         data, _ = self.get_pvals(positive=positive)
