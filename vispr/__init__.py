@@ -74,7 +74,7 @@ class TargetResults(AbstractResults):
         col = "p.{}".format("pos" if positive else "neg")
         pvals = -np.log10(self.df[[col]])
         data = pd.concat([self.df[["id"]], pvals], axis=1).sort(col, ascending=False).reset_index(drop=True)
-        return data, col
+        return data
 
     def plot_pvals(self, positive=True):
         """
@@ -83,44 +83,32 @@ class TargetResults(AbstractResults):
         Arguments
         positive -- if true, plot positive selection scores, else negative selection
         """
-        data, col = self.get_pvals(positive=positive)
+        data = self.get_pvals(positive=positive)
 
-        # create plot
-        plt = vincent.Line(data, columns=[col], width=230, height=200)
+        pvals = pd.DataFrame({
+            "idx":  data.index,
+            "pval": data.ix[:, 1]
+        })
 
-        # Circles for each data point
-        from_ = MarkRef(
-            data='table',
-            transform=[Transform(type='facet', keys=['data.idx'])])
-        enter_props = PropertySet(
-            x=ValueRef(scale='x', field="data.idx"),
-            y=ValueRef(scale='y', field="data.val"),
-            size=ValueRef(value=100),
-            opacity=ValueRef(value=0),
-            fill=ValueRef(scale="color", field='data.idx'))
-        update_props = PropertySet(
-            opacity=ValueRef(value=0)
-        )
-        hover_props = PropertySet(
-            opacity=ValueRef(value=1)
-        )
-        marks = [Mark(type='symbol',
-                      properties=MarkProperties(enter=enter_props, update=update_props, hover=hover_props))]
-        mark_group = Mark(type='group', from_=from_, marks=marks)
-        plt.marks.append(mark_group)
+        return render_template("plots/pvals.json", pvals=pvals.to_json(orient="records"))
 
-        # format plot
-        plt.axes[0].ticks = 1
-        plt.axes[0].offset = 3
-        plt.axes[1].offset = 3
-        plt.axis_titles(x="Targets", y="-log10 p-value")
+    def get_pvals_highlight(self, highlight_targets, positive=True):
+        pvals = self.get_pvals(positive=positive)
 
-        return plt
+        pvals = pd.DataFrame({
+            "idx": pvals.index,
+            "pval": pvals.ix[:, 1],
+            "label": pvals["id"]
+        })
+        pvals.index = pvals["label"]
+        pvals = pvals.ix[highlight_targets]
+
+        return pvals
 
     def plot_pval_hist(self, positive=True):
-        data, col = self.get_pvals(positive=positive)
+        data = self.get_pvals(positive=positive)
         edges = np.arange(0, 1.1, 0.1)
-        hist, _ = np.histogram(data[col], bins=edges)
+        hist, _ = np.histogram(data.ix[:, 1], bins=edges)
         x = (edges[:-1] + edges[1:]) / 2
         x = np.round(x, 2)
 

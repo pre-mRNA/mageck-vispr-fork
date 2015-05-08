@@ -35,7 +35,9 @@ def qc():
 
 @app.route("/plt/pvals/<selection>")
 def plt_pvals(selection):
-    return app.results.targets[get_screen()].plot_pvals(positive=selection == "positive").to_json()
+    plt = app.results.targets[get_screen()].plot_pvals(positive=selection == "positive")
+    print(plt)
+    return plt
 
 
 @app.route("/idx/pvals/<selection>/<target>")
@@ -79,6 +81,13 @@ def tbl_targets(selection):
         filter_count=filter_count,
         total_count=total_count,
     )
+
+
+@app.route("/tbl/pvals_highlight/<selection>/<targets>")
+def tbl_pvals_highlight(selection, targets):
+    targets = targets.split("|")
+    records = app.results.targets[get_screen()].get_pvals_highlight(targets, positive=selection == "positive")
+    return records.to_json(orient="records")
 
 
 @app.route("/tbl/rnas/<target>")
