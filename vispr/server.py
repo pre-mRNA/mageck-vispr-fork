@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 
 import re, json
 
+import numpy as np
 from flask import Flask, render_template, request, session
 
 app = Flask(__name__)
@@ -64,6 +65,13 @@ def tbl_targets(selection):
     else:
         records = records.sort("p.pos" if selection == "positive" else "p.neg")
     records = records[offset:offset + perpage]
+
+    def fmt_col(col):
+        if col.dtype == np.float64:
+            return col.apply("{:.2g}".format)
+        return col
+
+    records = records.apply(fmt_col)
 
     return render_template(
         "dyntable.json",

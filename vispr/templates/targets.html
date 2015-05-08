@@ -17,7 +17,7 @@
                                 Selection
                                 <span class="caret"></span>
                             </button>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="selection-menu">
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
                                 {% if is_genes %}
                                     <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
                                 {% endif %}
@@ -158,6 +158,7 @@ dt.on("dynatable:afterUpdate", function() {
         else {
             $(this).removeClass("active");
             delete selected[target];
+            $(this).blur();
         }
     });
 });
