@@ -1,13 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-md-4" style="min-width: 311px">
-        <div class="panel panel-default">
-            <div class="panel-heading">Normalized read count distributions</div>
-            <div id="normalization-plot" class="plot"></div>
+    <div class="col-md-5" style="min-width: 500px">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Normalized read count distributions</div>
+                    <div id="normalization-plot" class="plot"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Sample correlation</div>
+                    <div id="corr-plot" class="plot"></div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-8" style="min-width: 686px">
+    <div class="col-md-7" style="min-width: 686px">
         <div class="panel panel-default">
             <div class="panel-heading">Principal component analysis</div>
             <div id="pca-plot" class="plot"></div>
@@ -21,6 +33,9 @@ vg.parse.spec("/plt/normalization", function(chart) {
 });
 vg.parse.spec("/plt/pca", function(chart) {
     vega_draw(chart, "#pca-plot");
+});
+vg.parse.spec("/plt/correlation", function(chart) {
+    vega_draw(chart, "#corr-plot");
 });
 </script>
 {% endblock %}

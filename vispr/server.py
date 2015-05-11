@@ -109,6 +109,12 @@ def plt_pca():
     plt = app.results.rnas[get_screen()].plot_pca()
     return plt
 
+@app.route("/plt/correlation")
+def plt_correlation():
+    plt = app.results.rnas[get_screen()].plot_correlation()
+    return plt
+
+
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
     cols, ascending = [], []

@@ -189,6 +189,7 @@ dt.on("dynatable:afterUpdate", function() {
             $(this).removeClass("active");
             delete selected[target];
             $(this).blur();
+            update_pval_highlights();
         }
     });
 

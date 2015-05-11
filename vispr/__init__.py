@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, print_function
 
 import json
+from itertools import product
 try:
     from functools import lru_cache
 except ImportError:
@@ -14,6 +15,8 @@ except ImportError:
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from scipy.cluster.hierarchy import complete, leaves_list
+from scipy.spatial.distance import pdist, squareform
 from flask import render_template
 
 from vispr.version import __version__
@@ -122,9 +125,9 @@ class RNAResults(AbstractResults):
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"].sort(first_sample)
 
     def plot_normalization(self):
-        counts = self.counts
+        counts = self.counts()
         data = pd.DataFrame({
-            "label": counts.columns,
+            "label":  counts.columns,
             "median": counts.median(),
             "lo":     counts.quantile(0.25),
             "hi":     counts.quantile(0.75),
@@ -134,12 +137,11 @@ class RNAResults(AbstractResults):
         height = data.shape[0] * 15
         return render_template("plots/normalization.json", data=data.to_json(orient="records"), height=height)
 
-    @property
     def counts(self):
         return self.df.ix[:, 2:]
 
     def plot_pca(self):
-        counts = self.counts.transpose()
+        counts = self.counts().transpose()
         pca = PCA(n_components=3)
         data = pd.DataFrame(pca.fit_transform(counts))
         min_coeff = data.min().min()
@@ -148,4 +150,26 @@ class RNAResults(AbstractResults):
         data.columns = fields
         data["sample"] = counts.index
         plt = render_template("plots/pca.json", data=data.to_json(orient="records"), fields=json.dumps(fields), min_coeff=min_coeff, max_coeff=max_coeff)
+        return plt
+
+    def plot_correlation(self):
+        counts = self.counts().transpose()
+        # calculate correlation
+        corr = 1 - pdist(counts, 'correlation')
+        # calculate distance from absolute correlation
+        dist = 1 - np.abs(corr)
+        # cluster
+        clustering = complete(dist)
+        leaves = leaves_list(clustering)
+
+        # calculate correlation matrix
+        corr = np.round(squareform(corr), 2)
+        # fix diagonal, that will contain zeros because squareform expects a dist
+        np.fill_diagonal(corr, 1)
+        labels = counts.index.values
+
+        # convert to json records
+        data = [{"a": labels[i], "b": labels[j], "value": corr[i, j]} for i in leaves for j in leaves]
+
+        plt = render_template("plots/correlation.json", data=json.dumps(data))
         return plt
