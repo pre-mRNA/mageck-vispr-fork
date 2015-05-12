@@ -1,6 +1,6 @@
 {
-  "width": 300,
-  "height": {{ height }},
+  "width": {{ width }},
+  "height": 150,
   "data": [
     {
       "name": "counts",
@@ -9,34 +9,40 @@
   ],
   "scales": [
     {
-      "name": "y",
+      "name": "x",
       "type": "ordinal",
-      "range": "height",
+      "range": "width",
       "domain": {"data": "counts", "field": "index"}
     },
     {
-      "name": "yl",
+      "name": "xl",
       "type": "ordinal",
-      "range": "height",
+      "range": "width",
       "domain": {"data": "counts", "field": "data.label"}
     },
     {
-      "name": "x",
+      "name": "y",
       "type": "linear",
-      "range": "width",
+      "range": "height",
+      "ticks": 5,
       "nice": true,
       "domain": {"data": "counts", "field": "data.max"}
     }
   ],
   "axes": [
-    {"type": "x", "scale": "x", "ticks": 6, "offset": 5, "title": "log10 counts"},
+    {"type": "y", "scale": "y", "ticks": 6, "offset": 5, "title": "log10 counts"},
     {
-        "type": "y",
-        "scale": "yl",
+        "type": "x",
+        "scale": "xl",
         "offset": 5,
         "properties": {
             "axis": { "stroke": { "value": "transparent" } },
-            "ticks": { "stroke": { "value": "transparent" } }
+            "ticks": { "stroke": { "value": "transparent" } },
+            "labels": {
+              "angle": { "value": 45 },
+              "baseline": { "value": "middle" },
+              "align": {"value": "left"}
+            }
         }
     }
   ],
@@ -46,9 +52,22 @@
       "from": {"data": "counts"},
       "properties": {
         "enter": {
-          "x": {"scale": "x", "field": "data.min"},
-          "x2": {"scale": "x", "field": "data.max"},
-          "y": {"scale": "y", "field": "index", "offset": 6},
+          "y": {"scale": "y", "field": "data.min"},
+          "y2": {"scale": "y", "field": "data.max"},
+          "x": {"scale": "x", "field": "index", "offset": 10},
+          "width": {"value": 1},
+          "fill": {"value": "black"}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "properties": {
+        "enter": {
+          "y": {"scale": "y", "field": "data.min"},
+          "x": {"scale": "x", "field": "index", "offset": 9},
+          "width": {"value": 3},
           "height": {"value": 1},
           "fill": {"value": "black"}
         }
@@ -59,23 +78,10 @@
       "from": {"data": "counts"},
       "properties": {
         "enter": {
-          "x": {"scale": "x", "field": "data.min"},
-          "y": {"scale": "y", "field": "index", "offset": 5},
-          "height": {"value": 3},
-          "width": {"value": 1},
-          "fill": {"value": "black"}
-        }
-      }
-    },
-    {
-      "type": "rect",
-      "from": {"data": "counts"},
-      "properties": {
-        "enter": {
-          "x": {"scale": "x", "field": "data.max"},
-          "y": {"scale": "y", "field": "index", "offset": 5},
-          "height": {"value": 3},
-          "width": {"value": 1},
+          "y": {"scale": "y", "field": "data.max"},
+          "x": {"scale": "x", "field": "index", "offset": 9},
+          "width": {"value": 3},
+          "height": {"value": 1},
           "fill": {"value": "black"}
         }
       }
@@ -87,10 +93,10 @@
       },
       "properties": {
         "enter": {
-          "x": {"scale": "x", "field": "data.lo"},
-          "x2": {"scale": "x", "field": "data.hi"},
-          "y": {"scale": "y", "field": "index", "offset": 0},
-          "height": {"scale": "y", "band": true, "offset": -1},
+          "y": {"scale": "y", "field": "data.lo"},
+          "y2": {"scale": "y", "field": "data.hi"},
+          "x": {"scale": "x", "field": "index", "offset": 0},
+          "width": {"scale": "x", "band": true, "offset": -1},
           "fill": {"value": "steelblue"},
           "stroke": {"value": "transparent"}
         }
@@ -101,10 +107,10 @@
       "from": {"data": "counts"},
       "properties": {
         "enter": {
-          "x": {"scale": "x", "field": "data.median"},
-          "width": {"value": 1},
-          "y": {"scale": "y", "field": "index", "offset": 0},
-          "height": {"scale": "y", "band": true, "offset": -1},
+          "y": {"scale": "y", "field": "data.median"},
+          "height": {"value": 1},
+          "x": {"scale": "x", "field": "index", "offset": 0},
+          "width": {"scale": "x", "band": true, "offset": -1},
           "fill": {"value": "black"}
         }
       }

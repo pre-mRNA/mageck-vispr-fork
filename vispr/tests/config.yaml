@@ -1,5 +1,5 @@
-leukemia:
-  target_results: gene_summary.txt
-  rna_counts: normalized.txt
-  species: human
-  genes: true
+experiment: leukemia
+target_results: gene_summary.txt
+rna_counts: normalized.txt
+species: human
+genes: true

@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function
 
+import os
 import json
 from itertools import product
 try:
@@ -27,21 +28,22 @@ class VisprError(Exception):
 
 
 class Results:
-    def __init__(self, config):
+    def __init__(self):
         self.targets = {}
         self.rnas = {}
         self.is_genes = {}
         self.species = {}
-        try:
-            for screen, cfg in config.items():
-                self.targets[screen] = TargetResults(cfg["target_results"])
-                self.rnas[screen] = RNAResults(cfg["rna_counts"])
-                is_genes = cfg.get("genes", False)
-                self.is_genes[screen] = is_genes
-                if is_genes:
-                    self.species[screen] = cfg["species"]
-        except KeyError as e:
-            raise VisprError("No results for screen {}: {}".format(screen, e))
+
+    def add(self, config, parentdir="."):
+        def get_path(key):
+            return os.path.join(parentdir, config[key])
+        screen = config["experiment"]
+        self.targets[screen] = TargetResults(get_path("target_results"))
+        self.rnas[screen] = RNAResults(get_path("rna_counts"))
+        is_genes = config.get("genes", False)
+        self.is_genes[screen] = is_genes
+        if is_genes:
+            self.species[screen] = config["species"]
 
     @property
     def screens(self):
@@ -133,8 +135,8 @@ class RNAResults(AbstractResults):
             "min":    counts.min(),
             "max":    counts.max(),
         })
-        height = data.shape[0] * 15
-        return render_template("plots/normalization.json", data=data.to_json(orient="records"), height=height)
+        width = 20 * counts.shape[1]
+        return render_template("plots/normalization.json", data=data.to_json(orient="records"), width=width)
 
     def counts(self):
         return self.df.ix[:, 2:]

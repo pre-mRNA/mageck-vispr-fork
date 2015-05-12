@@ -30,7 +30,7 @@ def targets(selection):
 
 @app.route("/qc")
 def qc():
-    return render_template("qc.html")
+    return render_template("qc.html", screens=app.results.screens, screen=get_screen())
 
 
 @app.route("/plt/pvals/<selection>")
