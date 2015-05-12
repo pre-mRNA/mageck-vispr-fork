@@ -70,9 +70,10 @@ class TargetResults(AbstractResults):
     @lru_cache()
     def get_pvals(self, positive=True):
         # select column and sort
-        col = "p.{}".format("pos" if positive else "neg")
-        pvals = -np.log10(self.df[[col]])
-        data = pd.concat([self.df[["id"]], pvals], axis=1).sort(col, ascending=False).reset_index(drop=True)
+        col = "pos" if positive else "neg"
+        pvals = -np.log10(self.df[["p." + col]])
+        fdr = self.df[["fdr." + col]]
+        data = pd.concat([self.df[["id"]], pvals, fdr], axis=1).sort("p." + col, ascending=False).reset_index(drop=True)
         return data
 
     def plot_pvals(self, positive=True):
@@ -86,7 +87,8 @@ class TargetResults(AbstractResults):
 
         pvals = pd.DataFrame({
             "idx":  data.index,
-            "pval": data.ix[:, 1]
+            "pval": data.ix[:, 1],
+            "fdr": data.ix[:, 2]
         })
 
         return render_template("plots/pvals.json", pvals=pvals.to_json(orient="records"))
