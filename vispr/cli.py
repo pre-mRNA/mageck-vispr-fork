@@ -55,4 +55,11 @@ def main():
     except VisprError as e:
         logging.error(e)
         exit(1)
+    except ImportError as e:
+        print(
+            "{}. Please ensure that all depencies from "
+            "requirements.txt are installed.".format(e),
+            file=sys.stderr
+        )
+        exit(1)
     exit(0)
