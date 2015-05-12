@@ -1,0 +1,129 @@
+{
+  "width": 500,
+  "height": 430,
+  "padding": "strict",
+  "data": [
+    {
+      "name": "correlation",
+      "values": {{ data }}
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "ordinal",
+      "range": "width",
+      "domain": {
+        "data": "correlation",
+        "field": "data.a"
+      }
+    },
+    {
+      "name": "y",
+      "type": "ordinal",
+      "range": "height",
+      "domain": {
+        "data": "correlation",
+        "field": "data.b"
+      }
+    },
+    {
+      "name": "c",
+      "type": "linear",
+      "range": ["white", "steelblue"],
+      "domain": {
+        "data": "correlation",
+        "field": "data.value"
+      }
+    }
+  ],
+  "legends": [
+    {
+      "fill": "c",
+      "orient": "left",
+      "title": "correlation",
+      "properties": {
+        "gradient": {
+          "stroke": {"value": "transparent"},
+          "width": {"value": 50}
+        }
+      }
+    }
+  ],
+  "axes": [
+    {
+      "type": "x",
+      "scale": "x",
+      "orient": "bottom",
+      "properties": {
+        "axis": { "stroke": { "value": "transparent" } },
+        "ticks": { "stroke": { "value": "transparent" } },
+        "labels": {
+          "angle": { "value": 45 },
+          "baseline": { "value": "middle" },
+          "align": {"value": "left"}
+        }
+      }
+    },
+    {
+      "type": "y",
+      "scale": "y",
+      "orient": "right",
+      "properties": {
+        "axis": { "stroke": { "value": "transparent" } },
+        "ticks": { "stroke": { "value": "transparent" } }
+      }
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {
+        "data": "correlation"
+      },
+      "properties": {
+        "enter": {
+          "x": {
+            "scale": "x",
+            "field": "data.a"
+          },
+          "width": {
+            "scale": "x",
+            "band": true
+          },
+          "y": {
+            "scale": "y",
+            "field": "data.b"
+          },
+          "height": {
+            "scale": "y",
+            "band": true
+          },
+          "fill": {
+            "scale": "c",
+            "field": "data.value"
+          },
+          "stroke": {
+            "value": "transparent"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "correlation"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "data.a"},
+          "dx": {"scale": "x", "band": true, "mult": 0.5},
+          "y": {"scale": "y", "field": "data.b"},
+          "dy": {"scale": "y", "band": true, "mult": 0.5},
+          "align": {"value": "center"},
+          "baseline": {"value": "middle"},
+          "fill": {"value": "#000"},
+          "text": {"field": "data.value"}
+        }
+      }
+    }
+  ]
+}
