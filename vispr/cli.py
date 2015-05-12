@@ -34,22 +34,20 @@ def main():
     args = parser.parse_args()
 
     logging.basicConfig(
-        format=" %(asctime)s: %(message)s",
+        format="%(message)s",
         level=logging.DEBUG if args.debug else logging.INFO,
         stream=sys.stderr,
     )
 
     try:
         if args.subcommand == "server":
-            with open(config) as f:
+            with open(args.config) as f:
                 config = yaml.load(f)
                 init_server(config)
         elif args.subcommand == "test":
             os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
             with open("config.yaml") as f:
                 config = yaml.load(f)
-                print("", file=sys.stderr)
-                print("Server starting. Please open http://localhost:5000 in your browser.", file=sys.stderr)
                 init_server(config)
         else:
             parser.print_help()

@@ -57,6 +57,21 @@ def tbl_targets(selection):
     total_count = records.shape[0]
     filter_count = total_count  # TODO add filtering
 
+    search = get_search()
+    if search:
+        filter = records["id"].str.contains(search)
+        if np.any(filter):
+            records = records[filter]
+            filter_count = records.shape[0]
+        else:
+            return render_template(
+                "dyntable.json",
+                records="[]",
+                filter_count=0,
+                total_count=total_count,
+            )
+
+
     columns, ascending = get_sorting()
     if columns:
         records = records.sort(columns, ascending=ascending)
@@ -124,6 +139,10 @@ def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
             cols.append(m.group("col"))
             ascending.append(int(val) == 1)
     return cols, ascending
+
+
+def get_search(pattern=re.compile("search\[(?P<target>.+)\]")):
+    return request.args.get("queries[search]", None)
 
 
 def get_screen():

@@ -15,30 +15,32 @@
       "domain": {"data": "counts", "field": "index"}
     },
     {
+      "name": "yl",
+      "type": "ordinal",
+      "range": "height",
+      "domain": {"data": "counts", "field": "data.label"}
+    },
+    {
       "name": "x",
-      "range": [100, 300],
+      "type": "linear",
+      "range": "width",
       "nice": true,
-      "zero": true,
       "domain": {"data": "counts", "field": "data.max"}
     }
   ],
   "axes": [
-    {"type": "x", "scale": "x", "ticks": 6}
+    {"type": "x", "scale": "x", "ticks": 6, "offset": 5, "title": "log10 counts"},
+    {
+        "type": "y",
+        "scale": "yl",
+        "offset": 5,
+        "properties": {
+            "axis": { "stroke": { "value": "transparent" } },
+            "ticks": { "stroke": { "value": "transparent" } }
+        }
+    }
   ],
   "marks": [
-    {
-      "type": "text",
-      "from": {"data": "counts"},
-      "properties": {
-        "enter": {
-          "x": {"value": 0},
-          "y": {"scale": "y", "field": "index"},
-          "baseline": {"value": "middle"},
-          "fill": {"value": "#000"},
-          "text": {"field": "data.label"}
-        }
-      }
-    },
     {
       "type": "rect",
       "from": {"data": "counts"},
@@ -46,7 +48,7 @@
         "enter": {
           "x": {"scale": "x", "field": "data.min"},
           "x2": {"scale": "x", "field": "data.max"},
-          "y": {"scale": "y", "field": "index", "offset": -1},
+          "y": {"scale": "y", "field": "index", "offset": 6},
           "height": {"value": 1},
           "fill": {"value": "black"}
         }
@@ -58,7 +60,7 @@
       "properties": {
         "enter": {
           "x": {"scale": "x", "field": "data.min"},
-          "y": {"scale": "y", "field": "index", "offset": -2},
+          "y": {"scale": "y", "field": "index", "offset": 5},
           "height": {"value": 3},
           "width": {"value": 1},
           "fill": {"value": "black"}
@@ -71,7 +73,7 @@
       "properties": {
         "enter": {
           "x": {"scale": "x", "field": "data.max"},
-          "y": {"scale": "y", "field": "index", "offset": -2},
+          "y": {"scale": "y", "field": "index", "offset": 5},
           "height": {"value": 3},
           "width": {"value": 1},
           "fill": {"value": "black"}
@@ -80,13 +82,15 @@
     },
     {
       "type": "rect",
-      "from": {"data": "counts"},
+      "from": {
+          "data": "counts"
+      },
       "properties": {
         "enter": {
           "x": {"scale": "x", "field": "data.lo"},
           "x2": {"scale": "x", "field": "data.hi"},
-          "y": {"scale": "y", "field": "index", "offset": -5},
-          "height": {"value": 10},
+          "y": {"scale": "y", "field": "index", "offset": 0},
+          "height": {"scale": "y", "band": true, "offset": -1},
           "fill": {"value": "steelblue"},
           "stroke": {"value": "transparent"}
         }
@@ -98,11 +102,10 @@
       "properties": {
         "enter": {
           "x": {"scale": "x", "field": "data.median"},
-          "x2": {"scale": "x", "field": "data.median"},
-          "y": {"scale": "y", "field": "index", "offset": -5},
-          "height": {"value": 10},
-          "fill": {"value": "white"},
-          "stroke": {"value": "black"}
+          "width": {"value": 1},
+          "y": {"scale": "y", "field": "index", "offset": 0},
+          "height": {"scale": "y", "band": true, "offset": -1},
+          "fill": {"value": "black"}
         }
       }
     }

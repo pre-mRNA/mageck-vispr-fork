@@ -148,9 +148,13 @@ dt.on("dynatable:afterUpdate", function() {
             var samples = d3.keys(data[0]);
             var colors = d3.scale.category10().domain(names);
 
-            plt_rna = d3.parcoords()("#rna-plot")
+            plt_rna = d3.parcoords(
+                {
+                    dimensionTitleRotation: 45,
+                }
+            )("#rna-plot")
               .data(data)
-              .margin({ top: 24, left: 80, bottom: 12, right: 0 })
+              .margin({ top: 50, left: 80, bottom: 12, right: 0 })
               .color(function(record) { return colors(record.sgRNA) })
               .render()
               .commonScale()

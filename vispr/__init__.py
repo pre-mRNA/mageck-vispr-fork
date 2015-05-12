@@ -106,8 +106,7 @@ class TargetResults(AbstractResults):
         data = self.get_pvals(positive=positive)
         edges = np.arange(0, 1.1, 0.1)
         counts, _ = np.histogram(data.ix[:, 1], bins=edges)
-        bins = (edges[:-1] + edges[1:]) / 2
-        bins = np.round(bins, 2)
+        bins = edges[1:]
 
         hist = pd.DataFrame({"bin": bins, "count": counts})
         return render_template("plots/pval_hist.json", hist=hist.to_json(orient="records"))
@@ -125,7 +124,7 @@ class RNAResults(AbstractResults):
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns != "Gene"].sort(first_sample)
 
     def plot_normalization(self):
-        counts = self.counts()
+        counts = np.log10(self.counts() + 1)
         data = pd.DataFrame({
             "label":  counts.columns,
             "median": counts.median(),
@@ -141,7 +140,7 @@ class RNAResults(AbstractResults):
         return self.df.ix[:, 2:]
 
     def plot_pca(self):
-        counts = self.counts().transpose()
+        counts = np.log10(self.counts().transpose() + 1)
         pca = PCA(n_components=3)
         data = pd.DataFrame(pca.fit_transform(counts))
         min_coeff = data.min().min()
@@ -153,7 +152,7 @@ class RNAResults(AbstractResults):
         return plt
 
     def plot_correlation(self):
-        counts = self.counts().transpose()
+        counts = np.log10(self.counts().transpose() + 1)
         # calculate correlation
         corr = 1 - pdist(counts, 'correlation')
         # calculate distance from absolute correlation

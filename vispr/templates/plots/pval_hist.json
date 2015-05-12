@@ -15,6 +15,12 @@
       "domain": {"data": "hist", "field": "data.bin"}
     },
     {
+      "name": "xl",
+      "type": "linear",
+      "range": "width",
+      "domain": {"data": "hist", "field": "data.bin"}
+    },
+    {
       "name": "y",
       "range": "height",
       "nice": true,
@@ -22,7 +28,19 @@
     }
   ],
   "axes": [
-    {"type": "x", "scale": "x", "title": "p-value", "offset": 5},
+    {
+        "type": "x",
+        "scale": "xl",
+        "title": "p-value",
+        "offset": 5,
+        "properties": {
+          "labels": {
+            "angle": { "value": 45 },
+            "baseline": { "value": "middle" },
+            "align": {"value": "left"}
+          }
+        }
+    },
     {"type": "y", "scale": "y", "title": "count", "offset": 5, "titleOffset": 50}
   ],
   "marks": [

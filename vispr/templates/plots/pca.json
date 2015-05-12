@@ -108,14 +108,16 @@
         {
           "type": "x",
           "scale": "x",
-          "ticks": 3,
-          "offset": 5
+          "ticks": 4,
+          "offset": 5,
+          "nice": true
         },
         {
           "type": "y",
           "scale": "y",
-          "ticks": 3,
-          "offset": 5
+          "ticks": 4,
+          "offset": 5,
+          "nice": true
         }
       ],
       "marks": [
