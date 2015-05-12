@@ -57,7 +57,7 @@ def main():
         exit(1)
     except ImportError as e:
         print(
-            "{}. Please ensure that all depencies from "
+            "{}. Please ensure that all dependencies from "
             "requirements.txt are installed.".format(e),
             file=sys.stderr
         )
