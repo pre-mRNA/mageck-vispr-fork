@@ -42,7 +42,7 @@ function vega_draw(chart, el) {
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Experiment <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
 {% for _screen in screens %}
-    {% set invisible = "invisible" if _screen != screen else "" %}
+    {% set invisible = "invisible" if _screen != screen.name else "" %}
                     <li>
                         <a href="/?screen={{ _screen }}">
                             <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen }}
@@ -50,7 +50,7 @@ function vega_draw(chart, el) {
                     </li>
 {% endfor %}
                 </ul>
-            </li>            
+            </li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Results <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">

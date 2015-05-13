@@ -10,32 +10,37 @@ import os
 
 import yaml
 
-from vispr import TargetResults, Results, VisprError
+from vispr import Screens, VisprError
 from vispr.server import app
 
 
 def init_server(*configs):
-    app.results = Results()
+    app.screens = Screens()
     for path in configs:
         with open(path) as f:
             config = yaml.load(f)
             try:
-                app.results.add(config)
+                app.screens.add(config, parentdir=os.path.dirname(path))
             except KeyError as e:
-                raise VisprError("Syntax error in config file {}. Missing key {}.".format(path, e))
+                raise VisprError(
+                    "Syntax error in config file {}. Missing key {}.".format(
+                        path, e))
     app.secret_key = ''.join(
-        random.choice(string.ascii_uppercase + string.digits) for _ in range(30)
-    )
-    print("Starting server. Please open http://127.0.0.1:5000 in your browser.", file=sys.stderr)
+        random.choice(string.ascii_uppercase + string.digits)
+        for _ in range(30))
+    print(
+        "Starting server. Please open http://127.0.0.1:5000 in your browser.",
+        file=sys.stderr)
     app.run()
 
 
 def main():
     # create arg parser
     parser = argparse.ArgumentParser(
-        "An HTML5-based interactive visualization of CRISPR/Cas9 screen data."
-    )
-    parser.add_argument("--debug", action="store_true", help="Print debug info.")
+        "An HTML5-based interactive visualization of CRISPR/Cas9 screen data.")
+    parser.add_argument("--debug",
+                        action="store_true",
+                        help="Print debug info.")
     subparsers = parser.add_subparsers(dest="subcommand")
 
     server = subparsers.add_parser("server")
@@ -43,18 +48,15 @@ def main():
         "config",
         nargs="+",
         help="YAML config files. Each file points to the results of one "
-             "MAGeCK test run."
-    )
+        "MAGeCK test run.")
 
     test = subparsers.add_parser("test")
 
     args = parser.parse_args()
 
-    logging.basicConfig(
-        format="%(message)s",
-        level=logging.DEBUG if args.debug else logging.INFO,
-        stream=sys.stderr,
-    )
+    logging.basicConfig(format="%(message)s",
+                        level=logging.DEBUG if args.debug else logging.INFO,
+                        stream=sys.stderr, )
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     try:
@@ -70,10 +72,8 @@ def main():
         logging.error(e)
         exit(1)
     except ImportError as e:
-        print(
-            "{}. Please ensure that all dependencies from "
-            "requirements.txt are installed.".format(e),
-            file=sys.stderr
-        )
+        print("{}. Please ensure that all dependencies from "
+              "requirements.txt are installed.".format(e),
+              file=sys.stderr)
         exit(1)
     exit(0)

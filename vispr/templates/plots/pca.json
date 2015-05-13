@@ -54,7 +54,8 @@
           "x": {"scale": "x", "field": "data.x"},
           "y": {"scale": "y", "field": "data.y"},
           "fill": {"scale": "c", "field": "data.label"},
-          "stroke": {"value": "transparent"}
+          "stroke": {"value": "transparent"},
+          "size": {"value": 50}
         }
       }
     }

@@ -18,7 +18,7 @@
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-                                {% if is_genes %}
+                                {% if screen.is_genes %}
                                     <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
                                 {% endif %}
                                 <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
@@ -36,14 +36,8 @@
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-heading" style="margin-bottom: 10px;">p-values</div>
-                    <div class="row">
-                        <div class="col-md-5" style="min-width: 290px">
-                            <div id="score-plot" class="plot"></div>
-                        </div>
-                        <div class="col-md-7" style="min-width: 340px">
-                            <div id="pval-hist-plot" class="plot"></div>
-                        </div>
-                    </div>
+                        <div id="score-plot" class="plot" style="display: inline-block"></div>
+                        <div id="pval-hist-plot" class="plot" style="display: inline-block"></div>
                 </div>
             </div>
         </div>
@@ -79,12 +73,19 @@ vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
 
 
 function update_pval_highlights() {
-    d3.json("/tbl/pvals_highlight/{{ selection }}/" + get_selected().join("|"), function(error, json) {
-        plt_pval.data(
-            { "highlight": json }
-        );
+    var selected = get_selected();
+    if(selected.length == 0) {
+        plt_pval.data({ "highlight": [] });
         plt_pval.update();
-    });
+    }
+    else {
+        d3.json("/tbl/pvals_highlight/{{ selection }}/" + selected.join("|"), function(error, json) {
+            plt_pval.data(
+                { "highlight": json }
+            );
+            plt_pval.update();
+        });
+    }
 }
 
 function clear_pval_highlights() {
@@ -113,11 +114,11 @@ var dt = $("#targets").dynatable({
 
 // Perform actions when paging the table.
 dt.on("dynatable:afterUpdate", function() {
-    {% if is_genes %}
+    {% if screen.is_genes %}
         $("#targets tr td:first-child").each(function(idx, cell) {
             var target = $(cell).html();
             $(cell).html(
-                '<a target="_blank" href="http://www.ensembl.org/{{ species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
+                '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
             );
         });
     {% endif %}
@@ -196,6 +197,10 @@ dt.on("dynatable:afterUpdate", function() {
             update_pval_highlights();
         }
     });
+
+    for(target in selected) {
+        $("button[name=" + target + "]").addClass("active");
+    }
 
     $(".btn-plt-rnas:first").click();
 });

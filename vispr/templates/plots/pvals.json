@@ -57,7 +57,8 @@
           "x": {"scale": "x", "field": "data.idx"},
           "y": {"scale": "y", "field": "data.pval"},
           "fill": {"scale": "c", "field": "data.label"},
-          "stroke": {"value": "transparent"}
+          "stroke": {"value": "transparent"},
+          "size": {"value": 50}
         }
       }
     }

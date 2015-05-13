@@ -14,36 +14,33 @@ def index():
     screen = request.args.get("screen")
     if screen:
         session["screen"] = screen
-    return render_template("index.html", screens=app.results.screens, screen=get_screen())
+    return render_template("index.html",
+                           screens=app.screens,
+                           screen=get_screen())
 
 
 @app.route("/targets/<selection>")
 def targets(selection):
-    return render_template(
-        "targets.html",
-        screens=app.results.screens,
-        screen=get_screen(),
-        selection=selection,
-        is_genes=app.results.is_genes[get_screen()],
-        species=app.results.species[get_screen()],
-    )
+    return render_template("targets.html",
+                           screens=app.screens,
+                           selection=selection,
+                           screen=get_screen())
+
 
 @app.route("/qc")
 def qc():
-    return render_template("qc.html", screens=app.results.screens, screen=get_screen())
+    return render_template("qc.html", screens=app.screens, screen=get_screen())
 
 
 @app.route("/plt/pvals/<selection>")
 def plt_pvals(selection):
-    plt = app.results.targets[get_screen()].plot_pvals(positive=selection == "positive")
-    print(plt)
+    plt = get_screen().targets.plot_pvals(positive=selection == "positive")
     return plt
 
 
 @app.route("/plt/pvalhist/<selection>")
 def plt_pval_hist(selection):
-    plt = app.results.targets[get_screen()].plot_pval_hist(positive=selection == "positive")
-    print(plt)
+    plt = get_screen().targets.plot_pval_hist(positive=selection == "positive")
     return plt
 
 
@@ -53,7 +50,7 @@ def tbl_targets(selection):
     perpage = int(request.args.get("perPage", 20))
 
     # sort and slice records
-    records = app.results.targets[get_screen()][:]
+    records = get_screen().targets[:]
     total_count = records.shape[0]
     filter_count = total_count  # TODO add filtering
 
@@ -64,13 +61,10 @@ def tbl_targets(selection):
             records = records[filter]
             filter_count = records.shape[0]
         else:
-            return render_template(
-                "dyntable.json",
-                records="[]",
-                filter_count=0,
-                total_count=total_count,
-            )
-
+            return render_template("dyntable.json",
+                                   records="[]",
+                                   filter_count=0,
+                                   total_count=total_count, )
 
     columns, ascending = get_sorting()
     if columns:
@@ -86,53 +80,47 @@ def tbl_targets(selection):
 
     records = records.apply(fmt_col)
 
-    return render_template(
-        "dyntable.json",
-        records=records.to_json(orient="records", double_precision=15),
-        filter_count=filter_count,
-        total_count=total_count,
-    )
+    return render_template("dyntable.json",
+                           records=records.to_json(orient="records",
+                                                   double_precision=15),
+                           filter_count=filter_count,
+                           total_count=total_count, )
 
 
 @app.route("/tbl/pvals_highlight/<selection>/<targets>")
 def tbl_pvals_highlight(selection, targets):
     targets = targets.split("|")
-    records = app.results.targets[get_screen()].get_pvals_highlight(targets, positive=selection == "positive")
+    records = get_screen().targets.get_pvals_highlight(
+        targets,
+        positive=selection == "positive")
     return records.to_json(orient="records")
 
 
 @app.route("/tbl/rnas/<target>")
 def tbl_rnas(target):
-    table = app.results.rnas[get_screen()].by_target(target)
+    table = get_screen().rnas.by_target(target)
     return table.to_json(orient="records")
-    print(    table.columns)
-    return render_template(
-        "parcoords.json",
-        dimensions=json.dumps(list(table.columns)),
-        values=table.to_json(orient="values")
-    )
+    return render_template("parcoords.json",
+                           dimensions=json.dumps(list(table.columns)),
+                           values=table.to_json(orient="values"))
 
 
 @app.route("/plt/normalization")
 def plt_normalization():
-    plt = app.results.rnas[get_screen()].plot_normalization()
+    plt = get_screen().rnas.plot_normalization()
     return plt
 
 
 @app.route("/plt/pca/<int:x>/<int:y>/<int:legend>")
 def plt_pca(x, y, legend):
-    plt = app.results.rnas[get_screen()].plot_pca(
-        comp_x=x,
-        comp_y=y,
-        legend=legend == 1,
-    )
+    plt = get_screen().rnas.plot_pca(comp_x=x, comp_y=y, legend=legend == 1, )
     return plt
+
 
 @app.route("/plt/correlation")
 def plt_correlation():
-    plt = app.results.rnas[get_screen()].plot_correlation()
+    plt = get_screen().rnas.plot_correlation()
     return plt
-
 
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
@@ -150,4 +138,4 @@ def get_search(pattern=re.compile("search\[(?P<target>.+)\]")):
 
 
 def get_screen():
-    return session.get("screen", next(iter(app.results.screens)))
+    return app.screens[session.get("screen", next(iter(app.screens)))]
