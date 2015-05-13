@@ -26,6 +26,7 @@ def init_server(*configs):
     app.secret_key = ''.join(
         random.choice(string.ascii_uppercase + string.digits) for _ in range(30)
     )
+    print("Starting server. Please open http://127.0.0.1:5000 in your browser.", file=sys.stderr)
     app.run()
 
 
@@ -54,6 +55,7 @@ def main():
         level=logging.DEBUG if args.debug else logging.INFO,
         stream=sys.stderr,
     )
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     try:
         if args.subcommand == "server":
