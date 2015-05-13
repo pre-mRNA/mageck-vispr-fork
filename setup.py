@@ -21,7 +21,7 @@ setup(
     description="Interactive HTML5 visualization for GeCKO screens.",
     license="MIT",
     url="",
-    packages=["vispr", "vispr.tests"],
+    packages=["vispr", "vispr.tests", "vispr.results"],
     include_package_data=True,
     zip_safe=False,
     install_requires=["flask", "numpy", "pandas", "pyyaml", "nose", "scikit-learn", "fadapa"],

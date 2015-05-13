@@ -26,7 +26,7 @@
       "range": "height",
       "ticks": 5,
       "nice": true,
-      "domain": {"data": "counts", "field": "data.max"}
+      "domain": {"data": "counts", "field": "data.q90"}
     }
   ],
   "axes": [
@@ -52,8 +52,8 @@
       "from": {"data": "counts"},
       "properties": {
         "enter": {
-          "y": {"scale": "y", "field": "data.min"},
-          "y2": {"scale": "y", "field": "data.max"},
+          "y": {"scale": "y", "field": "data.q10"},
+          "y2": {"scale": "y", "field": "data.q90"},
           "x": {"scale": "x", "field": "index", "offset": 10},
           "width": {"value": 1},
           "fill": {"value": "black"}
@@ -65,7 +65,7 @@
       "from": {"data": "counts"},
       "properties": {
         "enter": {
-          "y": {"scale": "y", "field": "data.min"},
+          "y": {"scale": "y", "field": "data.q10"},
           "x": {"scale": "x", "field": "index", "offset": 9},
           "width": {"value": 3},
           "height": {"value": 1},
@@ -78,7 +78,7 @@
       "from": {"data": "counts"},
       "properties": {
         "enter": {
-          "y": {"scale": "y", "field": "data.max"},
+          "y": {"scale": "y", "field": "data.q90"},
           "x": {"scale": "x", "field": "index", "offset": 9},
           "width": {"value": 3},
           "height": {"value": 1},
