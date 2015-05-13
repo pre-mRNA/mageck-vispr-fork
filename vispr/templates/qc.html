@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-md-5" style="min-width: 500px">
+    <div class="col-md-6" style="min-width: 500px">
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default">
@@ -19,10 +19,15 @@
             </div>
         </div>
     </div>
-    <div class="col-md-7" style="min-width: 686px">
+    <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading">Principal component analysis</div>
-            <div id="pca-plot" class="plot"></div>
+
+                    <div id="pca-plot1" class="plot" style="display: inline-block;"></div>
+
+                    <div id="pca-plot2" class="plot" style="display: inline-block;"></div>
+
+                    <div id="pca-plot3" class="plot" style="display: inline-block;"></div>
         </div>
     </div>
 </div>
@@ -31,8 +36,14 @@
 vg.parse.spec("/plt/normalization", function(chart) {
     vega_draw(chart, "#normalization-plot");
 });
-vg.parse.spec("/plt/pca", function(chart) {
-    vega_draw(chart, "#pca-plot");
+vg.parse.spec("/plt/pca/1/2/0", function(chart) {
+    vega_draw(chart, "#pca-plot1");
+});
+vg.parse.spec("/plt/pca/1/3/0", function(chart) {
+    vega_draw(chart, "#pca-plot2");
+});
+vg.parse.spec("/plt/pca/2/3/1", function(chart) {
+    vega_draw(chart, "#pca-plot3");
 });
 vg.parse.spec("/plt/correlation", function(chart) {
     vega_draw(chart, "#corr-plot");

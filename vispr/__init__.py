@@ -143,7 +143,8 @@ class RNAResults(AbstractResults):
     def counts(self):
         return self.df.ix[:, 2:]
 
-    def plot_pca(self):
+    @lru_cache()
+    def pca(self, n_components=3):
         counts = np.log10(self.counts().transpose() + 1)
         pca = PCA(n_components=3)
         data = pd.DataFrame(pca.fit_transform(counts))
@@ -152,7 +153,23 @@ class RNAResults(AbstractResults):
         fields = ["PC{} ({:.0%})".format(i + 1, expl_var) for i, expl_var in enumerate(pca.explained_variance_ratio_)]
         data.columns = fields
         data["sample"] = counts.index
-        plt = render_template("plots/pca.json", data=data.to_json(orient="records"), fields=json.dumps(fields), min_coeff=min_coeff, max_coeff=max_coeff)
+        return data
+
+    def plot_pca(self, comp_x=1, comp_y=2, legend=True):
+        pca = self.pca(3)
+        data = pd.DataFrame({
+            "label": pca["sample"],
+            "x": pca[pca.columns[comp_x - 1]],
+            "y": pca[pca.columns[comp_y - 1]],
+        })
+
+        plt = render_template(
+            "plots/pca.json",
+            data=data.to_json(orient="records"),
+            xlabel=pca.columns[comp_x - 1],
+            ylabel=pca.columns[comp_y - 1],
+            legend=legend,
+        )
         return plt
 
     def plot_correlation(self):

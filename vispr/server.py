@@ -119,9 +119,13 @@ def plt_normalization():
     return plt
 
 
-@app.route("/plt/pca")
-def plt_pca():
-    plt = app.results.rnas[get_screen()].plot_pca()
+@app.route("/plt/pca/<int:x>/<int:y>/<int:legend>")
+def plt_pca(x, y, legend):
+    plt = app.results.rnas[get_screen()].plot_pca(
+        comp_x=x,
+        comp_y=y,
+        legend=legend == 1,
+    )
     return plt
 
 @app.route("/plt/correlation")
