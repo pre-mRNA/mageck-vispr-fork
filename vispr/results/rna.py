@@ -93,5 +93,7 @@ class RNAResults(AbstractResults):
                  "b": labels[j],
                  "value": corr[i, j]} for i in leaves for j in leaves]
 
-        plt = render_template("plots/correlation.json", data=json.dumps(data))
+        size = max(min(50 * len(labels), 700), 300)
+
+        plt = render_template("plots/correlation.json", data=json.dumps(data), size=size)
         return plt

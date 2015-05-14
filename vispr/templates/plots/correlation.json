@@ -1,6 +1,6 @@
 {
-    "width": 500,
-    "height": 430,
+    "width": {{size}},
+    "height": {{ size - 80 }},
     "padding": "strict",
     "data": [
         {
@@ -45,7 +45,7 @@
             "properties": {
                 "gradient": {
                     "stroke": {"value": "transparent"},
-                    "width": {"value": 50}
+                    "width": {"value": 67}
                 }
             }
         }
