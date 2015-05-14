@@ -1,77 +1,80 @@
 {
-  "width": 230,
-  "height": 200,
-  "data": [
-    {
-      "name": "pvals",
-      "values": {{ pvals }}
-    },
-    {
-        "name": "highlight",
-        "values": []
-    }
-  ],
-  "scales": [
-    {
-      "name": "x",
-      "type": "linear",
-      "range": "width",
-      "zero": false,
-      "domain": {"data": "pvals", "field": "data.idx"}
-    },
-    {
-      "name": "y",
-      "type": "linear",
-      "range": "height",
-      "nice": true,
-      "domain": {"data": "pvals", "field": "data.pval"}
-    },
-    {
-      "name": "c",
-      "type": "ordinal",
-      "domain": {"data": "highlight", "field": "data.label"},
-      "range": "category20"
-    }
-  ],
-  "axes": [
-    {"type": "x", "scale": "x", "offset": 5, "title": "targets", "ticks": 4},
-    {"type": "y", "scale": "y", "nice": true, "offset": 5, "title": "-log10 p-value"}
-  ],
-  "marks": [
-    {
-      "type": "line",
-      "from": {"data": "pvals"},
-      "properties": {
-        "enter": {
-          "x": {"scale": "x", "field": "data.idx"},
-          "y": {"scale": "y", "field": "data.pval"},
-          "stroke": {"value": "steelblue"}
+    "width": 230,
+    "height": 200,
+    "data": [
+        {
+            "name": "pvals",
+            "values": {{ pvals }}
+        },
+        {
+            "name": "highlight",
+            "values": []
         }
-      }
-    },
-    {
-      "type": "symbol",
-      "from": {"data": "highlight"},
-      "properties": {
-        "enter": {
-          "x": {"scale": "x", "field": "data.idx"},
-          "y": {"scale": "y", "field": "data.pval"},
-          "fill": {"scale": "c", "field": "data.label"},
-          "stroke": {"value": "transparent"},
-          "size": {"value": 50}
+    ],
+    "scales": [
+        {
+            "name": "x",
+            "type": "linear",
+            "range": "width",
+            "zero": false,
+            "domain": {"data": "pvals", "field": "data.idx"}
+        },
+        {
+            "name": "y",
+            "type": "linear",
+            "range": "height",
+            "nice": true,
+            "domain": {"data": "pvals", "field": "data.pval"}
+        },
+        {
+            "name": "c",
+            "type": "ordinal",
+            "domain": {"data": "highlight", "field": "data.label"},
+            "range": "category20"
         }
-      }
-    }
-  ],
-  "legends": [
-    {
-      "fill": "c",
-      "title": "                  ",
-      "properties": {
-        "symbols": {
-          "stroke": {"value": "transparent"}
+    ],
+    "axes": [
+        {"type": "x", "scale": "x", "offset": 5, "title": "targets", "ticks": 4},
+        {"type": "y", "scale": "y", "nice": true, "offset": 5, "title": "-log10 p-value"}
+    ],
+    "marks": [
+        {
+            "type": "line",
+            "from": {"data": "pvals"},
+            "properties": {
+                "enter": {
+                    "x": {"scale": "x", "field": "data.idx"},
+                    "y": {"scale": "y", "field": "data.pval"},
+                    "stroke": {"value": "steelblue"}
+                }
+            }
+        },
+        {
+            "type": "symbol",
+            "from": {"data": "highlight"},
+            "properties": {
+                "enter": {
+                    "x": {"scale": "x", "field": "data.idx"},
+                    "y": {"scale": "y", "field": "data.pval"},
+                    "fill": {"scale": "c", "field": "data.label"},
+                    "stroke": {"value": "transparent"},
+                    "size": {"value": 50}
+                }
+            }
         }
-      }
-    }
-  ]
+    ],
+    "legends": [
+        {
+            "fill": "c",
+            "title": "                  ",
+            "properties": {
+                "symbols": {
+                    "stroke": {"value": "transparent"}
+                },
+                "legend": {
+                    "x": {"value": 150}
+                }
+            }
+        }
+    ]
 }

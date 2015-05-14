@@ -151,11 +151,11 @@ dt.on("dynatable:afterUpdate", function() {
 
             plt_rna = d3.parcoords(
                 {
-                    dimensionTitleRotation: 45,
+                    dimensionTitleRotation: -45,
                 }
             )("#rna-plot")
               .data(data)
-              .margin({ top: 50, left: 80, bottom: 12, right: 0 })
+              .margin({ top: 80, left: 80, bottom: 12, right: 0 })
               .color(function(record) { return colors(record.sgRNA) })
               .render()
               .commonScale()
@@ -178,6 +178,7 @@ dt.on("dynatable:afterUpdate", function() {
             $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
             $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
             $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
+            $("#rna-plot svg .axis .label").attr("text-anchor", "left");
         });
     });
 
