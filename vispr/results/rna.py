@@ -18,7 +18,11 @@ class RNAResults(AbstractResults):
                                                              first_sample)
 
     def plot_normalization(self):
+        _, leaves, _ = self.clustering()
+
         counts = np.log10(self.counts() + 1)
+        # sort columns by clustering results
+        counts = counts.ix[:, leaves]
         data = pd.DataFrame({
             "label": counts.columns,
             "median": counts.median(),
@@ -63,7 +67,8 @@ class RNAResults(AbstractResults):
                               legend=legend, )
         return plt
 
-    def plot_correlation(self):
+    @lru_cache()
+    def clustering(self):
         counts = np.log10(self.counts().transpose() + 1)
         # calculate correlation
         corr = 1 - pdist(counts, 'correlation')
@@ -78,6 +83,10 @@ class RNAResults(AbstractResults):
         # fix diagonal, that will contain zeros because squareform expects a dist
         np.fill_diagonal(corr, 1)
         labels = counts.index.values
+        return corr, leaves, labels
+
+    def plot_correlation(self):
+        corr, leaves, labels = self.clustering()
 
         # convert to json records
         data = [{"a": labels[i],

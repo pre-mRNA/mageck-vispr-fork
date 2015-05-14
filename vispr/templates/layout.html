@@ -1,68 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
-<script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
-<script src="http://trifacta.github.io/vega/vega.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
+    <script src="http://trifacta.github.io/vega/vega.js"></script>
 
-<script src="/static/jquery.dynatable.js"></script>
-<link rel="stylesheet" href="/static/jquery.dynatable.css">
+    <script src="/static/jquery.dynatable.js"></script>
+    <link rel="stylesheet" href="/static/jquery.dynatable.css">
 
-<script src="/static/d3.parcoords.js"></script>
-<link rel="stylesheet" href="/static/d3.parcoords.css">
+    <script src="/static/d3.parcoords.js"></script>
+    <link rel="stylesheet" href="/static/d3.parcoords.css">
 
-<link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css">
 
-<script>
-function vega_draw(chart, el) {
-    var plt = chart({el: el}).update();
-    return plt;
-}
-</script>
+    <script>
+    function vega_draw(chart, el) {
+        var plt = chart({el: el}).update();
+        return plt;
+    }
+    </script>
 
 </head>
 <body>
     <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">VISPR</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Experiment <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-{% for _screen in screens %}
-    {% set invisible = "invisible" if _screen != screen.name else "" %}
-                    <li>
-                        <a href="/?screen={{ _screen }}">
-                            <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen }}
-                        </a>
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">VISPR</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Experiment <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            {% for _screen in screens %}
+                            {% set invisible = "invisible" if _screen != screen.name else "" %}
+                            <li>
+                                <a href="/?screen={{ _screen }}">
+                                    <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </li>
-{% endfor %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Results <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            {% for selection in ["positive", "negative"] %}
+                            <li><a href="/targets/{{ selection }}">{{ selection }} selection</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li><a href="/qc">Quality Control</a></li>
                 </ul>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Results <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-{% for selection in ["positive", "negative"] %}
-                    <li><a href="/targets/{{ selection }}">{{ selection }} selection</a></li>
-{% endfor %}
-                </ul>
-            </li>
-            <li><a href="/qc">Quality Control</a></li>
-          </ul>
+            </div>
         </div>
-      </div>
     </nav>
     <div id="content" class="container-fluid">
         {% block content %}

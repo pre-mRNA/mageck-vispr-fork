@@ -19,207 +19,207 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
                                 {% if screen.is_genes %}
-                                    <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                                <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
                                 {% endif %}
                                 <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
                             </ul>
                         </div>
                     </th>
-                <thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading" style="margin-bottom: 10px;">p-values</div>
-                        <div id="score-plot" class="plot" style="display: inline-block"></div>
-                        <div id="pval-hist-plot" class="plot" style="display: inline-block"></div>
+                    <thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="margin-bottom: 10px;">p-values</div>
+                            <div id="score-plot" class="plot" style="display: inline-block"></div>
+                            <div id="pval-hist-plot" class="plot" style="display: inline-block"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="margin-bottom: 10px;">gRNA counts</div>
+                            <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading" style="margin-bottom: 10px;">gRNA counts</div>
-                    <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
+        <script>
 
-var plt_pval = null;
-var plt_rna = null;
-var selected = {};
-var sample_order = null;
+        var plt_pval = null;
+        var plt_rna = null;
+        var selected = {};
+        var sample_order = null;
 
-function get_selected() {
-    var targets = [];
-    for(target in selected) {
-        targets.push(target);
-    }
-    return targets;
-}
-
-vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
-    plt_pval = vega_draw(chart, "#score-plot");
-});
-
-
-function update_pval_highlights() {
-    var selected = get_selected();
-    if(selected.length == 0) {
-        plt_pval.data({ "highlight": [] });
-        plt_pval.update();
-    }
-    else {
-        d3.json("/tbl/pvals_highlight/{{ selection }}/" + selected.join("|"), function(error, json) {
-            plt_pval.data(
-                { "highlight": json }
-            );
-            plt_pval.update();
-        });
-    }
-}
-
-function clear_pval_highlights() {
-    plt_pval.data({"highlight": []});
-    plt_pval.update();
-}
-
-vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
-    vega_draw(chart, "#pval-hist-plot");
-});
-
-var dt = $("#targets").dynatable({
-    dataset: {
-        ajax: true,
-        ajaxUrl: "/tbl/targets/{{ selection }}",
-        ajaxOnLoad: true,
-        perPageDefault: 20,
-        records: [],
-        inputs: {
-            paginationClass: 'pagination',
-            paginationActiveClass: 'active',
-            paginationDisabledClass: 'disabled'
-        }
-    }
-});
-
-// Perform actions when paging the table.
-dt.on("dynatable:afterUpdate", function() {
-    {% if screen.is_genes %}
-        $("#targets tr td:first-child").each(function(idx, cell) {
-            var target = $(cell).html();
-            $(cell).html(
-                '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
-            );
-        });
-    {% endif %}
-
-    $("#targets tr td:last-child").each(function(idx, cell) {
-        var target = $(cell).parent().children(":first").children(":first").html();
-        $(cell).html(
-            '<div class="btn-group" role="group" aria-label="...">' +
-            '<button type="button" class="btn btn-default btn-plt-rnas" name="' + target + '">gRNA counts</button>' +
-            '<button type="button" class="btn btn-default btn-select-target" name="' + target + '">Select</button>' +
-            '</div>'
-        );
-    });
-
-
-    // Display parallel coordinates plot of RNA counts.
-    $(".btn-plt-rnas").tooltip().click(function() {
-        var target = $(this).attr("name");
-
-        $(".btn-plt-rnas").removeClass("active");
-        $(this).addClass("active");
-
-        d3.json("/tbl/rnas/" + target, function(error, data) {
-            if (error) return console.warn(error);
-            $("#rna-plot").empty();
-
-            var names = data.map(function(rec) { return rec.sgRNA });
-            var samples = d3.keys(data[0]);
-            var colors = d3.scale.category10().domain(names);
-
-            plt_rna = d3.parcoords(
-                {
-                    dimensionTitleRotation: -45,
-                }
-            )("#rna-plot")
-              .data(data)
-              .margin({ top: 80, left: 80, bottom: 12, right: 0 })
-              .color(function(record) { return colors(record.sgRNA) })
-              .render()
-              .commonScale()
-              .createAxes()
-              .brushMode("1D-axes")
-              .reorderable()
-              .commonScale()
-              .interactive()
-              .render();
-
-            if(sample_order != null) {
-                plt_rna.dimensions(sample_order);
+        function get_selected() {
+            var targets = [];
+            for(target in selected) {
+                targets.push(target);
             }
+            return targets;
+        }
 
-            plt_rna.on("render", function() {
-                sample_order = plt_rna.dimensions();
+        vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
+            plt_pval = vega_draw(chart, "#score-plot");
+        });
+
+
+        function update_pval_highlights() {
+            var selected = get_selected();
+            if(selected.length == 0) {
+                plt_pval.data({ "highlight": [] });
+                plt_pval.update();
+            }
+            else {
+                d3.json("/tbl/pvals_highlight/{{ selection }}/" + selected.join("|"), function(error, json) {
+                    plt_pval.data(
+                        { "highlight": json }
+                    );
+                    plt_pval.update();
+                });
+            }
+        }
+
+        function clear_pval_highlights() {
+            plt_pval.data({"highlight": []});
+            plt_pval.update();
+        }
+
+        vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
+            vega_draw(chart, "#pval-hist-plot");
+        });
+
+        var dt = $("#targets").dynatable({
+            dataset: {
+                ajax: true,
+                ajaxUrl: "/tbl/targets/{{ selection }}",
+                ajaxOnLoad: true,
+                perPageDefault: 20,
+                records: [],
+                inputs: {
+                    paginationClass: 'pagination',
+                    paginationActiveClass: 'active',
+                    paginationDisabledClass: 'disabled'
+                }
+            }
+        });
+
+        // Perform actions when paging the table.
+        dt.on("dynatable:afterUpdate", function() {
+            {% if screen.is_genes %}
+            $("#targets tr td:first-child").each(function(idx, cell) {
+                var target = $(cell).html();
+                $(cell).html(
+                    '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
+                );
+            });
+            {% endif %}
+
+            $("#targets tr td:last-child").each(function(idx, cell) {
+                var target = $(cell).parent().children(":first").children(":first").html();
+                $(cell).html(
+                    '<div class="btn-group" role="group" aria-label="...">' +
+                    '<button type="button" class="btn btn-default btn-plt-rnas" name="' + target + '">gRNA counts</button>' +
+                    '<button type="button" class="btn btn-default btn-select-target" name="' + target + '">Select</button>' +
+                    '</div>'
+                );
             });
 
-            plt_rna.svg.selectAll("text").style("font-size", "10px");
-            $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
-            $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
-            $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
-            $("#rna-plot svg .axis .label").attr("text-anchor", "left");
+
+            // Display parallel coordinates plot of RNA counts.
+            $(".btn-plt-rnas").tooltip().click(function() {
+                var target = $(this).attr("name");
+
+                $(".btn-plt-rnas").removeClass("active");
+                $(this).addClass("active");
+
+                d3.json("/tbl/rnas/" + target, function(error, data) {
+                    if (error) return console.warn(error);
+                    $("#rna-plot").empty();
+
+                    var names = data.map(function(rec) { return rec.sgRNA });
+                    var samples = d3.keys(data[0]);
+                    var colors = d3.scale.category10().domain(names);
+
+                    plt_rna = d3.parcoords(
+                        {
+                            dimensionTitleRotation: -45,
+                        }
+                    )("#rna-plot")
+                    .data(data)
+                    .margin({ top: 80, left: 80, bottom: 12, right: 0 })
+                    .color(function(record) { return colors(record.sgRNA) })
+                    .render()
+                    .commonScale()
+                    .createAxes()
+                    .brushMode("1D-axes")
+                    .reorderable()
+                    .commonScale()
+                    .interactive()
+                    .render();
+
+                    if(sample_order != null) {
+                        plt_rna.dimensions(sample_order);
+                    }
+
+                    plt_rna.on("render", function() {
+                        sample_order = plt_rna.dimensions();
+                    });
+
+                    plt_rna.svg.selectAll("text").style("font-size", "10px");
+                    $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
+                    $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
+                    $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
+                    $("#rna-plot svg .axis .label").attr("text-anchor", "left");
+                });
+            });
+
+            // Display gene in hockey stick and update "selected".
+            $(".btn-select-target").tooltip().click(function() {
+                var target = $(this).attr("name"); //$(this).parent().parent().children(":first").children(":first").html();
+
+                if(!$(this).hasClass("active")) {
+                    $(this).addClass("active");
+                    selected[target] = true;
+                    update_pval_highlights();
+                }
+                else {
+                    $(this).removeClass("active");
+                    delete selected[target];
+                    $(this).blur();
+                    update_pval_highlights();
+                }
+            });
+
+            for(target in selected) {
+                $("button[name=" + target + "]").addClass("active");
+            }
+
+            $(".btn-plt-rnas:first").click();
         });
-    });
 
-    // Display gene in hockey stick and update "selected".
-    $(".btn-select-target").tooltip().click(function() {
-        var target = $(this).attr("name"); //$(this).parent().parent().children(":first").children(":first").html();
+        // Show selected genes in GeneMANIA.
+        $("#btn-genemania").click(function() {
+            var url = "http://genemania.org/link?o=human&g=";
+            window.open(encodeURI(url + get_selected().join("|")), '_blank');
+        });
 
-        if(!$(this).hasClass("active")) {
-            $(this).addClass("active");
-            selected[target] = true;
-            update_pval_highlights();
-        }
-        else {
-            $(this).removeClass("active");
-            delete selected[target];
-            $(this).blur();
-            update_pval_highlights();
-        }
-    });
+        // Deselect all genes.
+        $("#btn-deselect").click(function() {
+            for(target in selected) {
+                delete selected[target];
+            }
+            clear_pval_highlights();
+            $(".btn-select-target").removeClass("active");
+        });
 
-    for(target in selected) {
-        $("button[name=" + target + "]").addClass("active");
-    }
-
-    $(".btn-plt-rnas:first").click();
-});
-
-// Show selected genes in GeneMANIA.
-$("#btn-genemania").click(function() {
-    var url = "http://genemania.org/link?o=human&g=";
-    window.open(encodeURI(url + get_selected().join("|")), '_blank');
-});
-
-// Deselect all genes.
-$("#btn-deselect").click(function() {
-    for(target in selected) {
-        delete selected[target];
-    }
-    clear_pval_highlights();
-    $(".btn-select-target").removeClass("active");
-});
-
-</script>
-{% endblock %}
+        </script>
+        {% endblock %}
