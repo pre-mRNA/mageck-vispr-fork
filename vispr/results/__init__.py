@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, print_function
 
 import os
 
-from vispr.results.target import TargetResults
-from vispr.results.rna import RNAResults
-
+from vispr.results import target
+from vispr.results import rna
+from vispr.results import fastqc
 
 class Screens:
     def __init__(self):
@@ -28,9 +28,17 @@ class Screen:
             return os.path.join(parentdir, config[key])
 
         self.name = config["experiment"]
-        self.targets = TargetResults(get_path("target_results"))
-        self.rnas = RNAResults(get_path("rna_counts"))
+        self.targets = target.Results(get_path("target_results"))
+        self.rnas = rna.Results(get_path("rna_counts"))
         is_genes = config.get("genes", False)
         self.is_genes = is_genes
         if is_genes:
             self.species = config["species"]
+        self.fastqc = None
+        if "fastqc" in config:
+            self.fastqc = fastqc.Results(
+                **{
+                    sample: os.path.join(parentdir, path)
+                    for sample, path in config["fastqc"].items()
+                }
+            )

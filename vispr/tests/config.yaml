@@ -3,3 +3,6 @@ target_results: gene_summary.txt
 rna_counts: normalized.txt
 species: human
 genes: true
+fastqc:
+    sample1: fastqc/sample1.txt
+    sample2: fastqc/sample2.txt

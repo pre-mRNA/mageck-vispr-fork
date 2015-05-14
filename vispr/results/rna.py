@@ -10,7 +10,7 @@ from scipy.spatial.distance import pdist, squareform
 from vispr.results.common import lru_cache, AbstractResults
 
 
-class RNAResults(AbstractResults):
+class Results(AbstractResults):
     def by_target(self, target):
         first_sample = self.df.columns[2]
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=

@@ -45,7 +45,8 @@
                 "enter": {
                     "x": {"scale": "x", "field": "data.idx"},
                     "y": {"scale": "y", "field": "data.pval"},
-                    "stroke": {"value": "steelblue"}
+                    "stroke": {"value": "steelblue"},
+                    "strokeWidth": {"value": 2}
                 }
             }
         },

@@ -123,6 +123,23 @@ def plt_correlation():
     return plt
 
 
+@app.route("/plt/gc_content")
+def plt_gc_content():
+    plt = get_screen().fastqc.plot_gc_content()
+    return plt
+
+
+@app.route("/plt/base_quality")
+def plt_base_quality():
+    plt = get_screen().fastqc.plot_base_quality()
+    return plt
+
+@app.route("/plt/seq_quality")
+def plt_seq_quality():
+    plt = get_screen().fastqc.plot_seq_quality()
+    return plt
+
+
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
     cols, ascending = [], []
     for arg, val in request.args.items():

@@ -18,13 +18,34 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">GC content</div>
+                    <div id="gc-plot" class="plot"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">Principal component analysis</div>
-            <div id="pca-plot1" class="plot" style="display: inline-block;"></div>
-            <div id="pca-plot2" class="plot" style="display: inline-block;"></div>
-            <div id="pca-plot3" class="plot" style="display: inline-block;"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Principal component analysis</div>
+                    <div id="pca-plot1" class="plot" style="display: inline-block;"></div>
+                    <div id="pca-plot2" class="plot" style="display: inline-block;"></div>
+                    <div id="pca-plot3" class="plot" style="display: inline-block;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Base quality</div>
+                    <div id="base-quality-plot" class="plot" style="display: inline-block;"></div>
+                    <div id="seq-quality-plot" class="plot" style="display: inline-block;"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -45,5 +66,15 @@ vg.parse.spec("/plt/pca/2/3/1", function(chart) {
 vg.parse.spec("/plt/correlation", function(chart) {
     vega_draw(chart, "#corr-plot");
 });
+vg.parse.spec("/plt/gc_content", function(chart) {
+    vega_draw(chart, "#gc-plot");
+});
+vg.parse.spec("/plt/base_quality", function(chart) {
+    vega_draw(chart, "#base-quality-plot");
+});
+vg.parse.spec("/plt/seq_quality", function(chart) {
+    vega_draw(chart, "#seq-quality-plot");
+});
+
 </script>
 {% endblock %}

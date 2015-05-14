@@ -3,5 +3,6 @@ recursive-include vispr/static *
 include vispr/tests *.csv
 include vispr/tests *.txt
 include vispr/tests *.yaml
+include vispr/tests/fastqc *
 include . conda.txt
 recursive-include bin *

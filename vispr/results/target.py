@@ -7,7 +7,7 @@ import numpy as np
 from vispr.results.common import lru_cache, AbstractResults
 
 
-class TargetResults(AbstractResults):
+class Results(AbstractResults):
     """Keep and display feature results."""
 
     @lru_cache()
