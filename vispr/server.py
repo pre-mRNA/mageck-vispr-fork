@@ -29,7 +29,10 @@ def targets(selection):
 
 @app.route("/qc")
 def qc():
-    return render_template("qc.html", screens=app.screens, screen=get_screen())
+    return render_template("qc.html",
+                           screens=app.screens,
+                           screen=get_screen(),
+                           fastqc=get_screen().fastqc is not None)
 
 
 @app.route("/plt/pvals/<selection>")
