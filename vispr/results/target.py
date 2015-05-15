@@ -1,4 +1,6 @@
 import json
+from itertools import combinations
+from operator import itemgetter
 
 from flask import render_template
 import pandas as pd
@@ -66,3 +68,27 @@ class Results(AbstractResults):
         idx = data.index.values[(data["id"] == target).values]
         assert len(idx) == 1
         return int(idx[0])
+
+    def targets(self, fdr, positive=True):
+        col = "pos" if positive else "neg"
+        valid = self.df["fdr." + col] <= fdr
+        return set(self.df.ix[valid, "id"])
+
+
+def plot_overlap_chord(**targets):
+    ids = {label: i for i, label in enumerate(targets)}
+    data = []
+    for s in range(2, len(targets) + 1):
+        for c in combinations(targets.items(), s):
+            isect = set(c[0][1])
+            for other in map(itemgetter(1), c[1:]):
+                isect &= other
+            data.append([{"group": ids[label], "value": len(isect)} for label in map(itemgetter(0), c)])
+    for label, t in targets.items():
+        excl = set(t)
+        for l, t in targets.items():
+            if l != label:
+                excl -= t
+        data.append([{"group": ids[label], "value": len(excl)}])
+
+    return json.dumps({"connections": data, "labels": {i: label for label, i in ids.items()}})

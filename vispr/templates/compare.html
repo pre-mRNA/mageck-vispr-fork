@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <div id="overlap-plot"></div>
+    </div>
+</div>
+<script>
+var width = 700, height = 700, padding = 0.1;
+
+function plot_overlap_chord() {
+    d3.json("/plt/overlap_chord/0.8", function(error, json) {
+        var chart = d3.chord2()
+            .width(width)
+            .height(height)
+            .padding(padding);
+
+        console.log(json);
+
+        d3.select("#overlap-plot")
+          .selectAll("svg")
+          .data([json])
+          .enter()
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .call(chart);
+    });
+}
+plot_overlap_chord();
+</script>
+{% endblock %}

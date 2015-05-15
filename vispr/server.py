@@ -35,6 +35,15 @@ def qc():
                            fastqc=get_screen().fastqc is not None)
 
 
+@app.route("/compare")
+def compare():
+    return render_template("compare.html",
+                           screens=app.screens,
+                           screen=get_screen())
+
+
+
+
 @app.route("/plt/pvals/<selection>")
 def plt_pvals(selection):
     plt = get_screen().targets.plot_pvals(positive=selection == "positive")
@@ -137,10 +146,16 @@ def plt_base_quality():
     plt = get_screen().fastqc.plot_base_quality()
     return plt
 
+
 @app.route("/plt/seq_quality")
 def plt_seq_quality():
     plt = get_screen().fastqc.plot_seq_quality()
     return plt
+
+
+@app.route("/plt/overlap_chord/<float:fdr>")
+def plt_overlap_chord(fdr):
+    return app.screens.plot_overlap_chord(fdr)
 
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
