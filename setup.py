@@ -24,7 +24,7 @@ setup(
     packages=["vispr", "vispr.tests", "vispr.results"],
     include_package_data=True,
     zip_safe=False,
-    install_requires=["flask", "numpy", "pandas", "pyyaml", "nose", "scikit-learn", "fadapa"],
+    install_requires=["flask", "numpy", "pandas", "pyyaml", "scikit-learn"],
     entry_points={"console_scripts": ["vispr = vispr.cli:main"]},
     classifiers=[
         "Development Status :: 4 - Beta",
