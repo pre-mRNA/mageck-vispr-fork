@@ -1,0 +1,5 @@
+experiment: melanoma
+target_results: melanoma.gene_summary.txt
+rna_counts: melanoma.normalized.txt
+species: human
+genes: true
