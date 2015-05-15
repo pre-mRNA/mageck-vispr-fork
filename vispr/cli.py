@@ -64,7 +64,7 @@ def main():
             init_server(*args.config)
         elif args.subcommand == "test":
             os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
-            init_server("config.yaml")
+            init_server("leukemia.yaml", "melanoma.yaml")
         else:
             parser.print_help()
             exit(1)

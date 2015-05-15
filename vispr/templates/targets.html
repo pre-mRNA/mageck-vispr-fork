@@ -2,55 +2,49 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading" style="margin-bottom: 10px;">Results for {{ selection }} selection</div>
-            <table id="targets" class="table table-striped">
-                <thead>
-                    <th data-dynatable-column="id">Target</th>
-                    <th data-dynatable-column="lo.{{ selection[:3] }}">RRA-score</th>
-                    <th data-dynatable-column="p.{{ selection[:3] }}">p-value</th>
-                    <th data-dynatable-column="fdr.{{ selection[:3] }}">FDR</th>
-                    <th style="text-align: right;" data-dynatable-no-sort="true">
-                        <div class="dropdown">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
-                                Selection
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-                                {% if screen.is_genes %}
-                                <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
-                                {% endif %}
-                                <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
-                            </ul>
-                        </div>
-                    </th>
-                    <thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" style="margin-bottom: 10px;">p-values</div>
-                            <div id="score-plot" class="plot" style="display: inline-block"></div>
-                            <div id="pval-hist-plot" class="plot" style="display: inline-block"></div>
-                        </div>
+    <div class="col-md-5">
+        <h4>Results for {{ selection }} selection</h4>
+        <table id="targets" class="table table-striped">
+            <thead>
+                <th data-dynatable-column="id">Target</th>
+                <th data-dynatable-column="lo.{{ selection[:3] }}">RRA-score</th>
+                <th data-dynatable-column="p.{{ selection[:3] }}">p-value</th>
+                <th data-dynatable-column="fdr.{{ selection[:3] }}">FDR</th>
+                <th style="text-align: right;" data-dynatable-no-sort="true">
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
+                            Selection
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
+                            {% if screen.is_genes %}
+                            <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                            {% endif %}
+                            <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+                        </ul>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" style="margin-bottom: 10px;">gRNA counts</div>
-                            <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
-                        </div>
-                    </div>
+                </th>
+            <thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-7">
+        <div class="row">
+            <div class="col-md-12">
+                <h4>p-value distribution</h4>
+                <div class="text-center">
+                    <div id="score-plot" class="plot"></div>
+                    <div id="pval-hist-plot" class="plot"></div>
                 </div>
             </div>
         </div>
+        <div class="row">
+            <h4>gRNA counts</h4>
+            <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
+        </div>
+    </div>
+</div>
 
         <script>
 
@@ -111,6 +105,8 @@
                 }
             }
         });
+        $("#dynatable-query-search-targets").addClass("form-control").parent().addClass("form-inline");
+        $("#dynatable-per-page-targets").addClass("selectpicker");
 
         // Perform actions when paging the table.
         dt.on("dynatable:afterUpdate", function() {
@@ -126,9 +122,9 @@
             $("#targets tr td:last-child").each(function(idx, cell) {
                 var target = $(cell).parent().children(":first").children(":first").html();
                 $(cell).html(
-                    '<div class="btn-group" role="group" aria-label="...">' +
-                    '<button type="button" class="btn btn-default btn-plt-rnas" name="' + target + '">gRNA counts</button>' +
-                    '<button type="button" class="btn btn-default btn-select-target" name="' + target + '">Select</button>' +
+                    '<div class="btn-group" role="group">' +
+                    '<button type="button" class="btn btn-default btn-plt-rnas" name="' + target + '"><span class="glyphicon glyphicon-stats"></span></button>' +
+                    '<button type="button" class="btn btn-default btn-select-target" name="' + target + '"><span class="glyphicon glyphicon-ok"></span></button>' +
                     '</div>'
                 );
             });

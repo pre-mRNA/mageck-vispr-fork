@@ -37,9 +37,11 @@ def qc():
 
 @app.route("/compare")
 def compare():
+    overlap_items = ["{} {}".format(screen, sel) for screen in app.screens for sel in "+-"]
     return render_template("compare.html",
                            screens=app.screens,
-                           screen=get_screen())
+                           screen=get_screen(),
+                           overlap_items=overlap_items)
 
 
 
@@ -153,9 +155,14 @@ def plt_seq_quality():
     return plt
 
 
-@app.route("/plt/overlap_chord/<float:fdr>")
-def plt_overlap_chord(fdr):
-    return app.screens.plot_overlap_chord(fdr)
+@app.route("/plt/overlap_chord", methods=["POST"])
+def plt_overlap_chord():
+    def parse_item(item):
+        screen, sel = item.split()
+        return screen, sel == "+"
+    fdr = float(request.form.get("fdr", 1.0))
+    items = request.form.getlist("overlap-items")
+    return app.screens.plot_overlap_chord(fdr, items=map(parse_item, items))
 
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):

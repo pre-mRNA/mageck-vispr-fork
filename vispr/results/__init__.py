@@ -21,12 +21,13 @@ class Screens:
     def __getitem__(self, screen):
         return self.screens[screen]
 
-    def plot_overlap_chord(self, fdr=0.05):
+    def plot_overlap_chord(self, fdr=0.05, items=None):
+        if items is None:
+            items = [(screen, positive) for screen in self.screens for positive in (True, False)]
         selection = ["-", "+"]
         targets = {
             "{} {}".format(screen, selection[positive]): self.screens[screen].targets.targets(fdr, positive=positive)
-            for screen in self.screens
-            for positive in (True, False)
+            for screen, positive in items
         }
         return target.plot_overlap_chord(**targets)
 

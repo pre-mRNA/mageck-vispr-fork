@@ -1,21 +1,50 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-md-12 text-center">
+    <div class="col-md-6">
+        <h4>Target overlap</h4>
+        <form action="" method="GET" class="form-inline" id="config-overlap-chord">
+            <div class="form-group">
+                <label for="select-overlap-items">Experiments</label>
+                <select name="overlap-items" id="select-overlap-items" class="selectpicker" multiple>
+                    {% for item in overlap_items %}
+                    <option selected>{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="choose-fdr">Maximum FDR</label>
+                <input name="fdr" type="text" value="1.0" id="choose-fdr" class="form-control">
+            </div>
+            <div class="btn-group" role="group">
+                <button type="submit" class="btn btn-default">Apply</button>
+                <button type="reset" class="btn btn-default" id="overlap-chord-reset">Reset</button>
+            </div>
+        </form>
         <div id="overlap-plot"></div>
     </div>
 </div>
 <script>
-var width = 700, height = 700, padding = 0.1;
+var width = 600, height = 600, padding = 0.1;
 
 function plot_overlap_chord() {
-    d3.json("/plt/overlap_chord/0.8", function(error, json) {
+    if(isNaN(parseFloat($("#choose-fdr").val()))) {
+        $("#choose-fdr").parent().addClass("has-error");
+        return;
+    }
+    else {
+        $("#choose-fdr").parent().removeClass("has-error");
+    }
+    var config = $("#config-overlap-chord").serialize();
+
+    $.post("/plt/overlap_chord", config, function(json, status) {
+        console.log(json);
         var chart = d3.chord2()
             .width(width)
             .height(height)
             .padding(padding);
 
-        console.log(json);
+        $("#overlap-plot svg").remove();
 
         d3.select("#overlap-plot")
           .selectAll("svg")
@@ -25,8 +54,15 @@ function plot_overlap_chord() {
           .attr("width", width)
           .attr("height", height)
           .call(chart);
-    });
+    }, "json");
 }
+$("#config-overlap-chord").submit(function() { plot_overlap_chord(); return false; });
+$("#config-overlap-chord").on("reset", function() {
+    setTimeout(plot_overlap_chord);
+    setTimeout(function() {
+        $('#select-overlap-items').selectpicker('render');
+    });
+});
 plot_overlap_chord();
 </script>
 {% endblock %}

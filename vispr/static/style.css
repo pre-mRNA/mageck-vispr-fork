@@ -3,7 +3,7 @@
 }
 
 .plot {
-    text-align: center;
+    display: inline-block;
 }
 
 #score-plot {
@@ -26,4 +26,8 @@
 
 #overlap-plot {
     display: inline;
+}
+
+h4 {
+    border-bottom: 1px solid #EEE;
 }

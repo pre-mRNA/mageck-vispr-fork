@@ -1,0 +1,8 @@
+experiment: leukemia
+target_results: leukemia.gene_summary.txt
+rna_counts: leukemia.normalized.txt
+species: human
+genes: true
+fastqc:
+    sample1: fastqc/sample1.txt
+    sample2: fastqc/sample2.txt
