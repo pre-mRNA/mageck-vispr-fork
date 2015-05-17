@@ -39,9 +39,9 @@
                 "axis": { "stroke": { "value": "transparent" } },
                 "ticks": { "stroke": { "value": "transparent" } },
                 "labels": {
-                    "angle": { "value": 45 },
+                    "angle": { "value": -45 },
                     "baseline": { "value": "middle" },
-                    "align": {"value": "left"}
+                    "align": {"value": "right"}
                 }
             }
         }

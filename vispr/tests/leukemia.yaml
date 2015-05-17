@@ -6,3 +6,4 @@ genes: true
 fastqc:
     sample1: fastqc/sample1.txt
     sample2: fastqc/sample2.txt
+mapstats: test.countsummary.txt

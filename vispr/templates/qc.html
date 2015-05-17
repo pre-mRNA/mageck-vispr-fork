@@ -40,6 +40,16 @@
                 </div>
             </div>
         </div>
+        {% if mapstats %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Mapping statistics</h4>
+                <div class="text-center">
+                    <div id="mapstats-plot" class="plot"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% if fastqc %}
         <div class="row">
             <div class="col-md-12">
@@ -80,6 +90,12 @@ vg.parse.spec("/plt/base_quality", function(chart) {
 });
 vg.parse.spec("/plt/seq_quality", function(chart) {
     vega_draw(chart, "#seq-quality-plot");
+});
+{% endif %}
+
+{% if mapstats %}
+vg.parse.spec("/plt/mapstats", function(chart) {
+    vega_draw(chart, "#mapstats-plot");
 });
 {% endif %}
 

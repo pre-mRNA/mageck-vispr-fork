@@ -40,8 +40,10 @@
             </div>
         </div>
         <div class="row">
-            <h4>gRNA counts</h4>
-            <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
+            <div class="col-md-12">
+                <h4>gRNA counts</h4>
+                    <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -152,6 +154,7 @@
                     )("#rna-plot")
                     .data(data)
                     .margin({ top: 80, left: 80, bottom: 12, right: 0 })
+                    .height(Math.max(data.length * 12, 300))
                     .color(function(record) { return colors(record.sgRNA) })
                     .render()
                     .commonScale()

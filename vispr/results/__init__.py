@@ -6,6 +6,8 @@ import os
 from vispr.results import target
 from vispr.results import rna
 from vispr.results import fastqc
+from vispr.results import mapstats
+
 
 class Screens:
     def __init__(self):
@@ -23,13 +25,17 @@ class Screens:
 
     def plot_overlap_chord(self, fdr=0.05, items=None):
         if items is None:
-            items = [(screen, positive) for screen in self.screens for positive in (True, False)]
+            items = [(screen, positive)
+                     for screen in self.screens for positive in (True, False)]
         selection = ["-", "+"]
         targets = {
-            "{} {}".format(screen, selection[positive]): self.screens[screen].targets.targets(fdr, positive=positive)
+            "{} {}".format(screen, selection[positive]):
+            self.screens[screen].targets.targets(fdr,
+                                                 positive=positive)
             for screen, positive in items
         }
         return target.plot_overlap_chord(**targets)
+
 
 class Screen:
     def __init__(self, config, parentdir="."):
@@ -45,9 +51,10 @@ class Screen:
             self.species = config["species"]
         self.fastqc = None
         if "fastqc" in config:
-            self.fastqc = fastqc.Results(
-                **{
-                    sample: os.path.join(parentdir, path)
-                    for sample, path in config["fastqc"].items()
-                }
-            )
+            self.fastqc = fastqc.Results(**{
+                sample: os.path.join(parentdir, path)
+                for sample, path in config["fastqc"].items()
+            })
+        self.mapstats = None
+        if "mapstats" in config:
+            self.mapstats = mapstats.Results(get_path("mapstats"))

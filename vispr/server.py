@@ -32,7 +32,8 @@ def qc():
     return render_template("qc.html",
                            screens=app.screens,
                            screen=get_screen(),
-                           fastqc=get_screen().fastqc is not None)
+                           fastqc=get_screen().fastqc is not None,
+                           mapstats=get_screen().mapstats is not None)
 
 
 @app.route("/compare")
@@ -104,7 +105,7 @@ def tbl_targets(selection):
 @app.route("/tbl/pvals_highlight/<selection>/<targets>")
 def tbl_pvals_highlight(selection, targets):
     targets = targets.split("|")
-    records = get_screen().targets.get_pvals_highlight(
+    records = get_screen().targets.get_pvals_highlight_targets(
         targets,
         positive=selection == "positive")
     return records.to_json(orient="records")
@@ -152,6 +153,11 @@ def plt_base_quality():
 @app.route("/plt/seq_quality")
 def plt_seq_quality():
     plt = get_screen().fastqc.plot_seq_quality()
+    return plt
+
+@app.route("/plt/mapstats")
+def plt_mapstats():
+    plt = get_screen().mapstats.plot_mapstats()
     return plt
 
 

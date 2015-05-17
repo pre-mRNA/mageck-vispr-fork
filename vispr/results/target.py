@@ -40,15 +40,19 @@ class Results(AbstractResults):
         return render_template("plots/pvals.json",
                                pvals=pvals.to_json(orient="records"))
 
-    def get_pvals_highlight(self, highlight_targets, positive=True):
+    @lru_cache()
+    def get_pvals_highlight(self, positive=True):
         pvals = self.get_pvals(positive=positive)
-
         pvals = pd.DataFrame({
             "idx": pvals.index,
             "pval": pvals.ix[:, 1],
             "label": pvals["id"]
         })
         pvals.index = pvals["label"]
+        return pvals
+
+    def get_pvals_highlight_targets(self, highlight_targets, positive=True):
+        pvals = self.get_pvals_highlight(positive=positive)
         pvals = pvals.ix[highlight_targets]
 
         return pvals

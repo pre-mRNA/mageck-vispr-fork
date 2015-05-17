@@ -40,7 +40,7 @@
     "legends": [
         {
             "fill": "c",
-            "orient": "left",
+            "orient": "right",
             "title": "correlation",
             "properties": {
                 "gradient": {
@@ -59,16 +59,16 @@
                 "axis": { "stroke": { "value": "transparent" } },
                 "ticks": { "stroke": { "value": "transparent" } },
                 "labels": {
-                    "angle": { "value": 45 },
+                    "angle": { "value": -45 },
                     "baseline": { "value": "middle" },
-                    "align": {"value": "left"}
+                    "align": {"value": "right"}
                 }
             }
         },
         {
             "type": "y",
             "scale": "y",
-            "orient": "right",
+            "orient": "left",
             "properties": {
                 "axis": { "stroke": { "value": "transparent" } },
                 "ticks": { "stroke": { "value": "transparent" } }

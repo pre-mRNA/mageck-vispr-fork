@@ -1,6 +1,6 @@
 {
-    "width": 230,
-    "height": 200,
+    "width": 150,
+    "height": 150,
     "data": [
         {
             "name": "basequal",
@@ -29,8 +29,8 @@
         }
     ],
     "axes": [
-        {"type": "x", "scale": "x", "nice": true, "offset": 5, "title": "base"},
-        {"type": "y", "scale": "y", "nice": true, "offset": 5, "title": "median quality"}
+        {"type": "x", "scale": "x", "nice": true, "ticks": 6, "offset": 5, "title": "base"},
+        {"type": "y", "scale": "y", "nice": true, "ticks": 6, "offset": 5, "title": "median quality"}
     ],
     "marks": [
         {

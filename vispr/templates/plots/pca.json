@@ -34,7 +34,7 @@
             "nice": true,
             "offset": 5,
             "title": "{{ xlabel }}",
-            "ticks": 4
+            "ticks": 6
         },
         {
             "type": "y",
@@ -42,7 +42,7 @@
             "nice": true,
             "offset": 5,
             "title": "{{ ylabel }}",
-            "ticks": 4
+            "ticks": 6
         }
     ],
     "marks": [
