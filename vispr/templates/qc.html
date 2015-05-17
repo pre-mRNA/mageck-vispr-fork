@@ -46,6 +46,7 @@
                 <h4>Mapping statistics</h4>
                 <div class="text-center">
                     <div id="mapstats-plot" class="plot"></div>
+                    <div id="zerocounts-plot" class="plot"></div>
                 </div>
             </div>
         </div>
@@ -96,6 +97,9 @@ vg.parse.spec("/plt/seq_quality", function(chart) {
 {% if mapstats %}
 vg.parse.spec("/plt/mapstats", function(chart) {
     vega_draw(chart, "#mapstats-plot");
+});
+vg.parse.spec("/plt/zerocounts", function(chart) {
+    vega_draw(chart, "#zerocounts-plot");
 });
 {% endif %}
 

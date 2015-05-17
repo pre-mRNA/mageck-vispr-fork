@@ -155,9 +155,16 @@ def plt_seq_quality():
     plt = get_screen().fastqc.plot_seq_quality()
     return plt
 
+
 @app.route("/plt/mapstats")
 def plt_mapstats():
     plt = get_screen().mapstats.plot_mapstats()
+    return plt
+
+
+@app.route("/plt/zerocounts")
+def plt_zerocounts():
+    plt = get_screen().mapstats.plot_zerocounts()
     return plt
 
 
