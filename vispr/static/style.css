@@ -4,6 +4,7 @@
 
 .plot {
     display: inline-block;
+    vertical-align: middle;
 }
 
 #score-plot {
@@ -30,4 +31,16 @@
 
 h4 {
     border-bottom: 1px solid #EEE;
+}
+
+.venntooltip {
+  position: absolute;
+  text-align: center;
+  width: 128px;
+  background: #333;
+  color: #ddd;
+  padding: 2px;
+  border: 0px;
+  border-radius: 8px;
+  opacity: 0;
 }

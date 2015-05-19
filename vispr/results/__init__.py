@@ -23,18 +23,23 @@ class Screens:
     def __getitem__(self, screen):
         return self.screens[screen]
 
-    def plot_overlap_chord(self, fdr=0.05, items=None):
+    def _overlap_targets(self, fdr=0.05, items=None):
         if items is None:
             items = [(screen, positive)
                      for screen in self.screens for positive in (True, False)]
         selection = ["-", "+"]
-        targets = {
+        return {
             "{} {}".format(screen, selection[positive]):
             self.screens[screen].targets.targets(fdr,
                                                  positive=positive)
             for screen, positive in items
         }
-        return target.plot_overlap_chord(**targets)
+
+    def plot_overlap_chord(self, fdr=0.05, items=None):
+        return target.plot_overlap_chord(**self._overlap_targets(fdr=fdr, items=items))
+
+    def plot_overlap_venn(self, fdr=0.05, items=None):
+        return target.plot_overlap_venn(**self._overlap_targets(fdr=fdr, items=items))
 
 
 class Screen:

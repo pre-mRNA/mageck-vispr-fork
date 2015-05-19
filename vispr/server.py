@@ -170,13 +170,21 @@ def plt_zerocounts():
 
 @app.route("/plt/overlap_chord", methods=["POST"])
 def plt_overlap_chord():
+    return app.screens.plot_overlap_chord(*get_overlap_args())
+
+
+@app.route("/plt/overlap_venn", methods=["POST"])
+def plt_overlap_venn():
+    return app.screens.plot_overlap_venn(*get_overlap_args())
+
+
+def get_overlap_args():
     def parse_item(item):
         screen, sel = item.split()
         return screen, sel == "+"
-    fdr = float(request.form.get("fdr", 1.0))
-    items = request.form.getlist("overlap-items")
-    return app.screens.plot_overlap_chord(fdr, items=map(parse_item, items))
-
+    fdr = float(request.form.get("fdr", 0.25))
+    items = list(map(parse_item, request.form.getlist("overlap-items")))
+    return fdr, items
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
     cols, ascending = [], []

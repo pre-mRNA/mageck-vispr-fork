@@ -47,14 +47,29 @@ def main():
                         help="Print debug info.")
     subparsers = parser.add_subparsers(dest="subcommand")
 
-    server = subparsers.add_parser("server")
+    server = subparsers.add_parser("server", help="Start the VISPR server.")
     server.add_argument(
         "config",
         nargs="+",
         help="YAML config files. Each file points to the results of one "
         "MAGeCK test run.")
 
-    test = subparsers.add_parser("test")
+    subparsers.add_parser("test",
+                          help="Start the VISPR server with some included "
+                               "test data.")
+
+    workflow = subparsers.add_parser("init-workflow",
+                                     help="Initialize the MAGeCK/VISPR workflow "
+                                          "in a given directory. This will "
+                                          "install a Snakefile, a README and a "
+                                          "config file in this directory. "
+                                          "Configure the config file according "
+                                          "to your needs, and run the workflow "
+                                          "with Snakemake "
+                                          "(https://bitbucket.org/johanneskoester/snakemake).")
+    workflow.add_argument("directory",
+                          help="Path to the directory where the "
+                               "workflow shall be initialized.")
 
     args = parser.parse_args()
 
@@ -69,6 +84,8 @@ def main():
         elif args.subcommand == "test":
             os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
             init_server("leukemia.yaml", "melanoma.yaml")
+        elif args.subcommand == "init-workflow":
+            pass
         else:
             parser.print_help()
             exit(1)

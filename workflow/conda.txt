@@ -1,3 +1,4 @@
 fastqc
 mageck
 vispr
+snakemake

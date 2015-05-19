@@ -2,6 +2,16 @@
 {% block content %}
 <div class="row">
     <div class="col-md-5">
+        {% if fastqc %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>GC content</h4>
+                <div class="text-center">
+                    <div id="gc-plot" class="plot"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 <h4>Normalized read count distributions</h4>
@@ -18,28 +28,8 @@
                 </div>
             </div>
         </div>
-        {% if fastqc %}
-        <div class="row">
-            <div class="col-md-12">
-                <h4>GC content</h4>
-                <div class="text-center">
-                    <div id="gc-plot" class="plot"></div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
     </div>
     <div class="col-md-7">
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Principal component analysis</h4>
-                <div class="text-center">
-                    <div id="pca-plot1" class="plot"></div>
-                    <div id="pca-plot2" class="plot"></div>
-                    <div id="pca-plot3" class="plot"></div>
-                </div>
-            </div>
-        </div>
         {% if mapstats %}
         <div class="row">
             <div class="col-md-12">
@@ -62,6 +52,16 @@
             </div>
         </div>
         {% endif %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Principal component analysis</h4>
+                <div class="text-center">
+                    <div id="pca-plot1" class="plot"></div>
+                    <div id="pca-plot2" class="plot"></div>
+                    <div id="pca-plot3" class="plot"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

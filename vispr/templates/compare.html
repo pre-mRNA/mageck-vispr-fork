@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-6">
         <h4>Target overlap</h4>
-        <form action="" method="GET" class="form-inline" id="config-overlap-chord">
+        <form action="" method="GET" class="form-inline" id="config-overlap">
             <div class="form-group">
                 <label for="select-overlap-items">Experiments</label>
                 <select name="overlap-items" id="select-overlap-items" class="selectpicker" multiple>
@@ -14,39 +14,41 @@
             </div>
             <div class="form-group">
                 <label for="choose-fdr">Maximum FDR</label>
-                <input name="fdr" type="text" value="1.0" id="choose-fdr" class="form-control">
+                <select name="fdr" id="choose-fdr" class="selectpicker">
+                    {% for fdr in [0.001, 0.01, 0.05, 0.1, 0.25, 0.5] %}
+                        {% set sel = "selected" if fdr == 0.25 else "" %}
+                        <option {{ sel }}>{{ fdr }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="btn-group" role="group">
                 <button type="submit" class="btn btn-default">Apply</button>
                 <button type="reset" class="btn btn-default" id="overlap-chord-reset">Reset</button>
             </div>
         </form>
-        <div id="overlap-plot"></div>
+        <div class="text-center">
+            <div id="overlap-venn-plot" class="plot"></div>
+            <!--<div id="overlap-chord-plot" class="plot"></div>-->
+        </div>
     </div>
 </div>
 <script>
 var width = 600, height = 600, padding = 0.1;
+var venn = venn.VennDiagram();
 
-function plot_overlap_chord() {
-    if(isNaN(parseFloat($("#choose-fdr").val()))) {
-        $("#choose-fdr").parent().addClass("has-error");
-        return;
-    }
-    else {
-        $("#choose-fdr").parent().removeClass("has-error");
-    }
-    var config = $("#config-overlap-chord").serialize();
+function plot_overlap() {
+    var config = $("#config-overlap").serialize();
 
+    /*
     $.post("/plt/overlap_chord", config, function(json, status) {
-        console.log(json);
         var chart = d3.chord2()
             .width(width)
             .height(height)
             .padding(padding);
 
-        $("#overlap-plot svg").remove();
+        $("#overlap-chord-plot svg").remove();
 
-        d3.select("#overlap-plot")
+        d3.select("#overlap-chord-plot")
           .selectAll("svg")
           .data([json])
           .enter()
@@ -54,15 +56,62 @@ function plot_overlap_chord() {
           .attr("width", width)
           .attr("height", height)
           .call(chart);
+    }, "json");*/
+
+    $.post("/plt/overlap_venn", config, function(json, status) {
+        var div = d3.select("#overlap-venn-plot");
+        div.datum(json).call(venn);
+
+        // add a tooltip
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "venntooltip");
+        div.selectAll("path")
+            .style("stroke-opacity", 0)
+            .style("stroke", "#fff")
+            .style("stroke-width", 0);
+
+        // add listeners to all the groups to display tooltip on mousover
+        div.selectAll("g")
+            .on("mouseover", function(d, i) {
+                // sort all the areas relative to the current item
+                //venn.sortAreas(div, d);
+
+                // Display a tooltip with the current size
+                tooltip.transition().duration(400).style("opacity", .9);
+                tooltip.text(d.size + " targets");
+
+                // highlight the current path
+                var selection = d3.select(this).transition("tooltip").duration(400);
+                selection.select("path")
+                    .style("stroke-width", 3)
+                    .style("fill-opacity", d.sets.length == 1 ? .4 : .1)
+                    .style("stroke-opacity", 1);
+            })
+
+            .on("mousemove", function() {
+                tooltip.style("left", (d3.event.pageX) + "px")
+                       .style("top", (d3.event.pageY - 28) + "px");
+            })
+
+            .on("mouseout", function(d, i) {
+                tooltip.transition().duration(400).style("opacity", 0);
+                var selection = d3.select(this).transition("tooltip").duration(400);
+                selection.select("path")
+                    .style("stroke-width", 0)
+                    .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
+                    .style("stroke-opacity", 0);
+            });
+
     }, "json");
 }
-$("#config-overlap-chord").submit(function() { plot_overlap_chord(); return false; });
-$("#config-overlap-chord").on("reset", function() {
-    setTimeout(plot_overlap_chord);
+
+$("#config-overlap").submit(function() { plot_overlap(); return false; });
+$("#config-overlap").on("reset", function() {
+    setTimeout(plot_overlap);
     setTimeout(function() {
         $('#select-overlap-items').selectpicker('render');
     });
 });
-plot_overlap_chord();
+plot_overlap();
 </script>
 {% endblock %}

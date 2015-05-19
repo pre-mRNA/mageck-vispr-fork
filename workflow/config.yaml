@@ -1,20 +1,25 @@
-library: lib.csv
+library: path/to/sgrna_design.csv
 species: human
-genes: true
-trim_5: 0
-sgrna_len: 20
+genes: true # if screening genes, set this to true for proper linkouts to GeneMANIA and Ensembl
+trim_5: 0 # trim the 5 prime end to get rid of barcode sequences
+sgrna_len: 20 # specify the length of the sgRNAs
 samples:
-    A: A.fastq
-    B: B.fastq
-    C: C.fastq
+    # provide a label and a paths to the fastq files for each sample
+    A: path/to/A.fastq
+    B: path/to/B.fastq
+    C:
+        - path/to/C.1.fastq
+        - path/to/C.2.fastq # a sample can have technical replicates
 experiments:
-    test1:
+    "myexperiment:A-vs-all": # provide a descriptive name for your experiment (it will show up in VISPR)
+         # specify treatment and control samples to be used by MAGeCK
         treatment:
             - A
         control:
             - B
             - C
-    test2:
+    # define as many experiments as you want
+    "myexperiment:A-vs-B":
         treatment:
             - A
         control:

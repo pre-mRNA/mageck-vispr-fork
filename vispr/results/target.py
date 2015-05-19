@@ -79,20 +79,43 @@ class Results(AbstractResults):
         return set(self.df.ix[valid, "id"])
 
 
+def overlaps(order, **targets):
+    """
+    Arguments
+    order   -- 1: single condition, 2: overlap of 3 conditions, 3: overlap of 3 conditions...
+    targets -- labels and targets to compare
+    """
+    for c in combinations(targets.items(), order):
+        isect = set(c[0][1])
+        for other in map(itemgetter(1), c[1:]):
+            isect &= other
+        labels = list(map(itemgetter(0), c))
+        yield labels, len(isect)
+
+
 def plot_overlap_chord(**targets):
     ids = {label: i for i, label in enumerate(targets)}
     data = []
     for s in range(2, len(targets) + 1):
-        for c in combinations(targets.items(), s):
-            isect = set(c[0][1])
-            for other in map(itemgetter(1), c[1:]):
-                isect &= other
-            data.append([{"group": ids[label], "value": len(isect)} for label in map(itemgetter(0), c)])
+        for labels, isect in overlaps(s, **targets):
+            data.append([{"group": ids[label],
+                          "value": isect} for label in labels])
     for label, t in targets.items():
         excl = set(t)
         for l, t in targets.items():
             if l != label:
                 excl -= t
         data.append([{"group": ids[label], "value": len(excl)}])
+    return json.dumps({
+        "connections": data,
+        "labels": {i: label
+                   for label, i in ids.items()}
+    })
 
-    return json.dumps({"connections": data, "labels": {i: label for label, i in ids.items()}})
+
+def plot_overlap_venn(**targets):
+    data = []
+    for s in range(1, len(targets) + 1):
+        for labels, isect in overlaps(s, **targets):
+            data.append({"sets": labels, "size": isect})
+    return json.dumps(data)
