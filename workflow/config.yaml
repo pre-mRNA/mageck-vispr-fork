@@ -1,0 +1,21 @@
+library: lib.csv
+species: human
+genes: true
+trim_5: 0
+sgrna_len: 20
+samples:
+    A: A.fastq
+    B: B.fastq
+    C: C.fastq
+experiments:
+    test1:
+        treatment:
+            - A
+        control:
+            - B
+            - C
+    test2:
+        treatment:
+            - A
+        control:
+            - B

@@ -1,0 +1,97 @@
+#vim: set syntax=python
+
+__author__ = "Johannes Köste"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+"""
+A CRISPR/Cas9 analysis workflow using MAGeCK and VISPR.
+"""
+
+
+import yaml
+
+
+configfile: "config.yaml"
+
+
+rule all:
+    input:
+        expand("{experiment}.vispr.yaml", experiment=config["experiments"])
+
+
+rule fastqc:
+    input:
+        lambda wildcards: config["samples"][wildcards.sample]
+    output:
+        data="qc/{sample}/fastqc_data.txt"
+    params:
+        dir="qc/{sample}"
+    log:
+        "logs/fastqc/{sample}.log"
+    shell:
+        "rm -f {params.dir}/*.zip; "
+        "fastqc --extract -o {params.dir} {input} 2> {log} && "
+        "unzip -p {params.dir}/*.zip '*/fastqc_data.txt' > {output.data}"
+
+
+rule mageck_count:
+    input:
+        fastq=config["samples"].values(),
+        library=config["library"]
+    output:
+        "tables/count/all.count.txt",
+        "tables/count/all.count.median_normalized.txt"
+    params:
+        labels=",".join(config["samples"].keys())
+    log:
+        "logs/mageck/count/all.log"
+    shell:
+        "mageck count --output-prefix tables/count/all "
+        "--list-seq {input.library} "
+        "--fastq {input.fastq} --sample-label {params.labels} "
+        "--trim-5 {config[trim_5]} --sgrna-len {config[sgrna_len]} 2> {log}"
+
+
+rule mageck_test:
+    input:
+        "tables/count/all.count.txt"
+    output:
+        "tables/test/{experiment}.gene_summary.txt",
+        "tables/test/{experiment}.sgrna_summary.txt"
+    params:
+        prefix="tables/test/{experiment}",
+        treatment=lambda wildcards: ",".join(config["experiments"][wildcards.experiment]["treatment"]),
+        control=lambda wildcards: ",".join(config["experiments"][wildcards.experiment]["control"])
+    log:
+        "logs/mageck/test/{experiment}.log"
+    shell:
+        "mageck test --output-prefix {params.prefix} "
+        "--count-table {input} --treatment-id {params.treatment} "
+        "--control-id {params.control} 2> {log}"
+
+
+rule vispr:
+    input:
+        results="tables/test/{experiment}.gene_summary.txt",
+        counts="tables/count/all.count.median_normalized.txt",
+        fastqc=expand("qc/{sample}/fastqc_data.txt", sample=config["samples"])
+    output:
+        "{experiment}.vispr.yaml"
+    run:
+        with open(output[0], "w") as f:
+            yaml.dump(
+                {
+                    "experiment": wildcards.experiment,
+                    "target_results": input.results,
+                    "rna_counts": input.counts,
+                    "species": config["species"],
+                    "genes": config["genes"],
+                    "fastqc": {
+                        sample: fastqc
+                        for sample, fastqc in zip(config["samples"], input.fastqc)
+                    }
+                },
+                f,
+                default_flow_style=False
+            )
