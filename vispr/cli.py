@@ -7,6 +7,7 @@ import sys
 import string
 import random
 import os
+import shutil
 
 import yaml
 
@@ -28,13 +29,11 @@ def init_server(*configs):
     app.secret_key = ''.join(
         random.choice(string.ascii_uppercase + string.digits)
         for _ in range(30))
-    print(
-        "Starting server.",
-        "",
-        "Open:  go to http://127.0.0.1:5000 in your browser.",
-        "Close: hit Ctrl-C in this terminal.",
-        file=sys.stderr,
-        sep="\n")
+    print("Starting server.", "",
+          "Open:  go to http://127.0.0.1:5000 in your browser.",
+          "Close: hit Ctrl-C in this terminal.",
+          file=sys.stderr,
+          sep="\n")
     app.run()
 
 
@@ -56,20 +55,21 @@ def main():
 
     subparsers.add_parser("test",
                           help="Start the VISPR server with some included "
-                               "test data.")
+                          "test data.")
 
-    workflow = subparsers.add_parser("init-workflow",
-                                     help="Initialize the MAGeCK/VISPR workflow "
-                                          "in a given directory. This will "
-                                          "install a Snakefile, a README and a "
-                                          "config file in this directory. "
-                                          "Configure the config file according "
-                                          "to your needs, and run the workflow "
-                                          "with Snakemake "
-                                          "(https://bitbucket.org/johanneskoester/snakemake).")
+    workflow = subparsers.add_parser(
+        "init-workflow",
+        help="Initialize the MAGeCK/VISPR workflow "
+        "in a given directory. This will "
+        "install a Snakefile, a README and a "
+        "config file in this directory. "
+        "Configure the config file according "
+        "to your needs, and run the workflow "
+        "with Snakemake "
+        "(https://bitbucket.org/johanneskoester/snakemake).")
     workflow.add_argument("directory",
                           help="Path to the directory where the "
-                               "workflow shall be initialized.")
+                          "workflow shall be initialized.")
 
     args = parser.parse_args()
 
@@ -85,7 +85,15 @@ def main():
             os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
             init_server("leukemia.yaml", "melanoma.yaml")
         elif args.subcommand == "init-workflow":
-            pass
+            try:
+                os.makedirs(args.directory)
+            except OSError:
+                # either directory exists (then we can ignore) or it will fail in the
+                # next step.
+                pass
+            for f in ["Snakefile", "config.yaml", "README.md", "conda.txt"]:
+                shutil.copy(os.path.join(os.path.dirname(__file__), "workflow",
+                                         f), os.path.join(args.directory, f))
         else:
             parser.print_help()
             exit(1)
