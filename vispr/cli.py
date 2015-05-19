@@ -29,8 +29,12 @@ def init_server(*configs):
         random.choice(string.ascii_uppercase + string.digits)
         for _ in range(30))
     print(
-        "Starting server. Please open http://127.0.0.1:5000 in your browser.",
-        file=sys.stderr)
+        "Starting server.",
+        "",
+        "Open:  go to http://127.0.0.1:5000 in your browser.",
+        "Close: hit Ctrl-C in this terminal.",
+        file=sys.stderr,
+        sep="\n")
     app.run()
 
 
