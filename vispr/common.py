@@ -1,0 +1,2 @@
+class VisprError(Exception):
+    pass
