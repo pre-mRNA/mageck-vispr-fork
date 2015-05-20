@@ -18,7 +18,7 @@ class Screens:
         self.screens[screen] = Screen(config, parentdir=parentdir)
 
     def __iter__(self):
-        return iter(self.screens.keys())
+        return iter(sorted(self.screens.keys()))
 
     def __getitem__(self, screen):
         return self.screens[screen]

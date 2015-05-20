@@ -11,6 +11,13 @@ from vispr.results.common import lru_cache, AbstractResults
 
 
 class Results(AbstractResults):
+
+    def __init__(self, dataframe):
+        super().__init__(dataframe)
+        # reorder columns lexicographically
+        columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
+        self.df = self.df[columns]
+
     def by_target(self, target):
         first_sample = self.df.columns[2]
         return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=
