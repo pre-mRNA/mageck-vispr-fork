@@ -51,5 +51,10 @@ def parse_fastqc_data(path, pattern=re.compile(r"\n\>\>(?P<name>[\w ]+)\t(pass|f
     with open(path) as f:
         f = f.read()
         for match in pattern.finditer(f):
-            data = pd.read_table(StringIO(match.group("data")))
+            d = match.group("data")
+            try:
+                d = StringIO(d)
+            except TypeError:
+                d = StringIO(unicode(d))
+            data = pd.read_table(d)
             yield match.group("name"), data
