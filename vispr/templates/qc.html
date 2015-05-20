@@ -30,17 +30,6 @@
         </div>
     </div>
     <div class="col-md-7">
-        {% if mapstats %}
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Mapping statistics</h4>
-                <div class="text-center">
-                    <div id="mapstats-plot" class="plot"></div>
-                    <div id="zerocounts-plot" class="plot"></div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
         {% if fastqc %}
         <div class="row">
             <div class="col-md-12">
@@ -48,6 +37,17 @@
                 <div class="text-center">
                     <div id="base-quality-plot" class="plot"></div>
                     <div id="seq-quality-plot" class="plot"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if mapstats %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Mapping statistics</h4>
+                <div class="text-center">
+                    <div id="mapstats-plot" class="plot"></div>
+                    <div id="zerocounts-plot" class="plot"></div>
                 </div>
             </div>
         </div>

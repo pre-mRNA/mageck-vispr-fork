@@ -24,7 +24,9 @@ def targets(selection):
     return render_template("targets.html",
                            screens=app.screens,
                            selection=selection,
-                           screen=get_screen())
+                           screen=get_screen(),
+                           control_targets=get_screen().targets.controls,
+                           hide_control_targets=session.get("hide_control_targets", False))
 
 
 @app.route("/qc")
@@ -38,13 +40,12 @@ def qc():
 
 @app.route("/compare")
 def compare():
-    overlap_items = ["{} {}".format(screen, sel) for screen in app.screens for sel in "+-"]
+    overlap_items = ["{} {}".format(screen, sel)
+                     for screen in app.screens for sel in "+-"]
     return render_template("compare.html",
                            screens=app.screens,
                            screen=get_screen(),
                            overlap_items=overlap_items)
-
-
 
 
 @app.route("/plt/pvals/<selection>")
@@ -67,11 +68,17 @@ def tbl_targets(selection):
     # sort and slice records
     records = get_screen().targets[:]
     total_count = records.shape[0]
-    filter_count = total_count  # TODO add filtering
+    filter_count = total_count
 
     search = get_search()
-    if search:
-        filter = records["id"].str.contains(search)
+    if search or session.get("hide_control_targets", False):
+        if search:
+            filter = records["id"].str.contains(
+            search)
+        else:
+            control_targets = get_screen().targets.controls
+            filter = records["id"].apply(lambda target: target not in control_targets)
+
         if np.any(filter):
             records = records[filter]
             filter_count = records.shape[0]
@@ -79,7 +86,7 @@ def tbl_targets(selection):
             return render_template("dyntable.json",
                                    records="[]",
                                    filter_count=0,
-                                   total_count=total_count, )
+                                   total_count=total_count)
 
     columns, ascending = get_sorting()
     if columns:
@@ -99,7 +106,7 @@ def tbl_targets(selection):
                            records=records.to_json(orient="records",
                                                    double_precision=15),
                            filter_count=filter_count,
-                           total_count=total_count, )
+                           total_count=total_count)
 
 
 @app.route("/tbl/pvals_highlight/<selection>/<targets>")
@@ -178,13 +185,21 @@ def plt_overlap_venn():
     return app.screens.plot_overlap_venn(*get_overlap_args())
 
 
+@app.route("/set/hide_control_targets/<int:value>")
+def set_hide_control_targets(value):
+    session["hide_control_targets"] = value == 1
+    return ""
+
+
 def get_overlap_args():
     def parse_item(item):
         screen, sel = item.split()
         return screen, sel == "+"
+
     fdr = float(request.form.get("fdr", 0.25))
     items = list(map(parse_item, request.form.getlist("overlap-items")))
     return fdr, items
+
 
 def get_sorting(pattern=re.compile("sorts\[(?P<col>.+)\]")):
     cols, ascending = [], []

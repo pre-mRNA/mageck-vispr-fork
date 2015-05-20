@@ -10,7 +10,23 @@ from vispr.results.common import lru_cache, AbstractResults
 
 
 class Results(AbstractResults):
-    """Keep and display feature results."""
+    """Keep and display target results."""
+
+    def __init__(self, dataframe, controls=None):
+        """
+        Arguments
+
+        dataframe -- path to file containing MAGeCK target (gene) summary. Alternatively, a dataframe.
+        controls  -- path to file containing control genes. Alternatively, a dataframe.
+        """
+        super().__init__(dataframe)
+        if isinstance(controls, str):
+            self.controls = set(pd.read_table(controls,
+                                              header=None,
+                                              squeeze=True,
+                                              na_filter=False))
+        else:
+            self.controls = set()
 
     @lru_cache()
     def get_pvals(self, positive=True):

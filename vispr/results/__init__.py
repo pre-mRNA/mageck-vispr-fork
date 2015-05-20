@@ -48,7 +48,7 @@ class Screen:
             return os.path.join(parentdir, config[key])
 
         self.name = config["experiment"]
-        self.targets = target.Results(get_path("target_results"))
+        self.targets = target.Results(get_path("target_results"), controls=config.get("control_targets", None))
         self.rnas = rna.Results(get_path("rna_counts"))
         is_genes = config.get("genes", False)
         self.is_genes = is_genes

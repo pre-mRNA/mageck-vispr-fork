@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <h4>Results for {{ selection }} selection</h4>
         <table id="targets" class="table table-striped">
             <thead>
@@ -29,7 +29,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-7">
+    <div class="col-md-6">
         <div class="row">
             <div class="col-md-12">
                 <h4>p-value distribution</h4>
@@ -107,7 +107,28 @@
                 }
             }
         });
-        $("#dynatable-query-search-targets").addClass("form-control").parent().addClass("form-inline").css("margin-right", "8px");
+        var filters = $("#dynatable-query-search-targets").addClass("form-control").css("margin-right", "2px").parent();
+        filters.addClass("form-inline").css("margin-right", "8px");
+
+        {% if control_targets %}
+            filters.append('<div class="btn-group" data-toggle="buttons"><label class="btn btn-default"><input type="checkbox" id="hide-controls">hide controls</label></div>');
+            {% if hide_control_targets %}
+                $("#hide-controls").click();
+            {% endif %}
+            $("#hide-controls").change(function() {
+                if(this.checked) {
+                    $.get("/set/hide_control_targets/1", function() {
+                        dt.data('dynatable').process();
+                    });
+                }
+                else {
+                    $.get("/set/hide_control_targets/0", function() {
+                        dt.data('dynatable').process();
+                    });
+                }
+            });
+        {% endif %}
+
         $("#dynatable-per-page-targets").addClass("selectpicker");
 
         // Perform actions when paging the table.
