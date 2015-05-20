@@ -9,10 +9,21 @@ A CRISPR/Cas9 analysis workflow using MAGeCK and VISPR.
 """
 
 
+configfile: "config.yaml"
+
+
 import yaml
 
 
-configfile: "config.yaml"
+def postprocess_config():
+    for key in "library species genes trim_5 sgrna_len experiments samples".split():
+        if key not in config:
+            raise WorkflowError("Missing key in config file: {}".format(key))
+    for sample in config["samples"]:
+        if not isinstance(config["samples"][sample], list):
+            config["samples"][sample] = [config["samples"][sample]]
+
+
 postprocess_config()
 
 
@@ -42,10 +53,11 @@ rule mageck_count:
         library=config["library"]
     output:
         "tables/count/all.count.txt",
-        "tables/count/all.count.median_normalized.txt"
+        "tables/count/all.count.median_normalized.txt",
+        "tables/count/all.countsummary.txt"
     params:
         labels=",".join(config["samples"].keys()),
-        fastqs=" ".join(",".join(replicates) for replicates in config["sample"].values())
+        fastqs=" ".join(",".join(replicates) for replicates in config["samples"].values())
     log:
         "logs/mageck/count/all.log"
     shell:
@@ -77,6 +89,7 @@ rule vispr:
     input:
         results="tables/test/{experiment}.gene_summary.txt",
         counts="tables/count/all.count.median_normalized.txt",
+        mapstats="tables/count/all.countsummary.txt",
         fastqc=expand("qc/{sample}/fastqc_data.txt", sample=config["samples"])
     output:
         "{experiment}.vispr.yaml"
@@ -89,6 +102,7 @@ rule vispr:
                     "rna_counts": input.counts,
                     "species": config["species"],
                     "genes": config["genes"],
+                    "mapstats": input.mapstats,
                     "fastqc": {
                         sample: fastqc
                         for sample, fastqc in zip(config["samples"], input.fastqc)
@@ -99,10 +113,4 @@ rule vispr:
             )
 
 
-def postprocess_config():
-    for key in "library species genes trim_5 sgrna_len experiments samples".split():
-        if key not in config:
-            raise WorkflowError("Missing key in config file: {}".format(key))
-    for sample in config["samples"]:
-        if not isinstance(config[sample], list):
-            config[sample] = [config[sample]]
+
