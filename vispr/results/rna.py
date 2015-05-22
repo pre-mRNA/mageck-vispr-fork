@@ -20,7 +20,6 @@ class Results(AbstractResults):
         self.info = None
         if info is not None:
             self.info = pd.read_table(info, na_filter=False, index_col=3, names=["chrom", "start", "stop", "score"])
-            print(self.info)
 
     def by_target(self, target):
         first_sample = self.df.columns[2]
