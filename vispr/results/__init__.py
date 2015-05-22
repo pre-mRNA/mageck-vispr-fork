@@ -36,30 +36,39 @@ class Screens:
         }
 
     def plot_overlap_chord(self, fdr=0.05, items=None):
-        return target.plot_overlap_chord(**self._overlap_targets(fdr=fdr, items=items))
+        return target.plot_overlap_chord(**self._overlap_targets(fdr=fdr,
+                                                                 items=items))
 
     def plot_overlap_venn(self, fdr=0.05, items=None):
-        return target.plot_overlap_venn(**self._overlap_targets(fdr=fdr, items=items))
+        return target.plot_overlap_venn(**self._overlap_targets(fdr=fdr,
+                                                                items=items))
 
 
 class Screen:
     def __init__(self, config, parentdir="."):
-        def get_path(key):
-            return os.path.join(parentdir, config[key])
+        def get_path(relpath):
+            if relpath is None:
+                return None
+            return os.path.join(parentdir, relpath)
 
         self.name = config["experiment"]
-        self.targets = target.Results(get_path("target_results"), controls=config.get("control_targets", None))
-        self.rnas = rna.Results(get_path("rna_counts"))
-        is_genes = config.get("genes", False)
-        self.is_genes = is_genes
-        if is_genes:
-            self.species = config["species"]
+
+        self.targets = target.Results(
+            get_path(config["targets"]["results"]),
+            controls=get_path(config["targets"].get("controls", None)))
+        self.is_genes = config["targets"].get("genes", False)
+        if self.is_genes:
+            self.species = config["targets"]["species"]
+
+        self.rnas = rna.Results(get_path(config["sgrnas"]["counts"]), info=get_path(config["sgrnas"].get("info", None)))
+        self.mapstats = None
+        if "mapstats" in config["sgrnas"]:
+            self.mapstats = mapstats.Results(
+                get_path(config["sgrnas"]["mapstats"]))
+
         self.fastqc = None
         if "fastqc" in config:
             self.fastqc = fastqc.Results(**{
-                sample: os.path.join(parentdir, path)
+                sample: get_path(path)
                 for sample, path in config["fastqc"].items()
             })
-        self.mapstats = None
-        if "mapstats" in config:
-            self.mapstats = mapstats.Results(get_path("mapstats"))

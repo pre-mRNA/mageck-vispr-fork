@@ -12,17 +12,28 @@ from vispr.results.common import lru_cache, AbstractResults
 
 class Results(AbstractResults):
 
-    def __init__(self, dataframe):
+    def __init__(self, dataframe, info=None):
         super().__init__(dataframe)
         # reorder columns lexicographically
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
+        self.info = None
+        if info is not None:
+            self.info = pd.read_table(info, na_filter=False, index_col=3, names=["chrom", "start", "stop", "score"])
+            print(self.info)
 
     def by_target(self, target):
         first_sample = self.df.columns[2]
-        return self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=
+        data = self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=
                                                          "Gene"].sort(
                                                              first_sample)
+        if self.info is not None:
+            data.index = data["sgRNA"]
+            info = self.info.ix[data["sgRNA"]]
+            if not info["score"].hasnans() and not info["start"].hasnans():
+                data["score"] = info["score"]
+                data["chrom pos"] = info["start"]
+        return data
 
     def plot_normalization(self):
         _, leaves, _ = self.clustering()

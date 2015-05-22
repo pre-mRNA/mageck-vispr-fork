@@ -137,7 +137,8 @@
             $("#targets tr td:first-child").each(function(idx, cell) {
                 var target = $(cell).html();
                 $(cell).html(
-                    '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' + target + '">' + target + '</a>'
+                    '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' +
+                    target + '">' + target + '</a>'
                 );
             });
             {% endif %}
@@ -146,8 +147,10 @@
                 var target = $(cell).parent().children(":first").children(":first").html();
                 $(cell).html(
                     '<div class="btn-group" role="group">' +
-                    '<button type="button" class="btn btn-default btn-plt-rnas" name="' + target + '"><span class="glyphicon glyphicon-stats"></span></button>' +
-                    '<button type="button" class="btn btn-default btn-select-target" name="' + target + '"><span class="glyphicon glyphicon-ok"></span></button>' +
+                    '<button type="button" class="btn btn-default btn-plt-rnas" name="' +
+                    target + '"><span class="glyphicon glyphicon-stats"></span></button>' +
+                    '<button type="button" class="btn btn-default btn-select-target" name="' +
+                    target + '"><span class="glyphicon glyphicon-ok"></span></button>' +
                     '</div>'
                 );
             });
@@ -165,26 +168,39 @@
                     $("#rna-plot").empty();
 
                     var names = data.map(function(rec) { return rec.sgRNA });
-                    var samples = d3.keys(data[0]);
+                    var dimensions = d3.keys(data[0]);
                     var colors = d3.scale.category10().domain(names);
 
                     plt_rna = d3.parcoords(
-                        {
-                            dimensionTitleRotation: -45,
+                            {
+                                dimensionTitleRotation: -45,
+                            }
+                        )("#rna-plot")
+                        .data(data)
+                        .margin({ top: 80, left: 80, bottom: 12, right: 0 })
+                        .height(Math.max(data.length * 12, 300))
+                        .color(function(record) { return colors(record.sgRNA) })
+                        .render();
+
+                    var max_count = 0;
+                    dimensions.forEach(function(d) {
+                        if(d != "score" && d != "chrom pos" && d != "sgRNA") {
+                            max_count = Math.max(max_count, d3.max(data, function(rec) { return rec[d] }));
                         }
-                    )("#rna-plot")
-                    .data(data)
-                    .margin({ top: 80, left: 80, bottom: 12, right: 0 })
-                    .height(Math.max(data.length * 12, 300))
-                    .color(function(record) { return colors(record.sgRNA) })
-                    .render()
-                    .commonScale()
-                    .createAxes()
-                    .brushMode("1D-axes")
-                    .reorderable()
-                    .commonScale()
-                    .interactive()
-                    .render();
+                    });
+                    dimensions.forEach(function(d) {
+                        if(d != "score" && d != "chrom pos" && d != "sgRNA") {
+                            plt_rna.scale(d, [0, max_count]);
+                        }
+                    });
+
+                    plt_rna.createAxes()
+                        .brushMode("1D-axes")
+                        .reorderable()
+                        .interactive()
+                        .render();
+
+
 
                     if(sample_order != null) {
                         plt_rna.dimensions(sample_order);

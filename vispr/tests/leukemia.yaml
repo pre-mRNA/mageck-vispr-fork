@@ -1,10 +1,13 @@
 experiment: leukemia
-target_results: leukemia.gene_summary.txt
-rna_counts: leukemia.normalized.txt
-species: human
-genes: true
+targets:
+    results: leukemia.gene_summary.txt
+    species: human
+    genes: true
+    controls: ribosomal_genes.txt
+sgrnas:
+    counts: leukemia.normalized.txt
+    info: leukemia.sgrna.fake.bed
+    mapstats: test.countsummary.txt
 fastqc:
-    sample1: fastqc/sample1.txt
-    sample2: fastqc/sample2.txt
-mapstats: test.countsummary.txt
-control_targets: ribosomal_genes.txt
+    sample1: fastqc/sample1.fake.txt
+    sample2: fastqc/sample2.fake.txt

@@ -20,7 +20,7 @@ class Results(AbstractResults):
         controls  -- path to file containing control genes. Alternatively, a dataframe.
         """
         super().__init__(dataframe)
-        if isinstance(controls, str):
+        if controls is not None:
             self.controls = set(pd.read_table(controls,
                                               header=None,
                                               squeeze=True,
