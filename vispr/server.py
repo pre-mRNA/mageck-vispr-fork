@@ -12,67 +12,77 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    screen = request.args.get("screen")
-    if screen:
-        session["screen"] = screen
+    screen = app.screens[next(iter(app.screens))]
     return render_template("index.html",
                            screens=app.screens,
-                           screen=get_screen())
+                           screen=screen)
 
 
-@app.route("/targets/<selection>")
-def targets(selection):
+@app.route("/<screen>")
+def index_screen(screen):
+    screen = app.screens[screen]
+    return render_template("index.html",
+                           screens=app.screens,
+                           screen=screen)
+
+
+@app.route("/targets/<screen>/<selection>")
+def targets(screen, selection):
+    screen = app.screens[screen]
     table_args = request.query_string.decode()
-    print(table_args)
     return render_template(
         "targets.html",
         screens=app.screens,
         selection=selection,
-        screen=get_screen(),
-        control_targets=get_screen().control_targets,
+        screen=screen,
+        control_targets=screen.control_targets,
         hide_control_targets=session.get("hide_control_targets", False),
         table_args=table_args)
 
 
-@app.route("/qc")
-def qc():
+@app.route("/qc/<screen>")
+def qc(screen):
+    screen = app.screens[screen]
     return render_template("qc.html",
                            screens=app.screens,
-                           screen=get_screen(),
-                           fastqc=get_screen().fastqc is not None,
-                           mapstats=get_screen().mapstats is not None)
+                           screen=screen,
+                           fastqc=screen.fastqc is not None,
+                           mapstats=screen.mapstats is not None)
 
 
-@app.route("/compare")
-def compare():
+@app.route("/compare/<screen>")
+def compare(screen):
+    screen = app.screens[screen]
     overlap_items = ["{} {}".format(screen, sel)
                      for screen in app.screens for sel in "+-"]
     return render_template("compare.html",
                            screens=app.screens,
-                           screen=get_screen(),
+                           screen=screen,
                            overlap_items=overlap_items)
 
 
-@app.route("/plt/pvals/<selection>")
-def plt_pvals(selection):
-    plt = get_targets(selection).plot_pvals()
+@app.route("/plt/pvals/<screen>/<selection>")
+def plt_pvals(screen, selection):
+    screen = app.screens[screen]
+    plt = get_targets(screen, selection).plot_pvals()
     return plt
 
 
-@app.route("/plt/pvalhist/<selection>")
-def plt_pval_hist(selection):
-    plt = get_targets(selection).plot_pval_hist()
+@app.route("/plt/pvalhist/<screen>/<selection>")
+def plt_pval_hist(screen, selection):
+    screen = app.screens[screen]
+    plt = get_targets(screen, selection).plot_pval_hist()
     return plt
 
 
-@app.route("/tbl/targets/<selection>", methods=["GET"])
-def tbl_targets(selection):
-    print("tbl", request.query_string)
+@app.route("/tbl/targets/<screen>/<selection>", methods=["GET"])
+def tbl_targets(screen, selection):
+    screen = app.screens[screen]
     offset = int(request.args.get("offset", 0))
     perpage = int(request.args.get("perPage", 20))
 
     # sort and slice records
-    records = get_targets(selection)[:]
+    records = get_targets(screen, selection)[:]
     total_count = records.shape[0]
     filter_count = total_count
 
@@ -82,7 +92,6 @@ def tbl_targets(selection):
     overlap_args = get_overlap_args()
     if overlap_args:
         overlap = app.screens.overlap(*overlap_args)
-        print(overlap)
         filter &= records["target"].apply(lambda target: target in overlap)
 
     # searching
@@ -91,7 +100,7 @@ def tbl_targets(selection):
         filter &= records["target"].str.contains(search)
 
     if session.get("hide_control_targets", False):
-        control_targets = get_screen().control_targets
+        control_targets = screen.control_targets
         filter &= records["target"].apply(lambda target: target not in
                                           control_targets)
 
@@ -129,67 +138,77 @@ def tbl_targets(selection):
                            total_count=total_count)
 
 
-@app.route("/tbl/pvals_highlight/<selection>/<targets>")
-def tbl_pvals_highlight(selection, targets):
+@app.route("/tbl/pvals_highlight/<screen>/<selection>/<targets>")
+def tbl_pvals_highlight(screen, selection, targets):
+    screen = app.screens[screen]
     targets = targets.split("|")
-    records = get_targets(selection).get_pvals_highlight_targets(targets)
+    records = get_targets(screen, selection).get_pvals_highlight_targets(targets)
     return records.to_json(orient="records")
 
 
-@app.route("/tbl/rnas/<target>")
-def tbl_rnas(target):
-    table = get_screen().rnas.by_target(target)
+@app.route("/tbl/rnas/<screen>/<target>")
+def tbl_rnas(screen, target):
+    screen = app.screens[screen]
+    table = screen.rnas.by_target(target)
     return table.to_json(orient="records")
     return render_template("parcoords.json",
                            dimensions=json.dumps(list(table.columns)),
                            values=table.to_json(orient="values"))
 
 
-@app.route("/plt/normalization")
-def plt_normalization():
-    plt = get_screen().rnas.plot_normalization()
+@app.route("/plt/normalization/<screen>")
+def plt_normalization(screen):
+    screen = app.screens[screen]
+    plt = screen.rnas.plot_normalization()
     return plt
 
 
-@app.route("/plt/pca/<int:x>/<int:y>/<int:legend>")
-def plt_pca(x, y, legend):
-    plt = get_screen().rnas.plot_pca(comp_x=x, comp_y=y, legend=legend == 1, )
+@app.route("/plt/pca/<screen>/<int:x>/<int:y>/<int:legend>")
+def plt_pca(screen, x, y, legend):
+    screen = app.screens[screen]
+    plt = screen.rnas.plot_pca(comp_x=x, comp_y=y, legend=legend == 1, )
     return plt
 
 
-@app.route("/plt/correlation")
-def plt_correlation():
-    plt = get_screen().rnas.plot_correlation()
+@app.route("/plt/correlation/<screen>")
+def plt_correlation(screen):
+    screen = app.screens[screen]
+    plt = screen.rnas.plot_correlation()
     return plt
 
 
-@app.route("/plt/gc_content")
-def plt_gc_content():
-    plt = get_screen().fastqc.plot_gc_content()
+@app.route("/plt/gc_content/<screen>")
+def plt_gc_content(screen):
+    screen = app.screens[screen]
+    plt = screen.fastqc.plot_gc_content()
     return plt
 
 
-@app.route("/plt/base_quality")
-def plt_base_quality():
-    plt = get_screen().fastqc.plot_base_quality()
+@app.route("/plt/base_quality/<screen>")
+def plt_base_quality(screen):
+    screen = app.screens[screen]
+    plt = screen.fastqc.plot_base_quality()
     return plt
 
 
-@app.route("/plt/seq_quality")
-def plt_seq_quality():
-    plt = get_screen().fastqc.plot_seq_quality()
+@app.route("/plt/seq_quality/<screen>")
+def plt_seq_quality(screen):
+    screen = app.screens[screen]
+    plt = screen.fastqc.plot_seq_quality()
     return plt
 
 
-@app.route("/plt/mapstats")
-def plt_mapstats():
-    plt = get_screen().mapstats.plot_mapstats()
+@app.route("/plt/mapstats/<screen>")
+def plt_mapstats(screen):
+    screen = app.screens[screen]
+    plt = screen.mapstats.plot_mapstats()
     return plt
 
 
-@app.route("/plt/zerocounts")
-def plt_zerocounts():
-    plt = get_screen().mapstats.plot_zerocounts()
+@app.route("/plt/zerocounts/<screen>")
+def plt_zerocounts(screen):
+    screen = app.screens[screen]
+    plt = screen.mapstats.plot_zerocounts()
     return plt
 
 
@@ -208,17 +227,12 @@ def set_hide_control_targets(value):
     session["hide_control_targets"] = value == 1
     return ""
 
-@app.route("/set/screen/<screen>")
-def set_screen(screen):
-    session["screen"] = screen
-    return ""
 
 def get_overlap_args():
     def parse_item(item):
         screen, sel = item.split()
         return screen, sel == "+"
 
-    print(request.values)
     if "fdr" not in request.values and "overlap-items" not in request.form:
         return None
 
@@ -241,9 +255,5 @@ def get_search(pattern=re.compile("search\[(?P<target>.+)\]")):
     return request.args.get("queries[search]", None)
 
 
-def get_screen():
-    return app.screens[session.get("screen", next(iter(app.screens)))]
-
-
-def get_targets(selection):
-    return get_screen().targets(selection == "positive")
+def get_targets(screen, selection):
+    return screen.targets(selection == "positive")

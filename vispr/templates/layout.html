@@ -51,7 +51,7 @@
                             {% for _screen in screens %}
                             {% set invisible = "invisible" if _screen != screen.name else "" %}
                             <li>
-                                <a href="/?screen={{ _screen }}">
+                                <a href="/{{ _screen }}">
                                     <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen }}
                                 </a>
                             </li>
@@ -62,12 +62,12 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Results <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             {% for selection in ["positive", "negative"] %}
-                            <li><a href="/targets/{{ selection }}">{{ selection }} selection</a></li>
+                            <li><a href="/targets/{{ screen.name }}/{{ selection }}">{{ selection }} selection</a></li>
                             {% endfor %}
                         </ul>
                     </li>
-                    <li><a href="/qc">Quality Control</a></li>
-                    <li><a href="/compare">Compare Experiments</a></li>
+                    <li><a href="/qc/{{ screen.name }}">Quality Control</a></li>
+                    <li><a href="/compare/{{ screen.name }}">Compare Experiments</a></li>
                 </ul>
                 <ul class="nav navbar-right">
                     <li><p class="navbar-text">{{ screen.name }}</p></li>

@@ -66,39 +66,39 @@
 </div>
 
 <script>
-vg.parse.spec("/plt/normalization", function(chart) {
+vg.parse.spec("/plt/normalization/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#normalization-plot");
 });
-vg.parse.spec("/plt/pca/1/2/0", function(chart) {
+vg.parse.spec("/plt/pca/{{ screen.name }}/1/2/0", function(chart) {
     vega_draw(chart, "#pca-plot1");
 });
-vg.parse.spec("/plt/pca/1/3/0", function(chart) {
+vg.parse.spec("/plt/pca/{{ screen.name }}/1/3/0", function(chart) {
     vega_draw(chart, "#pca-plot2");
 });
-vg.parse.spec("/plt/pca/2/3/1", function(chart) {
+vg.parse.spec("/plt/pca/{{ screen.name }}/2/3/1", function(chart) {
     vega_draw(chart, "#pca-plot3");
 });
-vg.parse.spec("/plt/correlation", function(chart) {
+vg.parse.spec("/plt/correlation/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#corr-plot");
 });
 
 {% if fastqc %}
-vg.parse.spec("/plt/gc_content", function(chart) {
+vg.parse.spec("/plt/gc_content/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#gc-plot");
 });
-vg.parse.spec("/plt/base_quality", function(chart) {
+vg.parse.spec("/plt/base_quality/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#base-quality-plot");
 });
-vg.parse.spec("/plt/seq_quality", function(chart) {
+vg.parse.spec("/plt/seq_quality/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#seq-quality-plot");
 });
 {% endif %}
 
 {% if mapstats %}
-vg.parse.spec("/plt/mapstats", function(chart) {
+vg.parse.spec("/plt/mapstats/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#mapstats-plot");
 });
-vg.parse.spec("/plt/zerocounts", function(chart) {
+vg.parse.spec("/plt/zerocounts/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#zerocounts-plot");
 });
 {% endif %}

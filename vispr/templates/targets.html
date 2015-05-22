@@ -63,7 +63,7 @@
             return targets;
         }
 
-        vg.parse.spec("/plt/pvals/{{ selection }}", function(chart) {
+        vg.parse.spec("/plt/pvals/{{ screen.name }}/{{ selection }}", function(chart) {
             plt_pval = vega_draw(chart, "#score-plot");
         });
 
@@ -75,7 +75,7 @@
                 plt_pval.update();
             }
             else {
-                d3.json("/tbl/pvals_highlight/{{ selection }}/" + selected.join("|"), function(error, json) {
+                d3.json("/tbl/pvals_highlight/{{ screen.name }}/{{ selection }}/" + selected.join("|"), function(error, json) {
                     plt_pval.data(
                         { "highlight": json }
                     );
@@ -89,14 +89,14 @@
             plt_pval.update();
         }
 
-        vg.parse.spec("/plt/pvalhist/{{ selection }}", function(chart) {
+        vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ selection }}", function(chart) {
             vega_draw(chart, "#pval-hist-plot");
         });
 
         var dt = $("#targets").dynatable({
             dataset: {
                 ajax: true,
-                ajaxUrl: "/tbl/targets/{{ selection }}?{{ table_args|safe }}",
+                ajaxUrl: "/tbl/targets/{{ screen.name }}/{{ selection }}?{{ table_args|safe }}",
                 ajaxOnLoad: true,
                 perPageDefault: 20,
                 records: [],
@@ -163,7 +163,7 @@
                 $(".btn-plt-rnas").removeClass("active");
                 $(this).addClass("active");
 
-                d3.json("/tbl/rnas/" + target, function(error, data) {
+                d3.json("/tbl/rnas/{{ screen.name }}/" + target, function(error, data) {
                     if (error) return console.warn(error);
                     $("#rna-plot").empty();
 
