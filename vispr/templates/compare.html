@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-6">
         <h4>Target overlap</h4>
-        <form action="" method="GET" class="form-inline" id="config-overlap">
+        <form action="" class="form-inline" id="config-overlap">
             <div class="form-group">
                 <label for="select-overlap-items">Experiments</label>
                 <select name="overlap-items" id="select-overlap-items" class="selectpicker" multiple>
@@ -28,39 +28,23 @@
         </form>
         <div class="text-center">
             <div id="overlap-venn-plot" class="plot"></div>
-            <!--<div id="overlap-chord-plot" class="plot"></div>-->
+            <form action="" method="POST" id="show-targets">
+            </form>
         </div>
     </div>
 </div>
 <script>
-var width = 600, height = 600, padding = 0.1;
-var venn = venn.VennDiagram();
+var venn_chart = venn.VennDiagram()
+               .width(500)
+               .height(500);
 
 function plot_overlap() {
-    var config = $("#config-overlap").serialize();
+    var config = $("#config-overlap").serializeArray();
+    var fdr = $("#choose-fdr").val();
 
-    /*
-    $.post("/plt/overlap_chord", config, function(json, status) {
-        var chart = d3.chord2()
-            .width(width)
-            .height(height)
-            .padding(padding);
-
-        $("#overlap-chord-plot svg").remove();
-
-        d3.select("#overlap-chord-plot")
-          .selectAll("svg")
-          .data([json])
-          .enter()
-          .append("svg")
-          .attr("width", width)
-          .attr("height", height)
-          .call(chart);
-    }, "json");*/
-
-    $.post("/plt/overlap_venn", config, function(json, status) {
+    $.get("/plt/overlap_venn", config, function(json, status) {
         var div = d3.select("#overlap-venn-plot");
-        div.datum(json).call(venn);
+        div.datum(json).call(venn_chart);
 
         // add a tooltip
         var tooltip = d3.select("body").append("div")
@@ -100,6 +84,29 @@ function plot_overlap() {
                     .style("stroke-width", 0)
                     .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
                     .style("stroke-opacity", 0);
+            })
+
+            .on("click", function(d, i) {
+                var item = d.sets[0];
+                var screen = item.substr(0, item.length - 2);
+                var sel = "positive";
+                if(item.substr(item.length - 2) == "-") {
+                    sel = "negative";
+                }
+
+                var overlap_param = "&overlap-items=";
+                window.open("/targets/" + sel + "?fdr=" + fdr + overlap_param + d.sets.join(overlap_param));
+                /*
+                var form = $("#show-targets");
+
+                form.empty();
+                form.attr("action", "/targets/" + sel);
+                form.add('<input type="hidden" name="screen" value="' + screen + '">');
+                form.add('<input type="hidden" name="fdr" value="' + fdr + '">');
+                d.sets.forEach(function(item) {
+                    form.add('<input type="hidden" name="overlap-items" value="' + item + '">');
+                });
+                form.submit();*/
             });
 
     }, "json");

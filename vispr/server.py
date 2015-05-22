@@ -5,6 +5,7 @@ import re, json
 
 import numpy as np
 from flask import Flask, render_template, request, session
+from jinja2 import Markup
 
 app = Flask(__name__)
 
@@ -21,12 +22,16 @@ def index():
 
 @app.route("/targets/<selection>")
 def targets(selection):
-    return render_template("targets.html",
-                           screens=app.screens,
-                           selection=selection,
-                           screen=get_screen(),
-                           control_targets=get_screen().control_targets,
-                           hide_control_targets=session.get("hide_control_targets", False))
+    table_args = request.query_string.decode()
+    print(table_args)
+    return render_template(
+        "targets.html",
+        screens=app.screens,
+        selection=selection,
+        screen=get_screen(),
+        control_targets=get_screen().control_targets,
+        hide_control_targets=session.get("hide_control_targets", False),
+        table_args=table_args)
 
 
 @app.route("/qc")
@@ -60,8 +65,9 @@ def plt_pval_hist(selection):
     return plt
 
 
-@app.route("/tbl/targets/<selection>", methods=["GET", "POST"])
+@app.route("/tbl/targets/<selection>", methods=["GET"])
 def tbl_targets(selection):
+    print("tbl", request.query_string)
     offset = int(request.args.get("offset", 0))
     perpage = int(request.args.get("perPage", 20))
 
@@ -70,18 +76,27 @@ def tbl_targets(selection):
     total_count = records.shape[0]
     filter_count = total_count
 
+    filter = np.ones(total_count, dtype=np.bool)
+
     # restrict to overlap
-    if "fdr" in request.form and "overlap-items" in request.form:
-        pass
+    overlap_args = get_overlap_args()
+    if overlap_args:
+        overlap = app.screens.overlap(*overlap_args)
+        print(overlap)
+        filter &= records["target"].apply(lambda target: target in overlap)
 
+    # searching
     search = get_search()
-    if search or session.get("hide_control_targets", False):
-        if search:
-            filter = records["target"].str.contains(search)
-        else:
-            control_targets = get_screen().control_targets
-            filter = records["target"].apply(lambda target: target not in control_targets)
+    if search:
+        filter &= records["target"].str.contains(search)
 
+    if session.get("hide_control_targets", False):
+        control_targets = get_screen().control_targets
+        filter &= records["target"].apply(lambda target: target not in
+                                          control_targets)
+
+    # filtering
+    if not np.all(filter):
         if np.any(filter):
             records = records[filter]
             filter_count = records.shape[0]
@@ -91,6 +106,7 @@ def tbl_targets(selection):
                                    filter_count=0,
                                    total_count=total_count)
 
+    # sorting
     columns, ascending = get_sorting()
     if columns:
         records = records.sort(columns, ascending=ascending)
@@ -98,6 +114,7 @@ def tbl_targets(selection):
         records = records.sort("p-value")
     records = records[offset:offset + perpage]
 
+    # formatting
     def fmt_col(col):
         if col.dtype == np.float64:
             return col.apply("{:.2g}".format)
@@ -115,8 +132,7 @@ def tbl_targets(selection):
 @app.route("/tbl/pvals_highlight/<selection>/<targets>")
 def tbl_pvals_highlight(selection, targets):
     targets = targets.split("|")
-    records = get_targets(selection).get_pvals_highlight_targets(
-        targets)
+    records = get_targets(selection).get_pvals_highlight_targets(targets)
     return records.to_json(orient="records")
 
 
@@ -177,12 +193,12 @@ def plt_zerocounts():
     return plt
 
 
-@app.route("/plt/overlap_chord", methods=["POST"])
+@app.route("/plt/overlap_chord")
 def plt_overlap_chord():
     return app.screens.plot_overlap_chord(*get_overlap_args())
 
 
-@app.route("/plt/overlap_venn", methods=["POST"])
+@app.route("/plt/overlap_venn")
 def plt_overlap_venn():
     return app.screens.plot_overlap_venn(*get_overlap_args())
 
@@ -192,17 +208,22 @@ def set_hide_control_targets(value):
     session["hide_control_targets"] = value == 1
     return ""
 
+@app.route("/set/screen/<screen>")
+def set_screen(screen):
+    session["screen"] = screen
+    return ""
 
 def get_overlap_args():
     def parse_item(item):
         screen, sel = item.split()
         return screen, sel == "+"
 
-    if "fdr" not in request.form and "overlap-items" not in request.form:
+    print(request.values)
+    if "fdr" not in request.values and "overlap-items" not in request.form:
         return None
 
-    fdr = float(request.form.get("fdr", 0.25))
-    items = list(map(parse_item, request.form.getlist("overlap-items")))
+    fdr = float(request.values.get("fdr", 0.25))
+    items = list(map(parse_item, request.values.getlist("overlap-items")))
     return fdr, items
 
 

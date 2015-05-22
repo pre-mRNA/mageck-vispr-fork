@@ -5,6 +5,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
+    <script src="/static/bootstrap-select.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap-select.min.css">
+
     <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
     <script src="http://trifacta.github.io/vega/vega.js"></script>
 
@@ -15,9 +18,8 @@
     <link rel="stylesheet" href="/static/d3.parcoords.css">
 
     <script src="/static/chord2.js"></script>
+
     <script src="/static/venn.min.js"></script>
-    <script src="/static/bootstrap-select.min.js"></script>
-    <link rel="stylesheet" href="/static/bootstrap-select.min.css">
 
     <link rel="stylesheet" href="/static/style.css">
 
@@ -66,6 +68,9 @@
                     </li>
                     <li><a href="/qc">Quality Control</a></li>
                     <li><a href="/compare">Compare Experiments</a></li>
+                </ul>
+                <ul class="nav navbar-right">
+                    <li><p class="navbar-text">{{ screen.name }}</p></li>
                 </ul>
             </div>
         </div>

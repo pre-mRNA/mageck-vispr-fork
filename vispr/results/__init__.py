@@ -41,11 +41,14 @@ class Screens:
                                                                  items=items))
 
     def plot_overlap_venn(self, fdr=0.05, items=None):
-        return target.plot_overlap_venn(**self._overlap_targets(fdr=fdr,
-                                                                items=items))
+        plt = target.plot_overlap_venn(**self._overlap_targets(fdr=fdr,
+                                                               items=items))
+        return plt
 
     def overlap(self, fdr=0.05, items=None):
-        return target.overlap(*self._overlap_targets(fdr=fdr, items=items).values())
+        return target.overlap(*self._overlap_targets(fdr=fdr,
+                                                     items=items).values())
+
 
 class Screen:
     def __init__(self, config, parentdir="."):
@@ -57,17 +60,15 @@ class Screen:
         self.name = config["experiment"]
 
         targets = get_path(config["targets"]["results"])
-        self.pos_targets = target.Results(
-            targets,
-            positive=True)
-        self.neg_targets = target.Results(
-            targets,
-            positive=False)
+        self.pos_targets = target.Results(targets, positive=True)
+        self.neg_targets = target.Results(targets, positive=False)
         self.is_genes = config["targets"].get("genes", False)
         if self.is_genes:
             self.species = config["targets"]["species"]
 
-        self.rnas = rna.Results(get_path(config["sgrnas"]["counts"]), info=get_path(config["sgrnas"].get("info", None)))
+        self.rnas = rna.Results(
+            get_path(config["sgrnas"]["counts"]),
+            info=get_path(config["sgrnas"].get("info", None)))
         self.mapstats = None
         if "mapstats" in config["sgrnas"]:
             self.mapstats = mapstats.Results(
@@ -82,10 +83,11 @@ class Screen:
 
         self.control_targets = set()
         if "controls" in config["targets"]:
-            self.control_targets = set(pd.read_table(config["targets"]["controls"],
-                                                     header=None,
-                                                     squeeze=True,
-                                                     na_filter=False))
+            self.control_targets = set(
+                pd.read_table(config["targets"]["controls"],
+                              header=None,
+                              squeeze=True,
+                              na_filter=False))
 
     def targets(self, positive=True):
         return self.pos_targets if positive else self.neg_targets
