@@ -12,7 +12,7 @@ from vispr.results.common import lru_cache, AbstractResults
 class Results(AbstractResults):
     """Keep and display target results."""
 
-    def __init__(self, dataframe, controls=None):
+    def __init__(self, dataframe, positive=True):
         """
         Arguments
 
@@ -20,33 +20,30 @@ class Results(AbstractResults):
         controls  -- path to file containing control genes. Alternatively, a dataframe.
         """
         super().__init__(dataframe)
-        if controls is not None:
-            self.controls = set(pd.read_table(controls,
-                                              header=None,
-                                              squeeze=True,
-                                              na_filter=False))
+        if positive:
+            self.df = self.df[["id", "lo.pos", "p.pos", "fdr.pos"]]
         else:
-            self.controls = set()
+            self.df = self.df[["id", "lo.neg", "p.neg", "fdr.neg"]]
+        self.df.columns = ["target", "score", "p-value", "fdr"]
 
     @lru_cache()
-    def get_pvals(self, positive=True):
+    def get_pvals(self):
         # select column and sort
-        col = "pos" if positive else "neg"
-        pvals = -np.log10(self.df[["p." + col]])
-        fdr = self.df[["fdr." + col]]
-        data = pd.concat([self.df[["id"]], pvals, fdr],
-                         axis=1).sort("p." + col,
+        pvals = -np.log10(self.df[["p-value"]])
+        fdr = self.df[["fdr"]]
+        data = pd.concat([self.df[["target"]], pvals, fdr],
+                         axis=1).sort("p-value",
                                       ascending=False).reset_index(drop=True)
         return data
 
-    def plot_pvals(self, positive=True):
+    def plot_pvals(self):
         """
         Plot the gene ranking in form of their p-values as line plot.
 
         Arguments
         positive -- if true, plot positive selection scores, else negative selection
         """
-        data = self.get_pvals(positive=positive)
+        data = self.get_pvals()
 
         pvals = pd.DataFrame(
             {"idx": data.index,
@@ -57,24 +54,24 @@ class Results(AbstractResults):
                                pvals=pvals.to_json(orient="records"))
 
     @lru_cache()
-    def get_pvals_highlight(self, positive=True):
-        pvals = self.get_pvals(positive=positive)
+    def get_pvals_highlight(self):
+        pvals = self.get_pvals()
         pvals = pd.DataFrame({
             "idx": pvals.index,
             "pval": pvals.ix[:, 1],
-            "label": pvals["id"]
+            "label": pvals["target"]
         })
         pvals.index = pvals["label"]
         return pvals
 
-    def get_pvals_highlight_targets(self, highlight_targets, positive=True):
-        pvals = self.get_pvals_highlight(positive=positive)
+    def get_pvals_highlight_targets(self, highlight_targets):
+        pvals = self.get_pvals_highlight()
         pvals = pvals.ix[highlight_targets]
 
         return pvals
 
-    def plot_pval_hist(self, positive=True):
-        data = self.get_pvals(positive=positive)
+    def plot_pval_hist(self):
+        data = self.get_pvals()
         edges = np.arange(0, 1.1, 0.1)
         counts, _ = np.histogram(data.ix[:, 1], bins=edges)
         bins = edges[1:]
@@ -83,16 +80,22 @@ class Results(AbstractResults):
         return render_template("plots/pval_hist.json",
                                hist=hist.to_json(orient="records"))
 
-    def get_pvals_idx(self, target, positive=True):
-        data, _ = self.get_pvals(positive=positive)
-        idx = data.index.values[(data["id"] == target).values]
+    def get_pvals_idx(self, target):
+        data, _ = self.get_pvals()
+        idx = data.index.values[(data["target"] == target).values]
         assert len(idx) == 1
         return int(idx[0])
 
-    def targets(self, fdr, positive=True):
-        col = "pos" if positive else "neg"
-        valid = self.df["fdr." + col] <= fdr
-        return set(self.df.ix[valid, "id"])
+    def ids(self, fdr):
+        valid = self.df["fdr"] <= fdr
+        return set(self.df.ix[valid, "target"])
+
+
+def overlap(*targets):
+    isect = set(targets[0])
+    for other in targets[1:]:
+        isect &= other
+    return isect
 
 
 def overlaps(order, **targets):
@@ -102,9 +105,7 @@ def overlaps(order, **targets):
     targets -- labels and targets to compare
     """
     for c in combinations(targets.items(), order):
-        isect = set(c[0][1])
-        for other in map(itemgetter(1), c[1:]):
-            isect &= other
+        isect = overlap(*map(itemgetter(1), c))
         labels = list(map(itemgetter(0), c))
         yield labels, len(isect)
 

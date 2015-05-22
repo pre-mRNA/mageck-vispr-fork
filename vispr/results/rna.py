@@ -24,14 +24,15 @@ class Results(AbstractResults):
     def by_target(self, target):
         first_sample = self.df.columns[2]
         data = self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=
-                                                         "Gene"].sort(
-                                                             first_sample)
+                                                         "Gene"]
+        data.sort(first_sample, inplace=True)
         if self.info is not None:
             data.index = data["sgRNA"]
             info = self.info.ix[data["sgRNA"]]
             if not info["score"].hasnans() and not info["start"].hasnans():
-                data["score"] = info["score"]
+                data.insert(1, "efficiency", info["score"])
                 data["chrom pos"] = info["start"]
+                data.sort("efficiency", inplace=True)
         return data
 
     def plot_normalization(self):

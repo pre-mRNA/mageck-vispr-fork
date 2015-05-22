@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function
 
 import os
 
+import pandas as pd
+
 from vispr.results import target
 from vispr.results import rna
 from vispr.results import fastqc
@@ -30,8 +32,7 @@ class Screens:
         selection = ["-", "+"]
         return {
             "{} {}".format(screen, selection[positive]):
-            self.screens[screen].targets.targets(fdr,
-                                                 positive=positive)
+            self.screens[screen].targets(positive).ids(fdr)
             for screen, positive in items
         }
 
@@ -43,6 +44,8 @@ class Screens:
         return target.plot_overlap_venn(**self._overlap_targets(fdr=fdr,
                                                                 items=items))
 
+    def overlap(self, fdr=0.05, items=None):
+        return target.overlap(*self._overlap_targets(fdr=fdr, items=items).values())
 
 class Screen:
     def __init__(self, config, parentdir="."):
@@ -53,9 +56,13 @@ class Screen:
 
         self.name = config["experiment"]
 
-        self.targets = target.Results(
-            get_path(config["targets"]["results"]),
-            controls=get_path(config["targets"].get("controls", None)))
+        targets = get_path(config["targets"]["results"])
+        self.pos_targets = target.Results(
+            targets,
+            positive=True)
+        self.neg_targets = target.Results(
+            targets,
+            positive=False)
         self.is_genes = config["targets"].get("genes", False)
         if self.is_genes:
             self.species = config["targets"]["species"]
@@ -72,3 +79,13 @@ class Screen:
                 sample: get_path(path)
                 for sample, path in config["fastqc"].items()
             })
+
+        self.control_targets = set()
+        if "controls" in config["targets"]:
+            self.control_targets = set(pd.read_table(config["targets"]["controls"],
+                                                     header=None,
+                                                     squeeze=True,
+                                                     na_filter=False))
+
+    def targets(self, positive=True):
+        return self.pos_targets if positive else self.neg_targets

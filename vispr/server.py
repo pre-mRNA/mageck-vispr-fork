@@ -25,7 +25,7 @@ def targets(selection):
                            screens=app.screens,
                            selection=selection,
                            screen=get_screen(),
-                           control_targets=get_screen().targets.controls,
+                           control_targets=get_screen().control_targets,
                            hide_control_targets=session.get("hide_control_targets", False))
 
 
@@ -50,34 +50,37 @@ def compare():
 
 @app.route("/plt/pvals/<selection>")
 def plt_pvals(selection):
-    plt = get_screen().targets.plot_pvals(positive=selection == "positive")
+    plt = get_targets(selection).plot_pvals()
     return plt
 
 
 @app.route("/plt/pvalhist/<selection>")
 def plt_pval_hist(selection):
-    plt = get_screen().targets.plot_pval_hist(positive=selection == "positive")
+    plt = get_targets(selection).plot_pval_hist()
     return plt
 
 
-@app.route("/tbl/targets/<selection>", methods=["GET"])
+@app.route("/tbl/targets/<selection>", methods=["GET", "POST"])
 def tbl_targets(selection):
     offset = int(request.args.get("offset", 0))
     perpage = int(request.args.get("perPage", 20))
 
     # sort and slice records
-    records = get_screen().targets[:]
+    records = get_targets(selection)[:]
     total_count = records.shape[0]
     filter_count = total_count
+
+    # restrict to overlap
+    if "fdr" in request.form and "overlap-items" in request.form:
+        pass
 
     search = get_search()
     if search or session.get("hide_control_targets", False):
         if search:
-            filter = records["id"].str.contains(
-            search)
+            filter = records["target"].str.contains(search)
         else:
-            control_targets = get_screen().targets.controls
-            filter = records["id"].apply(lambda target: target not in control_targets)
+            control_targets = get_screen().control_targets
+            filter = records["target"].apply(lambda target: target not in control_targets)
 
         if np.any(filter):
             records = records[filter]
@@ -92,7 +95,7 @@ def tbl_targets(selection):
     if columns:
         records = records.sort(columns, ascending=ascending)
     else:
-        records = records.sort("p.pos" if selection == "positive" else "p.neg")
+        records = records.sort("p-value")
     records = records[offset:offset + perpage]
 
     def fmt_col(col):
@@ -112,9 +115,8 @@ def tbl_targets(selection):
 @app.route("/tbl/pvals_highlight/<selection>/<targets>")
 def tbl_pvals_highlight(selection, targets):
     targets = targets.split("|")
-    records = get_screen().targets.get_pvals_highlight_targets(
-        targets,
-        positive=selection == "positive")
+    records = get_targets(selection).get_pvals_highlight_targets(
+        targets)
     return records.to_json(orient="records")
 
 
@@ -196,6 +198,9 @@ def get_overlap_args():
         screen, sel = item.split()
         return screen, sel == "+"
 
+    if "fdr" not in request.form and "overlap-items" not in request.form:
+        return None
+
     fdr = float(request.form.get("fdr", 0.25))
     items = list(map(parse_item, request.form.getlist("overlap-items")))
     return fdr, items
@@ -217,3 +222,7 @@ def get_search(pattern=re.compile("search\[(?P<target>.+)\]")):
 
 def get_screen():
     return app.screens[session.get("screen", next(iter(app.screens)))]
+
+
+def get_targets(selection):
+    return get_screen().targets(selection == "positive")
