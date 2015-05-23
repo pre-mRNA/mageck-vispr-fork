@@ -26,15 +26,11 @@ class Results(AbstractResults):
             self.df = self.df[["id", "lo.neg", "p.neg", "fdr.neg"]]
         self.df.columns = ["target", "score", "p-value", "fdr"]
 
-    @lru_cache()
-    def get_pvals(self):
-        # select column and sort
-        pvals = -np.log10(self.df[["p-value"]])
-        fdr = self.df[["fdr"]]
-        data = pd.concat([self.df[["target"]], pvals, fdr],
-                         axis=1).sort("p-value",
-                                      ascending=False).reset_index(drop=True)
-        return data
+        self.df.sort("p-value", inplace=True)
+        self.df.reset_index(drop=True, inplace=True)
+        self.df["log10-p-value"] = -np.log10(self.df[["p-value"]])
+        self.df["idx"] = self.df.index
+        self.df.index = self.df["target"]
 
     def plot_pvals(self):
         """
@@ -43,48 +39,24 @@ class Results(AbstractResults):
         Arguments
         positive -- if true, plot positive selection scores, else negative selection
         """
-        data = self.get_pvals()
+        data = self.df[["idx", "log10-p-value"]]
 
-        pvals = pd.DataFrame(
-            {"idx": data.index,
-             "pval": data.ix[:, 1],
-             "fdr": data.ix[:, 2]})
-
-        return render_template("plots/pvals.json",
-                               pvals=pvals.to_json(orient="records"))
-
-    @lru_cache()
-    def get_pvals_highlight(self):
-        pvals = self.get_pvals()
-        pvals = pd.DataFrame({
-            "idx": pvals.index,
-            "pval": pvals.ix[:, 1],
-            "label": pvals["target"]
-        })
-        pvals.index = pvals["label"]
-        return pvals
+        plt = render_template("plots/pvals.json",
+                               pvals=data.to_json(orient="records"))
+        return plt
 
     def get_pvals_highlight_targets(self, highlight_targets):
-        pvals = self.get_pvals_highlight()
-        pvals = pvals.ix[highlight_targets]
-
-        return pvals
+        data = self.df[["idx", "log10-p-value", "target"]]
+        return data.ix[highlight_targets]
 
     def plot_pval_hist(self):
-        data = self.get_pvals()
         edges = np.arange(0, 1.1, 0.1)
-        counts, _ = np.histogram(data.ix[:, 1], bins=edges)
+        counts, _ = np.histogram(self.df["p-value"], bins=edges)
         bins = edges[1:]
 
         hist = pd.DataFrame({"bin": bins, "count": counts})
         return render_template("plots/pval_hist.json",
                                hist=hist.to_json(orient="records"))
-
-    def get_pvals_idx(self, target):
-        data, _ = self.get_pvals()
-        idx = data.index.values[(data["target"] == target).values]
-        assert len(idx) == 1
-        return int(idx[0])
 
     def ids(self, fdr):
         valid = self.df["fdr"] <= fdr

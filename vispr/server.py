@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 import re, json
 
 import numpy as np
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, abort
 from jinja2 import Markup
 
 app = Flask(__name__)
@@ -13,17 +13,16 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     screen = app.screens[next(iter(app.screens))]
-    return render_template("index.html",
-                           screens=app.screens,
-                           screen=screen)
+    return render_template("index.html", screens=app.screens, screen=screen)
 
 
 @app.route("/<screen>")
 def index_screen(screen):
-    screen = app.screens[screen]
-    return render_template("index.html",
-                           screens=app.screens,
-                           screen=screen)
+    try:
+        screen = app.screens[screen]
+    except KeyError:
+        abort(404)
+    return render_template("index.html", screens=app.screens, screen=screen)
 
 
 @app.route("/targets/<screen>/<selection>")
@@ -101,8 +100,8 @@ def tbl_targets(screen, selection):
 
     if session.get("hide_control_targets", False):
         control_targets = screen.control_targets
-        filter &= records["target"].apply(lambda target: target not in
-                                          control_targets)
+        filter &= records["target"].apply(
+            lambda target: target not in control_targets)
 
     # filtering
     if not np.all(filter):
@@ -119,8 +118,6 @@ def tbl_targets(screen, selection):
     columns, ascending = get_sorting()
     if columns:
         records = records.sort(columns, ascending=ascending)
-    else:
-        records = records.sort("p-value")
     records = records[offset:offset + perpage]
 
     # formatting
@@ -142,7 +139,8 @@ def tbl_targets(screen, selection):
 def tbl_pvals_highlight(screen, selection, targets):
     screen = app.screens[screen]
     targets = targets.split("|")
-    records = get_targets(screen, selection).get_pvals_highlight_targets(targets)
+    records = get_targets(screen,
+                          selection).get_pvals_highlight_targets(targets)
     return records.to_json(orient="records")
 
 

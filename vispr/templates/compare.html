@@ -91,11 +91,12 @@ function plot_overlap() {
                 d.sets.forEach(function(item) {
                     var screen = item.substr(0, item.length - 2);
                     var sel = "positive";
-                    if(item.substr(item.length - 2) == "-") {
+                    if(item.substr(item.length - 1) == "-") {
                         sel = "negative";
                     }
 
-                    window.open("/targets/" + screen + "/" + sel + "?fdr=" + fdr + overlap_param + d.sets.join(overlap_param));
+                    items = d.sets.map(encodeURIComponent);
+                    window.open("/targets/" + screen + "/" + sel + "?fdr=" + fdr + overlap_param + items.join(overlap_param));
                 });
             });
 

@@ -24,12 +24,12 @@
             "type": "linear",
             "range": "height",
             "nice": true,
-            "domain": {"data": "pvals", "field": "data.pval"}
+            "domain": {"data": "pvals", "field": "data.log10-p-value"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "highlight", "field": "data.label"},
+            "domain": {"data": "highlight", "field": "data.target"},
             "range": "category20"
         }
     ],
@@ -44,7 +44,7 @@
             "properties": {
                 "enter": {
                     "x": {"scale": "x", "field": "data.idx"},
-                    "y": {"scale": "y", "field": "data.pval"},
+                    "y": {"scale": "y", "field": "data.log10-p-value"},
                     "stroke": {"value": "steelblue"},
                     "strokeWidth": {"value": 2}
                 }
@@ -56,8 +56,8 @@
             "properties": {
                 "enter": {
                     "x": {"scale": "x", "field": "data.idx"},
-                    "y": {"scale": "y", "field": "data.pval"},
-                    "fill": {"scale": "c", "field": "data.label"},
+                    "y": {"scale": "y", "field": "data.log10-p-value"},
+                    "fill": {"scale": "c", "field": "data.target"},
                     "stroke": {"value": "transparent"},
                     "size": {"value": 50}
                 }
