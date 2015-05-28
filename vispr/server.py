@@ -35,8 +35,9 @@ def targets(screen, selection):
         selection=selection,
         screen=screen,
         control_targets=screen.control_targets,
-        hide_control_targets=session.get("hide_control_targets", False),
-        table_args=table_args)
+        hide_control_targets=session.get("hide_control_targets", True),
+        table_args=table_args,
+        samples=screen.rnas.samples)
 
 
 @app.route("/qc/<screen>")

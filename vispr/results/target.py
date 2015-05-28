@@ -41,8 +41,20 @@ class Results(AbstractResults):
         """
         data = self.df[["idx", "log10-p-value"]]
 
+        i5 = self.df["fdr"].searchsorted(0.05)[0]
+        i25 = self.df["fdr"].searchsorted(0.25)[0]
+
+        fdr5 = data.iloc[i5]["log10-p-value"]
+        fdr25 = data.iloc[i25]["log10-p-value"]
+        fdr5label = "{:.0%} FDR".format(self.df.iloc[i5]["fdr"])
+        fdr25label = "{:.0%} FDR".format(self.df.iloc[i25]["fdr"])
+
         plt = render_template("plots/pvals.json",
-                               pvals=data.to_json(orient="records"))
+                              pvals=data.to_json(orient="records"),
+                              fdr5=fdr5,
+                              fdr25=fdr25,
+                              fdr5label=fdr5label,
+                              fdr25label=fdr25label)
         return plt
 
     def get_pvals_highlight_targets(self, highlight_targets):

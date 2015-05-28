@@ -21,6 +21,10 @@ class Results(AbstractResults):
         if info is not None:
             self.info = pd.read_table(info, na_filter=False, index_col=3, names=["chrom", "start", "stop", "score"])
 
+    @property
+    def samples(self):
+        return self.df.columns[2:]
+
     def by_target(self, target):
         first_sample = self.df.columns[2]
         data = self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=

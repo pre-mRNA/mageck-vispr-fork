@@ -42,6 +42,14 @@
         <div class="row">
             <div class="col-md-12">
                 <h4>gRNAs</h4>
+                    <div class="form-group form-inline text-right">
+                        <label for="choose-samples">Samples</label>
+                        <select id="choose-samples" class="selectpicker" multiple>
+                            {% for sample in samples %}
+                            <option selected>{{ sample }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
             </div>
         </div>
@@ -53,7 +61,8 @@
         var plt_pval = null;
         var plt_rna = null;
         var selected = {};
-        var sample_order = null;
+        var rna_dimensions = null;
+        var rna_dimensions_aux = ["efficiency", "chrom pos", "sgRNA"];
 
         function get_selected() {
             var targets = [];
@@ -89,6 +98,33 @@
             plt_pval.update();
         }
 
+        function highlight_targets_init() {
+            // highlight the first 5 targets
+            $(".btn-select-target:lt(6)").each(function(i, e) {
+                $(e).click();
+            });
+        }
+
+        function update_dimensions() {
+            var sel = [];
+            $("#choose-samples option:selected").each(function() {
+                sel.push($(this).text());
+            });
+            var new_dimensions = [];
+            rna_dimensions.forEach(function(d) {
+                if(sel.indexOf(d) != -1 || rna_dimensions_aux.indexOf(d) != -1) {
+                    new_dimensions.push(d);
+                }
+            });
+            sel.forEach(function(d) {
+                if(new_dimensions.indexOf(d) == -1) {
+                    new_dimensions.push(d);
+                }
+            });
+            rna_dimensions = new_dimensions;
+            plt_rna.dimensions(rna_dimensions);
+        }
+
         vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ selection }}", function(chart) {
             vega_draw(chart, "#pval-hist-plot");
         });
@@ -112,9 +148,6 @@
 
         {% if control_targets %}
             filters.append('<div class="btn-group" data-toggle="buttons"><label class="btn btn-default"><input type="checkbox" id="hide-controls">hide controls</label></div>');
-            {% if hide_control_targets %}
-                $("#hide-controls").click();
-            {% endif %}
             $("#hide-controls").change(function() {
                 if(this.checked) {
                     $.get("/set/hide_control_targets/1", function() {
@@ -127,6 +160,9 @@
                     });
                 }
             });
+            {% if hide_control_targets %}
+                $("#hide-controls").click();
+            {% endif %}
         {% endif %}
 
         $("#dynatable-per-page-targets").addClass("selectpicker");
@@ -168,7 +204,6 @@
                     $("#rna-plot").empty();
 
                     var names = data.map(function(rec) { return rec.sgRNA });
-                    var dimensions = d3.keys(data[0]);
                     var colors = d3.scale.category10().domain(names);
 
                     plt_rna = d3.parcoords(
@@ -182,16 +217,31 @@
                         .color(function(record) { return colors(record.sgRNA) })
                         .render();
 
+                    if(rna_dimensions == null) {
+                        rna_dimensions = plt_rna.dimensions();
+                    }
+
+                    update_dimensions();
+
                     var max_count = 0;
-                    dimensions.forEach(function(d) {
-                        if(d != "efficiency" && d != "chrom pos" && d != "sgRNA") {
+                    rna_dimensions.forEach(function(d) {
+                        if(rna_dimensions_aux.indexOf(d) == -1) {
                             max_count = Math.max(max_count, d3.max(data, function(rec) { return rec[d] }));
                         }
                     });
-                    dimensions.forEach(function(d) {
-                        if(d != "efficiency" && d != "chrom pos" && d != "sgRNA") {
+                    rna_dimensions.forEach(function(d) {
+                        if(rna_dimensions_aux.indexOf(d) == -1) {
                             plt_rna.scale(d, [0, max_count]);
                         }
+                    });
+
+                    plt_rna.on("render", function() {
+                        rna_dimensions = plt_rna.dimensions();
+                        plt_rna.svg.selectAll("text").style("font-size", "10px");
+                        $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
+                        $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
+                        $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
+                        $("#rna-plot svg .axis .label").attr("text-anchor", "left");
                     });
 
                     plt_rna.createAxes()
@@ -199,23 +249,10 @@
                         .reorderable()
                         .interactive()
                         .render();
-
-
-
-                    if(sample_order != null) {
-                        plt_rna.dimensions(sample_order);
-                    }
-
-                    plt_rna.on("render", function() {
-                        sample_order = plt_rna.dimensions();
-                    });
-
-                    plt_rna.svg.selectAll("text").style("font-size", "10px");
-                    $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
-                    $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
-                    $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
-                    $("#rna-plot svg .axis .label").attr("text-anchor", "left");
                 });
+
+                highlight_targets_init();
+                highlight_targets_init = function() {};
             });
 
             // Display gene in hockey stick and update "selected".
@@ -256,6 +293,8 @@
             clear_pval_highlights();
             $(".btn-select-target").removeClass("active");
         });
+
+        $("#choose-samples").change(update_dimensions);
 
         </script>
         {% endblock %}
