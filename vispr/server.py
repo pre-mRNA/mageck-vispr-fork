@@ -150,9 +150,14 @@ def tbl_rnas(screen, target):
     screen = app.screens[screen]
     table = screen.rnas.by_target(target)
     return table.to_json(orient="records")
-    return render_template("parcoords.json",
-                           dimensions=json.dumps(list(table.columns)),
-                           values=table.to_json(orient="values"))
+
+
+@app.route("/bed/rnas/<screen>/<target>.bed")
+def bed_rnas(screen, target):
+    screen = app.screens[screen]
+    table = screen.rnas.target_track(target)
+    bed = table.to_csv(sep="\t", header=False, index=False)
+    return bed
 
 
 @app.route("/plt/normalization/<screen>")

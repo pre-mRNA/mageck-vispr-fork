@@ -1,5 +1,6 @@
 import sys, csv, random
 
+
 reader = csv.reader(sys.stdin)
 next(reader)
 for l in reader:

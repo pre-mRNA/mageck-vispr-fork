@@ -62,7 +62,7 @@
         var plt_rna = null;
         var selected = {};
         var rna_dimensions = null;
-        var rna_dimensions_aux = ["efficiency", "chrom pos", "sgRNA"];
+        var rna_dimensions_aux = ["efficiency", "chrom pos", "rna"];
 
         function get_selected() {
             var targets = [];
@@ -183,6 +183,8 @@
                 var target = $(cell).parent().children(":first").children(":first").html();
                 $(cell).html(
                     '<div class="btn-group" role="group">' +
+                    '<a class="btn btn-default btn-show-igv" href="http://localhost:60151/load?file={{ request.url_root }}bed/rnas/{{ screen.name }}/' +
+                    target + '.bed&amp;merge=true&amp;locus=' + target + '"><span class="glyphicon glyphicon-equalizer"></span></a>' +
                     '<button type="button" class="btn btn-default btn-plt-rnas" name="' +
                     target + '"><span class="glyphicon glyphicon-stats"></span></button>' +
                     '<button type="button" class="btn btn-default btn-select-target" name="' +
@@ -203,7 +205,7 @@
                     if (error) return console.warn(error);
                     $("#rna-plot").empty();
 
-                    var names = data.map(function(rec) { return rec.sgRNA });
+                    var names = data.map(function(rec) { return rec.rna });
                     var colors = d3.scale.category10().domain(names);
 
                     plt_rna = d3.parcoords(
@@ -214,7 +216,7 @@
                         .data(data)
                         .margin({ top: 80, left: 80, bottom: 12, right: 0 })
                         .height(Math.max(data.length * 12, 300))
-                        .color(function(record) { return colors(record.sgRNA) })
+                        .color(function(record) { return colors(record.rna) })
                         .render();
 
                     if(rna_dimensions == null) {
@@ -238,9 +240,9 @@
                     plt_rna.on("render", function() {
                         rna_dimensions = plt_rna.dimensions();
                         plt_rna.svg.selectAll("text").style("font-size", "10px");
-                        $("#rna-plot svg .axis > :contains(sgRNA)").css("opacity", "0");
-                        $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".domain").css("opacity", "0");
-                        $("#rna-plot svg .axis > :contains(sgRNA)").parent().find(".tick line").css("opacity", "0");
+                        $("#rna-plot svg .axis > :contains(rna)").css("opacity", "0");
+                        $("#rna-plot svg .axis > :contains(rna)").parent().find(".domain").css("opacity", "0");
+                        $("#rna-plot svg .axis > :contains(rna)").parent().find(".tick line").css("opacity", "0");
                         $("#rna-plot svg .axis .label").attr("text-anchor", "left");
                     });
 
@@ -257,7 +259,7 @@
 
             // Display gene in hockey stick and update "selected".
             $(".btn-select-target").tooltip().click(function() {
-                var target = $(this).attr("name"); //$(this).parent().parent().children(":first").children(":first").html();
+                var target = $(this).attr("name");
 
                 if(!$(this).hasClass("active")) {
                     $(this).addClass("active");
@@ -273,7 +275,7 @@
             });
 
             for(target in selected) {
-                $("button[name=" + target + "]").addClass("active");
+                $("button.btn-select-target[name=" + target + "]").addClass("active");
             }
 
             $(".btn-plt-rnas:first").click();

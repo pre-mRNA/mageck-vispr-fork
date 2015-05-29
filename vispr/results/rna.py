@@ -17,6 +17,8 @@ class Results(AbstractResults):
         # reorder columns lexicographically
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
+        self.df.columns = ["rna", "target"] + list(self.df.columns[2:])
+        self.df.index = self.df["target"]
         self.info = None
         if info is not None:
             self.info = pd.read_table(info, na_filter=False, index_col=3, names=["chrom", "start", "stop", "score"])
@@ -27,16 +29,22 @@ class Results(AbstractResults):
 
     def by_target(self, target):
         first_sample = self.df.columns[2]
-        data = self.df.loc[self.df["Gene"] == target].ix[:, self.df.columns !=
-                                                         "Gene"]
+        data = self.df.ix[target, self.df.columns != "target"]
+
         data.sort(first_sample, inplace=True)
         if self.info is not None:
-            data.index = data["sgRNA"]
-            info = self.info.ix[data["sgRNA"]]
+            data.index = data["rna"]
+            info = self.info.ix[data["rna"]]
             if not info["score"].hasnans() and not info["start"].hasnans():
                 data.insert(1, "efficiency", info["score"])
                 data["chrom pos"] = info["start"]
                 data.sort("efficiency", inplace=True)
+        return data
+
+    def target_track(self, target):
+        rnas = self.df.ix[target, "rna"]
+        data = self.info.ix[rnas, ["chrom", "start", "stop"]]
+        data["name"] = data.index
         return data
 
     def plot_normalization(self):
