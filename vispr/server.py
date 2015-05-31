@@ -37,7 +37,8 @@ def targets(screen, selection):
         control_targets=screen.control_targets,
         hide_control_targets=session.get("hide_control_targets", True),
         table_args=table_args,
-        samples=screen.rnas.samples)
+        samples=screen.rnas.samples,
+        has_rna_info=screen.rnas.info is not None)
 
 
 @app.route("/qc/<screen>")
@@ -64,7 +65,7 @@ def compare(screen):
 @app.route("/plt/pvals/<screen>/<selection>")
 def plt_pvals(screen, selection):
     screen = app.screens[screen]
-    plt = get_targets(screen, selection).plot_pvals()
+    plt = get_targets(screen, selection).plot_pvals(screen.control_targets)
     return plt
 
 
@@ -99,7 +100,7 @@ def tbl_targets(screen, selection):
     if search:
         filter &= records["target"].str.contains(search)
 
-    if session.get("hide_control_targets", False):
+    if session.get("hide_control_targets", True):
         control_targets = screen.control_targets
         filter &= records["target"].apply(
             lambda target: target not in control_targets)
@@ -129,6 +130,9 @@ def tbl_targets(screen, selection):
 
     records = records.apply(fmt_col)
 
+    if screen.rnas.info is not None:
+        records["locus"] = ["{}:{}-{}".format(*screen.rnas.target_locus(target)) for target in records["target"]]
+
     return render_template("dyntable.json",
                            records=records.to_json(orient="records",
                                                    double_precision=15),
@@ -152,12 +156,16 @@ def tbl_rnas(screen, target):
     return table.to_json(orient="records")
 
 
-@app.route("/bed/rnas/<screen>/<target>.bed")
-def bed_rnas(screen, target):
+@app.route("/igv/session/<screen>.xml")
+def igv_session(screen):
     screen = app.screens[screen]
-    table = screen.rnas.target_track(target)
-    bed = table.to_csv(sep="\t", header=False, index=False)
-    return bed
+    return render_template("igv/session.xml", screen=screen)
+
+
+@app.route("/igv/track/rnas/<screen>.gct")
+def igv_track_rnas(screen):
+    screen = app.screens[screen]
+    return screen.rnas.track()
 
 
 @app.route("/plt/normalization/<screen>")

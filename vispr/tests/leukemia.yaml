@@ -1,7 +1,8 @@
 experiment: leukemia
+species: human
+assembly: hg19
 targets:
     results: leukemia.gene_summary.txt
-    species: human
     genes: true
     controls: ribosomal_genes.txt
 sgrnas:

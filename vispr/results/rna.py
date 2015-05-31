@@ -11,21 +11,24 @@ from vispr.results.common import lru_cache, AbstractResults
 
 
 class Results(AbstractResults):
-
     def __init__(self, dataframe, info=None):
         super().__init__(dataframe)
         # reorder columns lexicographically
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
-        self.df.columns = ["rna", "target"] + list(self.df.columns[2:])
+        self.df.columns = ["rna", "target"] + list(self.samples)
         self.df.index = self.df["target"]
         self.info = None
         if info is not None:
-            self.info = pd.read_table(info, na_filter=False, index_col=3, names=["chrom", "start", "stop", "score"])
+            self.info = pd.read_table(
+                info,
+                na_filter=False,
+                index_col=3,
+                names=["chrom", "start", "stop", "score"])
 
     @property
     def samples(self):
-        return self.df.columns[2:]
+        return list(self.df.columns[2:])
 
     def by_target(self, target):
         first_sample = self.df.columns[2]
@@ -41,11 +44,24 @@ class Results(AbstractResults):
                 data.sort("efficiency", inplace=True)
         return data
 
-    def target_track(self, target):
-        rnas = self.df.ix[target, "rna"]
-        data = self.info.ix[rnas, ["chrom", "start", "stop"]]
-        data["name"] = data.index
-        return data
+    def track(self):
+        data = self.df.ix[:, self.df.columns != "target"]
+        data["desc"] = [
+            "na|@chr{}:{}-{}|".format(*row) for _, row in
+            self.info.ix[data["rna"], ["chrom", "start", "stop"]].iterrows()
+        ]
+        return "#1.2\n{rnas}\t{samples}\n{data}".format(
+            rnas=data.shape[0],
+            samples=data.shape[1] - 2,
+            data=data.to_csv(sep="\t",
+                             index=False,
+                             columns=["rna", "desc"] + self.samples,
+                             header=["Name", "Description"] + self.samples))
+
+    def target_locus(self, target):
+        loci = self.info.ix[self.df.ix[target, "rna"], ["chrom", "start",
+                                                        "stop"]]
+        return loci["chrom"][0], loci["start"].min(), loci["stop"].max()
 
     def plot_normalization(self):
         _, leaves, _ = self.clustering()
@@ -125,5 +141,7 @@ class Results(AbstractResults):
 
         size = max(min(50 * len(labels), 700), 300)
 
-        plt = render_template("plots/correlation.json", data=json.dumps(data), size=size)
+        plt = render_template("plots/correlation.json",
+                              data=json.dumps(data),
+                              size=size)
         return plt

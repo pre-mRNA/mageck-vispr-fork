@@ -8,7 +8,7 @@
         },
         {
             "name": "highlight",
-            "values": []
+            "values": {{ highlight }}
         }
     ],
     "scales": [

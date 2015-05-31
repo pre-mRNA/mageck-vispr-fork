@@ -32,7 +32,7 @@ class Results(AbstractResults):
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
-    def plot_pvals(self):
+    def plot_pvals(self, control_targets):
         """
         Plot the gene ranking in form of their p-values as line plot.
 
@@ -49,8 +49,15 @@ class Results(AbstractResults):
         fdr5label = "{:.0%} FDR".format(self.df.iloc[i5]["fdr"])
         fdr25label = "{:.0%} FDR".format(self.df.iloc[i25]["fdr"])
 
+        top5 = self.df[["idx", "log10-p-value", "target"]]
+        if control_targets:
+            valid = self.df["target"].apply(lambda target: target not in control_targets)
+            top5 = top5[valid]
+        top5 = top5.ix[:5]
+
         plt = render_template("plots/pvals.json",
                               pvals=data.to_json(orient="records"),
+                              highlight=top5.to_json(orient="records"),
                               fdr5=fdr5,
                               fdr25=fdr25,
                               fdr5label=fdr5label,

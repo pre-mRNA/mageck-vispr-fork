@@ -63,8 +63,8 @@ class Screen:
         self.pos_targets = target.Results(targets, positive=True)
         self.neg_targets = target.Results(targets, positive=False)
         self.is_genes = config["targets"].get("genes", False)
-        if self.is_genes:
-            self.species = config["targets"]["species"]
+        self.species = config["species"]
+        self.assembly = config["assembly"]
 
         self.rnas = rna.Results(
             get_path(config["sgrnas"]["counts"]),

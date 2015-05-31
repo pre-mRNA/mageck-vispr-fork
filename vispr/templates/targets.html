@@ -7,20 +7,27 @@
         <table id="targets" class="table table-striped">
             <thead>
                 <th data-dynatable-column="target">Target</th>
+{% if has_rna_info %}
+                <th style="display: none" data-dynatable-column="locus">Locus</th>
+{% endif %}
                 <th data-dynatable-column="score">RRA-score</th>
                 <th data-dynatable-column="p-value">p-value</th>
                 <th data-dynatable-column="fdr">FDR</th>
                 <th style="text-align: right;" data-dynatable-no-sort="true">
                     <div class="dropdown">
                         <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
-                            Selection
+                            <span class="glyphicon glyphicon-menu-hamburger"></span>
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-                            {% if screen.is_genes %}
+{% if has_rna_info %}
                             <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
-                            {% endif %}
+{% endif %}
                             <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+{% if has_rna_info %}
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.broadinstitute.org/igv/projects/current/igv.php?sessionURL={{ request.url_root }}igv/session/{{ screen.name }}.xml">Open IGV</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="http://127.0.0.1:60151?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Show in existing IGV</a></li>
+{% endif %}
                         </ul>
                     </div>
                 </th>
@@ -100,8 +107,9 @@
 
         function highlight_targets_init() {
             // highlight the first 5 targets
-            $(".btn-select-target:lt(6)").each(function(i, e) {
-                $(e).click();
+            $(".btn-select-target:lt(6)").each(function(idx, e) {
+                var target = $(e).attr("name");
+                selected[target] = true;
             });
         }
 
@@ -148,6 +156,9 @@
 
         {% if control_targets %}
             filters.append('<div class="btn-group" data-toggle="buttons"><label class="btn btn-default"><input type="checkbox" id="hide-controls">hide controls</label></div>');
+            {% if hide_control_targets %}
+                $("#hide-controls").click();
+            {% endif %}
             $("#hide-controls").change(function() {
                 if(this.checked) {
                     $.get("/set/hide_control_targets/1", function() {
@@ -160,9 +171,6 @@
                     });
                 }
             });
-            {% if hide_control_targets %}
-                $("#hide-controls").click();
-            {% endif %}
         {% endif %}
 
         $("#dynatable-per-page-targets").addClass("selectpicker");
@@ -181,21 +189,30 @@
 
             $("#targets tr td:last-child").each(function(idx, cell) {
                 var target = $(cell).parent().children(":first").children(":first").html();
+                var locus = $(cell).parent().children(":eq(1)").html();
                 $(cell).html(
                     '<div class="btn-group" role="group">' +
-                    '<a class="btn btn-default btn-show-igv" href="http://localhost:60151/load?file={{ request.url_root }}bed/rnas/{{ screen.name }}/' +
-                    target + '.bed&amp;merge=true&amp;locus=' + target + '"><span class="glyphicon glyphicon-equalizer"></span></a>' +
+{% if has_rna_info %}
+                    '<a class="btn btn-default btn-show-igv" data-toggle="tooltip" ' +
+                    'title="Show in IGV (an instance of IGV can be opened in the menu at the top of this column)." ' +
+                    'href="http://127.0.0.1:60151/goto?locus=' +
+                    locus + '"><span class="glyphicon glyphicon-equalizer"></span></a>' +
+{% endif %}
                     '<button type="button" class="btn btn-default btn-plt-rnas" name="' +
-                    target + '"><span class="glyphicon glyphicon-stats"></span></button>' +
+                    target + '" data-toggle="tooltip" title="Show RNA counts.">' +
+                    '<span class="glyphicon glyphicon-stats"></span></button>' +
                     '<button type="button" class="btn btn-default btn-select-target" name="' +
-                    target + '"><span class="glyphicon glyphicon-ok"></span></button>' +
+                    target + '" data-toggle="tooltip" title="Select target and highlight in p-value plot.">' +
+                    '<span class="glyphicon glyphicon-ok"></span></button>' +
                     '</div>'
                 );
             });
 
+            highlight_targets_init();
+            highlight_targets_init = function() {};
 
             // Display parallel coordinates plot of RNA counts.
-            $(".btn-plt-rnas").tooltip().click(function() {
+            $(".btn-plt-rnas").click(function() {
                 var target = $(this).attr("name");
 
                 $(".btn-plt-rnas").removeClass("active");
@@ -252,13 +269,10 @@
                         .interactive()
                         .render();
                 });
-
-                highlight_targets_init();
-                highlight_targets_init = function() {};
             });
 
             // Display gene in hockey stick and update "selected".
-            $(".btn-select-target").tooltip().click(function() {
+            $(".btn-select-target").click(function() {
                 var target = $(this).attr("name");
 
                 if(!$(this).hasClass("active")) {
@@ -274,11 +288,14 @@
                 }
             });
 
+
+            console.log(selected);
             for(target in selected) {
                 $("button.btn-select-target[name=" + target + "]").addClass("active");
             }
 
             $(".btn-plt-rnas:first").click();
+            $('[data-toggle="tooltip"]').tooltip({container: 'body'})
         });
 
         // Show selected genes in GeneMANIA.

@@ -1,7 +1,8 @@
 experiment: melanoma
+species: human
+assembly: hg19
 targets:
     results: melanoma.gene_summary.txt
-    species: human
     genes: true
 sgrnas:
     counts: melanoma.normalized.txt
