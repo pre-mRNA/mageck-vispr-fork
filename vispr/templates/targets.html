@@ -210,6 +210,9 @@
 
             highlight_targets_init();
             highlight_targets_init = function() {};
+{% if table_args %}
+            update_pval_highlights();
+{% endif %}
 
             // Display parallel coordinates plot of RNA counts.
             $(".btn-plt-rnas").click(function() {
@@ -288,8 +291,6 @@
                 }
             });
 
-
-            console.log(selected);
             for(target in selected) {
                 $("button.btn-select-target[name=" + target + "]").addClass("active");
             }
