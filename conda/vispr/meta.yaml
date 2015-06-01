@@ -1,0 +1,24 @@
+package:
+  name: vispr
+  version: "0.1"
+source:
+  fn: vispr-0.1.tar.gz
+build:
+  entry_points:
+    - vispr = vispr.cli:main
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python
+    - numpy
+    - flask
+    - pandas
+    - pyyaml
+    - scikit-learn
+    - scipy
+about:
+  home: https://bitbucket.org/johanneskoester/vispr
+  license: MIT License
+  summary: VISPR is a visualization framework and analysis workflow for CRISPR/Cas9 knockout screens. VISPR is targeted on displaying results calculated by MAGeCK.
