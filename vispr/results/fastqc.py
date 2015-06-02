@@ -6,7 +6,7 @@ import pandas as pd
 from flask import render_template
 
 
-class Results:
+class Results(object):
     def __init__(self, **fastqc_data):
         self.gc_content = []
         self.base_quality = []

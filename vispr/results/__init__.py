@@ -11,7 +11,7 @@ from vispr.results import fastqc
 from vispr.results import mapstats
 
 
-class Screens:
+class Screens(object):
     def __init__(self):
         self.screens = {}
 
@@ -50,7 +50,7 @@ class Screens:
                                                      items=items).values())
 
 
-class Screen:
+class Screen(object):
     def __init__(self, config, parentdir="."):
         def get_path(relpath):
             if relpath is None:

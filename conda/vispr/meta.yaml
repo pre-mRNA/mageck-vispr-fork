@@ -2,7 +2,7 @@ package:
   name: vispr
   version: "0.1"
 source:
-  fn: vispr-0.1.tar.gz
+  path: ../../
 build:
   entry_points:
     - vispr = vispr.cli:main

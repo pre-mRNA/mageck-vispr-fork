@@ -19,7 +19,7 @@ class Results(AbstractResults):
         dataframe -- path to file containing MAGeCK target (gene) summary. Alternatively, a dataframe.
         controls  -- path to file containing control genes. Alternatively, a dataframe.
         """
-        super().__init__(dataframe)
+        super(Results, self).__init__(dataframe)
         if positive:
             self.df = self.df[["id", "lo.pos", "p.pos", "fdr.pos"]]
         else:

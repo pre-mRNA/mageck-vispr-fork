@@ -12,7 +12,7 @@ from vispr.results.common import lru_cache, AbstractResults
 
 class Results(AbstractResults):
     def __init__(self, dataframe, info=None):
-        super().__init__(dataframe)
+        super(Results, self).__init__(dataframe)
         # reorder columns lexicographically
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
@@ -81,6 +81,10 @@ class Results(AbstractResults):
         return render_template("plots/normalization.json",
                                data=data.to_json(orient="records"),
                                width=width)
+
+    def plot_distributions(self):
+        pass
+
 
     def counts(self):
         return self.df.ix[:, 2:]

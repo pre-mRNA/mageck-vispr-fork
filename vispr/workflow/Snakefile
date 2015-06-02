@@ -13,15 +13,7 @@ configfile: "config.yaml"
 
 
 import yaml
-
-
-def postprocess_config():
-    for key in "library species genes trim_5 sgrna_len experiments samples".split():
-        if key not in config:
-            raise WorkflowError("Missing key in config file: {}".format(key))
-    for sample in config["samples"]:
-        if not isinstance(config["samples"][sample], list):
-            config["samples"][sample] = [config["samples"][sample]]
+from vispr.workflow import postprocess_config
 
 
 postprocess_config()
@@ -64,7 +56,7 @@ rule mageck_count:
         "mageck count --output-prefix tables/count/all "
         "--list-seq {input.library} "
         "--fastq {input.fastq} --sample-label {params.labels} "
-        "--trim-5 {config[trim_5]} --sgrna-len {config[sgrna_len]} 2> {log}"
+        "--trim-5 {config[sgrnas][trim-5]} --sgrna-len {config[sgrnas][len]} 2> {log}"
 
 
 rule mageck_test:
@@ -94,23 +86,30 @@ rule vispr:
     output:
         "{experiment}.vispr.yaml"
     run:
+        vispr_config = {
+            "experiment": wildcards.experiment,
+            "species": config["species"],
+            "assembly": config["assembly"],
+            "targets": {
+                "results": input.results,
+                "genes": config["genes"]
+            },
+            "sgrnas": {
+                "counts": input.counts,
+                "mapstats": input.mapstats
+            },
+            "fastqc": {
+                sample: fastqc
+                for sample, fastqc in zip(config["samples"], input.fastqc)
+            }
+        }
+        if "controls" in config["targets"]:
+            vispr_config["targets"]["controls"] = config["targets"]["controls"]
+        if "info" in config["sgrnas"]:
+            vispr_config["sgrnas"]["info"] = config["sgrnas"]["info"]
         with open(output[0], "w") as f:
             yaml.dump(
-                {
-                    "experiment": wildcards.experiment,
-                    "target_results": input.results,
-                    "rna_counts": input.counts,
-                    "species": config["species"],
-                    "genes": config["genes"],
-                    "mapstats": input.mapstats,
-                    "fastqc": {
-                        sample: fastqc
-                        for sample, fastqc in zip(config["samples"], input.fastqc)
-                    }
-                },
+                vispr_config,
                 f,
                 default_flow_style=False
             )
-
-
-

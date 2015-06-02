@@ -1,8 +1,13 @@
 library: path/to/sgrna_design.csv
 species: human
-genes: true # if screening genes, set this to true for proper linkouts to GeneMANIA and Ensembl
-trim_5: 0 # trim the 5 prime end to get rid of barcode sequences
-sgrna_len: 20 # specify the length of the sgRNAs
+assembly: hg38
+targets:
+    genes: true # if screening genes, set this to true for proper linkouts to GeneMANIA and Ensembl
+    controls: ribosomal_genes.txt
+sgrnas:
+    trim-5: 0 # trim the 5 prime end to get rid of barcode sequences
+    len: 20 # specify the length of the sgRNAs
+    info: sgnra_info.bed # optional bed file containing location and efficiency of each sgRNA
 samples:
     # provide a label and a paths to the fastq files for each sample
     A: path/to/A.fastq
@@ -11,7 +16,7 @@ samples:
         - path/to/C.1.fastq
         - path/to/C.2.fastq # a sample can have technical replicates
 experiments:
-    "myexperiment:A-vs-all": # provide a descriptive name for your experiment (it will show up in VISPR)
+    "myexperiment: A-vs-all": # provide a descriptive name for your experiment (it will show up in VISPR)
          # specify treatment and control samples to be used by MAGeCK
         treatment:
             - A
@@ -19,7 +24,7 @@ experiments:
             - B
             - C
     # define as many experiments as you want
-    "myexperiment:A-vs-B":
+    "myexperiment: A-vs-B":
         treatment:
             - A
         control:

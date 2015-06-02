@@ -54,8 +54,8 @@ def qc(screen):
 @app.route("/compare/<screen>")
 def compare(screen):
     screen = app.screens[screen]
-    overlap_items = ["{} {}".format(screen, sel)
-                     for screen in app.screens for sel in "+-"]
+    overlap_items = ["{} {}".format(_screen, sel)
+                     for _screen in app.screens for sel in "+-"]
     return render_template("compare.html",
                            screens=app.screens,
                            screen=screen,

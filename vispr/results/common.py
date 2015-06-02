@@ -13,7 +13,7 @@ except ImportError:
         return dummy
 
 
-class AbstractResults:
+class AbstractResults(object):
     def __init__(self, dataframe):
         """
         Arguments:
