@@ -246,6 +246,12 @@ def plt_zerocounts(screen):
     return plt
 
 
+@app.route("/plt/readcount_cdf/<screen>")
+def plt_readcounts(screen):
+    screen = app.screens[screen]
+    plt = screen.rnas.plot_readcount_cdf()
+    return plt
+
 @app.route("/plt/overlap_chord")
 def plt_overlap_chord():
     return app.screens.plot_overlap_chord(*get_overlap_args())

@@ -30,7 +30,7 @@
         }
     ],
     "axes": [
-        {"type": "y", "scale": "y", "ticks": 6, "offset": 5, "title": "log10 counts"},
+        {"type": "y", "scale": "y", "ticks": 6, "offset": 5, "title": "log10 count"},
         {
             "type": "x",
             "scale": "xl",

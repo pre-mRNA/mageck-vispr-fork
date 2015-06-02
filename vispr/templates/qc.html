@@ -17,6 +17,7 @@
                 <h4>Normalized read count distributions</h4>
                 <div class="text-center">
                     <div id="normalization-plot" class="plot"></div>
+                    <div id="readcount-cdf-plot" class="plot"></div>
                 </div>
             </div>
         </div>
@@ -68,6 +69,9 @@
 <script>
 vg.parse.spec("/plt/normalization/{{ screen.name }}", function(chart) {
     vega_draw(chart, "#normalization-plot");
+});
+vg.parse.spec("/plt/readcount_cdf/{{ screen.name }}", function(chart) {
+    vega_draw(chart, "#readcount-cdf-plot");
 });
 vg.parse.spec("/plt/pca/{{ screen.name }}/1/2/0", function(chart) {
     vega_draw(chart, "#pca-plot1");
