@@ -92,7 +92,7 @@ rule vispr:
             "assembly": config["assembly"],
             "targets": {
                 "results": input.results,
-                "genes": config["genes"]
+                "genes": config["targets"]["genes"]
             },
             "sgrnas": {
                 "counts": input.counts,
