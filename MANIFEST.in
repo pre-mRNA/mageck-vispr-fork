@@ -4,3 +4,4 @@ recursive-include vispr/tests *
 recursive-include bin *
 recursive-include vispr/workflow *
 include requirements.txt
+include README.md
