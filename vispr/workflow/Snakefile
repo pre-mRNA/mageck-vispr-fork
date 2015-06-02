@@ -21,7 +21,7 @@ postprocess_config(config)
 
 rule all:
     input:
-        expand("{experiment}.vispr.yaml", experiment=config["experiments"])
+        expand("results/{experiment}.vispr.yaml", experiment=config["experiments"])
 
 
 rule fastqc:
