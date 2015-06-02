@@ -16,7 +16,7 @@ import yaml
 from vispr.workflow import postprocess_config
 
 
-postprocess_config()
+postprocess_config(config)
 
 
 rule all:
