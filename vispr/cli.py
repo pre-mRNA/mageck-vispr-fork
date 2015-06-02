@@ -94,7 +94,7 @@ def main():
             for f in ["Snakefile", "config.yaml", "README.md", "conda.txt"]:
                 source = os.path.join(os.path.dirname(__file__), "workflow", f)
                 target = os.path.join(args.directory, f)
-                if os.path.exists(target):
+                if f in ["Snakefile", "config.yaml"] and os.path.exists(target):
                     shutil.copy(target, target + ".old")
                 shutil.copy(source, target)
         else:
