@@ -296,7 +296,12 @@
             }
 
             $(".btn-plt-rnas:first").click();
-            $('[data-toggle="tooltip"]').tooltip({container: 'body'})
+            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: "hover"})
+        });
+
+        $(".btn-show-igv").click(function() {
+            $(this).focusout();
+            $(this).tooltip('hide');
         });
 
         // Show selected genes in GeneMANIA.
