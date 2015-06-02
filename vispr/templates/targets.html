@@ -1,6 +1,34 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<div class="modal fade" id="modal-igv">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Open IGV</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    VISPR allows you to display read counts and positions of sgRNAs in IGV.
+                    You can open IGV directly via JAVA Web Start (not recommended on Mac OS)
+                    or download an installable instance.
+                </p>
+                <p>
+                    Once an IGV instance is open, you can select to load the current results
+                    from the IGV menu in VISPR and jump to each target via the
+                    <span class="glyphicon glyphicon-equalizer"></span> buttons.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <a href="http://www.broadinstitute.org/igv/projects/current/igv.php" class="btn btn-default">Open via JAVA Web Start</a>
+                <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default">Download</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-6">
         <h4>Results for {{ selection }} selection</h4>
@@ -14,21 +42,31 @@
                 <th data-dynatable-column="p-value">p-value</th>
                 <th data-dynatable-column="fdr">FDR</th>
                 <th style="text-align: right;" data-dynatable-no-sort="true">
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
-                            <span class="glyphicon glyphicon-menu-hamburger"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-                            {% if has_rna_info %}
-                            <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
-                            {% endif %}
-                            <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
-                            {% if has_rna_info %}
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.broadinstitute.org/igv/projects/current/igv.php?sessionURL={{ request.url_root }}igv/session/{{ screen.name }}.xml">Open IGV</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="http://127.0.0.1:60151?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Show in existing IGV</a></li>
-                            {% endif %}
-                        </ul>
+                    <div class="btn-group">
+                        {% if has_rna_info %}
+                        <div class="btn-group">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
+                                IGV
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">Open IGV</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <div class="btn-group">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
+                                Selection
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
+                                {% if has_rna_info %}
+                                <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                                {% endif %}
+                                <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </th>
             <thead>
