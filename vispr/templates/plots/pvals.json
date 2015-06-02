@@ -68,7 +68,7 @@
             "properties": {
                 "enter": {
                     "x": {"value": 0},
-                    "x2": {"value": 120},
+                    "x2": {"value": 200},
                     "y": {"scale": "y", "value": {{ fdr5 }}},
                     "y2": {"scale": "y", "value": {{ fdr5 }}},
                     "stroke": {"value": "grey"},
@@ -82,7 +82,7 @@
             "properties": {
                 "enter": {
                     "x": {"value": 0},
-                    "x2": {"value": 120},
+                    "x2": {"value": 200},
                     "y": {"scale": "y", "value": {{ fdr25 }}},
                     "y2": {"scale": "y", "value": {{ fdr25 }}},
                     "stroke": {"value": "grey"},
@@ -95,7 +95,7 @@
             "type": "text",
             "properties": {
                 "enter": {
-                    "x": {"value": 120},
+                    "x": {"value": 200},
                     "y": {"scale": "y", "value": {{ fdr5 }}},
                     "dy": {"value": -2},
                     "text": {"value": "{{ fdr5label }}"},
@@ -108,7 +108,7 @@
             "type": "text",
             "properties": {
                 "enter": {
-                    "x": {"value": 120},
+                    "x": {"value": 200},
                     "y": {"scale": "y", "value": {{ fdr25 }}},
                     "dy": {"value": -2},
                     "text": {"value": "{{ fdr25label }}"},
@@ -125,9 +125,6 @@
             "properties": {
                 "symbols": {
                     "stroke": {"value": "transparent"}
-                },
-                "legend": {
-                    "x": {"value": 130}
                 }
             }
         }
