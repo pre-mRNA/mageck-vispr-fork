@@ -16,7 +16,7 @@ import yaml
 from vispr.workflow import postprocess_config
 
 
-postprocess_config()
+postprocess_config(config)
 
 
 rule all:
@@ -94,7 +94,7 @@ rule vispr:
             "assembly": config["assembly"],
             "targets": {
                 "results": relpath(input.results),
-                "genes": config["genes"]
+                "genes": config["targets"]["genes"]
             },
             "sgrnas": {
                 "counts": relpath(input.counts),
