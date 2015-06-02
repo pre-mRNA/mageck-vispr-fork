@@ -28,15 +28,15 @@ rule fastqc:
     input:
         lambda wildcards: config["samples"][wildcards.sample]
     output:
-        data="qc/{sample}/fastqc_data.txt"
+        "results/qc/{sample}/fastqc_data.txt"
     params:
-        dir="qc/{sample}"
+        dir="results/qc/{sample}"
     log:
         "logs/fastqc/{sample}.log"
     shell:
         "rm -f {params.dir}/*.zip; "
         "fastqc --extract -o {params.dir} {input} 2> {log} && "
-        "unzip -p {params.dir}/*.zip '*/fastqc_data.txt' > {output.data}"
+        "unzip -p {params.dir}/*.zip '*/fastqc_data.txt' > {output}"
 
 
 rule mageck_count:
@@ -44,16 +44,17 @@ rule mageck_count:
         fastq=config["samples"].values(),
         library=config["library"]
     output:
-        "tables/count/all.count.txt",
-        "tables/count/all.count.median_normalized.txt",
-        "tables/count/all.countsummary.txt"
+        "results/count/all.count.txt",
+        "results/count/all.count.median_normalized.txt",
+        "results/count/all.countsummary.txt"
     params:
         labels=",".join(config["samples"].keys()),
-        fastqs=" ".join(",".join(replicates) for replicates in config["samples"].values())
+        fastqs=" ".join(",".join(replicates) for replicates in config["samples"].values()),
+        prefix="results/count/all"
     log:
         "logs/mageck/count/all.log"
     shell:
-        "mageck count --output-prefix tables/count/all "
+        "mageck count --output-prefix {params.prefix} "
         "--list-seq {input.library} "
         "--fastq {input.fastq} --sample-label {params.labels} "
         "--trim-5 {config[sgrnas][trim-5]} --sgrna-len {config[sgrnas][len]} 2> {log}"
@@ -61,12 +62,12 @@ rule mageck_count:
 
 rule mageck_test:
     input:
-        "tables/count/all.count.txt"
+        "results/count/all.count.txt"
     output:
-        "tables/test/{experiment}.gene_summary.txt",
-        "tables/test/{experiment}.sgrna_summary.txt"
+        "results/test/{experiment}.gene_summary.txt",
+        "results/test/{experiment}.sgrna_summary.txt"
     params:
-        prefix="tables/test/{experiment}",
+        prefix="results/test/{experiment}",
         treatment=lambda wildcards: ",".join(config["experiments"][wildcards.experiment]["treatment"]),
         control=lambda wildcards: ",".join(config["experiments"][wildcards.experiment]["control"])
     log:
@@ -79,27 +80,28 @@ rule mageck_test:
 
 rule vispr:
     input:
-        results="tables/test/{experiment}.gene_summary.txt",
-        counts="tables/count/all.count.median_normalized.txt",
-        mapstats="tables/count/all.countsummary.txt",
-        fastqc=expand("qc/{sample}/fastqc_data.txt", sample=config["samples"])
+        results="results/test/{experiment}.gene_summary.txt",
+        counts="results/count/all.count.median_normalized.txt",
+        mapstats="results/count/all.countsummary.txt",
+        fastqc=expand("results/qc/{sample}/fastqc_data.txt", sample=config["samples"])
     output:
-        "{experiment}.vispr.yaml"
+        "results/{experiment}.vispr.yaml"
     run:
+        relpath = lambda path: os.path.relpath(path, "results")
         vispr_config = {
             "experiment": wildcards.experiment,
             "species": config["species"],
             "assembly": config["assembly"],
             "targets": {
-                "results": input.results,
+                "results": relpath(input.results),
                 "genes": config["genes"]
             },
             "sgrnas": {
-                "counts": input.counts,
-                "mapstats": input.mapstats
+                "counts": relpath(input.counts),
+                "mapstats": relpath(input.mapstats)
             },
             "fastqc": {
-                sample: fastqc
+                sample: relpath(fastqc)
                 for sample, fastqc in zip(config["samples"], input.fastqc)
             }
         }
