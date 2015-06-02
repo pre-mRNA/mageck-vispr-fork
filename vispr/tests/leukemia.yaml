@@ -1,5 +1,5 @@
 experiment: leukemia
-species: human
+species: homo_sapiens
 assembly: hg19
 targets:
     results: leukemia.gene_summary.txt

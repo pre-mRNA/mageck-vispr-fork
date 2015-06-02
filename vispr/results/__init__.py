@@ -63,7 +63,7 @@ class Screen(object):
         self.pos_targets = target.Results(targets, positive=True)
         self.neg_targets = target.Results(targets, positive=False)
         self.is_genes = config["targets"].get("genes", False)
-        self.species = config["species"]
+        self.species = config["species"].upper()
         self.assembly = config["assembly"]
 
         self.rnas = rna.Results(

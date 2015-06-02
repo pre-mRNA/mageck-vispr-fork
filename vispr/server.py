@@ -31,6 +31,21 @@ def index_screen(screen):
 def targets(screen, selection):
     screen = app.screens[screen]
     table_args = request.query_string.decode()
+
+    gorilla = screen.species in GORILLA_SPECIES and screen.is_genes
+    targets = ""
+    background = ""
+    if gorilla:
+        overlap_args = get_overlap_args()
+        targets = get_targets(screen, selection)[:]["target"]
+        if overlap_args:
+            overlap = app.screens.overlap(*overlap_args)
+            filter = targets.apply(lambda target: target in overlap)
+            background = targets[~filter]
+            targets = targets[filter]
+            background = background.to_csv(None, index=False)
+        targets = targets.to_csv(None, index=False)
+
     return render_template(
         "targets.html",
         screens=app.screens,
@@ -40,7 +55,12 @@ def targets(screen, selection):
         hide_control_targets=session.get("hide_control_targets", True),
         table_args=table_args,
         samples=screen.rnas.samples,
-        has_rna_info=screen.rnas.info is not None)
+        has_rna_info=screen.rnas.info is not None,
+        gorilla=gorilla,
+        gorilla_targets=targets,
+        gorilla_background=background,
+        gorilla_mode="hg" if background else "mhg",
+        gorilla_species=screen.species)
 
 
 @app.route("/qc/<screen>")
@@ -271,3 +291,8 @@ def get_search(pattern=re.compile("search\[(?P<target>.+)\]")):
 
 def get_targets(screen, selection):
     return screen.targets(selection == "positive")
+
+
+GORILLA_SPECIES = ("HOMO_SAPIENS ARABIDOPSIS_THALIANA SACCHAROMYCES_CEREVISIAE "
+                   "CAENORHABDITIS_ELEGANS DROSOPHILA_MELANOGASTER DANIO_RERIO "
+                   "MUS_MUSCULUS RATTUS_NORVEGICUS".split())

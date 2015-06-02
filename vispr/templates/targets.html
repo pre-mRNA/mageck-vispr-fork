@@ -21,9 +21,57 @@
                 </p>
             </div>
             <div class="modal-footer">
-                <a href="http://www.broadinstitute.org/igv/projects/current/igv.php" class="btn btn-default">Open via JAVA Web Start</a>
-                <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default">Download</a>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <div class="btn-group">
+                    <a href="http://www.broadinstitute.org/igv/projects/current/igv.php" class="btn btn-default">Open via JAVA Web Start</a>
+                    <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default">Download</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-gorilla">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">GO term enrichment with GOrilla</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Perform a GO term enrichment of the currently displayed table
+                    with the GOrilla web service.
+
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" enctype="multipart/form-data" target="_blank" action="http://cbl-gorilla.cs.technion.ac.il/servlet/GOrilla" name="gorilla">
+                    <input type="hidden" name="application" value="gorilla">
+                    <input type="hidden" name="species" value="{{ gorilla_species }}">
+                    <input type="hidden" name="run_mode" value="{{ gorilla_mode }}">
+                    <input type="hidden" name="db" value="all">
+                    <input type="hidden" name="target_set" value="{{ gorilla_targets }}">
+                    <input type="hidden" name="background_set" value="{{ gorilla_background }}">
+                    <div class="form-group">
+                        <label for="pvalue_thresh">maximum enrichment p-value</label>
+                        <select class="selectpicker" name="pvalue_thresh">
+                            <option value="0.001" selected>0.001</option>
+                            <option value="0.0001">0.0001</option>
+                            <option value="0.00001">1e-05</option>
+                            <option value="0.000001">1e-06</option>
+                            <option value="0.0000001">1e-07</option>
+                            <option value="0.00000001">1e-08</option>
+                            <option value="0.000000001">1e-09</option>
+                            <option value="0.0000000001">1e-10</option>
+                            <option value="0.00000000001">1e-11</option>
+                        </select>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-default">OK</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -51,9 +99,12 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
                                 <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">Open IGV</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
+                                <li role="presentation"><a role="menuitem" id="load-igv" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
                             </ul>
                         </div>
+                        {% endif %}
+                        {% if gorilla %}
+                        <a class="btn btn-default" data-toggle="modal" data-target="#modal-gorilla" href="#">GOrilla</a>
                         {% endif %}
                         <div class="btn-group">
                             <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
@@ -334,7 +385,7 @@ dt.on("dynatable:afterUpdate", function() {
     }
 
     $(".btn-plt-rnas:first").click();
-    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: "hover"})
+    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: "hover"});
 });
 
 $(".btn-show-igv").click(function() {
