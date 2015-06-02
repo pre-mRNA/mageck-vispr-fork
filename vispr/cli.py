@@ -92,8 +92,11 @@ def main():
                 # next step.
                 pass
             for f in ["Snakefile", "config.yaml", "README.md", "conda.txt"]:
-                shutil.copy(os.path.join(os.path.dirname(__file__), "workflow",
-                                         f), os.path.join(args.directory, f))
+                source = os.path.join(os.path.dirname(__file__), "workflow", f)
+                target = os.path.join(args.directory, f)
+                if os.path.exists(target):
+                    shutil.copy(target, target + ".old")
+                shutil.copy(source, target)
         else:
             parser.print_help()
             exit(1)
