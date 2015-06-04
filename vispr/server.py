@@ -14,7 +14,7 @@ app.jinja_env.lstrip_blocks = True
 
 @app.route("/")
 def index():
-    screen = app.screens[next(iter(app.screens))]
+    screen = next(iter(app.screens))
     return render_template("index.html", screens=app.screens, screen=screen)
 
 
@@ -27,8 +27,8 @@ def index_screen(screen):
     return render_template("index.html", screens=app.screens, screen=screen)
 
 
-@app.route("/targets/<screen>/<selection>")
-def targets(screen, selection):
+@app.route("/targets/<screen>/<condition>/<selection>")
+def targets(screen, condition, selection):
     screen = app.screens[screen]
     table_args = request.query_string.decode()
 
@@ -37,7 +37,7 @@ def targets(screen, selection):
     background = ""
     if gorilla:
         overlap_args = get_overlap_args()
-        targets = get_targets(screen, selection)[:]["target"]
+        targets = screen.targets[condition][selection][:]["target"]
         if overlap_args:
             overlap = app.screens.overlap(*overlap_args)
             filter = targets.apply(lambda target: target in overlap)
@@ -50,6 +50,7 @@ def targets(screen, selection):
         "targets.html",
         screens=app.screens,
         selection=selection,
+        condition=condition,
         screen=screen,
         control_targets=screen.control_targets,
         hide_control_targets=session.get("hide_control_targets", True),
@@ -76,36 +77,33 @@ def qc(screen):
 @app.route("/compare/<screen>")
 def compare(screen):
     screen = app.screens[screen]
-    overlap_items = ["{} {}".format(_screen, sel)
-                     for _screen in app.screens for sel in "+-"]
     return render_template("compare.html",
                            screens=app.screens,
-                           screen=screen,
-                           overlap_items=overlap_items)
+                           screen=screen)
 
 
-@app.route("/plt/pvals/<screen>/<selection>")
-def plt_pvals(screen, selection):
+@app.route("/plt/pvals/<screen>/<condition>/<selection>")
+def plt_pvals(screen, condition, selection):
     screen = app.screens[screen]
-    plt = get_targets(screen, selection).plot_pvals(screen.control_targets)
+    plt = screen.targets[condition][selection].plot_pvals(screen.control_targets)
     return plt
 
 
-@app.route("/plt/pvalhist/<screen>/<selection>")
-def plt_pval_hist(screen, selection):
+@app.route("/plt/pvalhist/<screen>/<condition>/<selection>")
+def plt_pval_hist(screen, condition, selection):
     screen = app.screens[screen]
-    plt = get_targets(screen, selection).plot_pval_hist()
+    plt = screen.targets[condition][selection].plot_pval_hist()
     return plt
 
 
-@app.route("/tbl/targets/<screen>/<selection>", methods=["GET"])
-def tbl_targets(screen, selection):
+@app.route("/tbl/targets/<screen>/<condition>/<selection>", methods=["GET"])
+def tbl_targets(screen, condition, selection):
     screen = app.screens[screen]
     offset = int(request.args.get("offset", 0))
     perpage = int(request.args.get("perPage", 20))
 
     # sort and slice records
-    records = get_targets(screen, selection)[:]
+    records = screen.targets[condition][selection][:]
     total_count = records.shape[0]
     filter_count = total_count
 
@@ -269,15 +267,11 @@ def set_hide_control_targets(value):
 
 
 def get_overlap_args():
-    def parse_item(item):
-        screen, sel = item.split()
-        return screen, sel == "+"
-
     if "fdr" not in request.values and "overlap-items" not in request.form:
         return None
 
     fdr = float(request.values.get("fdr", 0.25))
-    items = list(map(parse_item, request.values.getlist("overlap-items")))
+    items = list(map(lambda item: item.split("|"), request.values.getlist("overlap-items")))
     return fdr, items
 
 

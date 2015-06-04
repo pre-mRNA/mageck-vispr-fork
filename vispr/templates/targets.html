@@ -1,4 +1,12 @@
 {% extends "layout.html" %}
+{% block breadcrumbs %}
+<li>{{ screen.name }}</li>
+<li>results</li>
+{% if condition != "default" %}
+<li>{{ condition }}</li>
+{% endif %}
+<li class="active">{{ selection }}</li>
+{% endblock %}
 {% block content %}
 
 <div class="modal fade" id="modal-igv">
@@ -79,7 +87,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        <h4>Results for {{ selection }} selection</h4>
+        <h4>Target results</h4>
         <table id="targets" class="table table-striped">
             <thead>
                 <th data-dynatable-column="target">Target</th>
@@ -168,7 +176,7 @@ function get_selected() {
     return targets;
 }
 
-vg.parse.spec("/plt/pvals/{{ screen.name }}/{{ selection }}", function(chart) {
+vg.parse.spec("/plt/pvals/{{ screen.name }}/{{ condition }}/{{ selection }}", function(chart) {
     plt_pval = vega_draw(chart, "#score-plot");
 });
 
@@ -180,7 +188,7 @@ function update_pval_highlights() {
         plt_pval.update();
     }
     else {
-        d3.json("/tbl/pvals_highlight/{{ screen.name }}/{{ selection }}/" + selected.join("|"), function(error, json) {
+        d3.json("/tbl/pvals_highlight/{{ screen.name }}/{{ condition }}/{{ selection }}/" + selected.join("|"), function(error, json) {
             plt_pval.data(
                 { "highlight": json }
             );
@@ -222,14 +230,14 @@ function update_dimensions() {
     plt_rna.dimensions(rna_dimensions);
 }
 
-vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ selection }}", function(chart) {
+vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ condition }}/{{ selection }}", function(chart) {
     vega_draw(chart, "#pval-hist-plot");
 });
 
 var dt = $("#targets").dynatable({
     dataset: {
         ajax: true,
-        ajaxUrl: "/tbl/targets/{{ screen.name }}/{{ selection }}?{{ table_args|safe }}",
+        ajaxUrl: "/tbl/targets/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}",
         ajaxOnLoad: true,
         perPageDefault: 20,
         records: [],

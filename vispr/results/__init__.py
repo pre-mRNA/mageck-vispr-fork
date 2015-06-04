@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, print_function
 
 import os
+from itertools import filterfalse
 
 import pandas as pd
 
@@ -20,20 +21,22 @@ class Screens(object):
         self.screens[screen] = Screen(config, parentdir=parentdir)
 
     def __iter__(self):
-        return iter(sorted(self.screens.keys()))
+        return map(self.__getitem__, sorted(self.screens.keys()))
 
     def __getitem__(self, screen):
         return self.screens[screen]
 
     def _overlap_targets(self, fdr=0.05, items=None):
-        if items is None:
-            items = [(screen, positive)
-                     for screen in self.screens for positive in (True, False)]
-        selection = ["-", "+"]
+        assert items is not None
+        def label(screen, condition, selection):
+            if condition != "default":
+                return screen, condition, selection
+            else:
+                return screen, selection
         return {
-            "{} {}".format(screen, selection[positive]):
-            self.screens[screen].targets(positive).ids(fdr)
-            for screen, positive in items
+            " | ".join(label(screen, condition, selection)):
+            self.screens[screen].targets[condition][selection].ids(fdr)
+            for screen, condition, selection in items
         }
 
     def plot_overlap_chord(self, fdr=0.05, items=None):
@@ -59,9 +62,8 @@ class Screen(object):
 
         self.name = config["experiment"]
 
-        targets = get_path(config["targets"]["results"])
-        self.pos_targets = target.Results(targets, positive=True)
-        self.neg_targets = target.Results(targets, positive=False)
+        self.targets = parse_target_results(
+            get_path(config["targets"]["results"]))
         self.is_genes = config["targets"].get("genes", False)
         self.species = config["species"].upper()
         self.assembly = config["assembly"]
@@ -91,3 +93,45 @@ class Screen(object):
 
     def targets(self, positive=True):
         return self.pos_targets if positive else self.neg_targets
+
+
+def parse_target_results(path,
+                         selections=["negative selection",
+                                     "positive selection"]):
+    results = pd.read_table(path, na_filter=False)
+    paths = [col.split("|") for col in results.columns]
+
+    max_depth = max(map(len, paths))
+    if max_depth == 3:
+        # MLE format
+        def get_results(selection):
+            res = results["id {cond}|beta {cond}|{sel}|p-value {cond}|{sel}|fdr".format(
+                cond=condition,
+                sel=selection[:3]).split()]
+            res.columns = ["target", "beta", "p-value", "fdr"]
+            return target.Results(res.copy())
+
+        conditions = [path[0] for path in paths if len(path) > 1]
+        targets = {
+            condition:
+            {selection: get_results(selection)
+             for selection in selections}
+        }
+
+    elif max_depth == 2:
+        # RRA format
+        def get_results(selection):
+            res = results["id {sel}|score {sel}|p-value {sel}|fdr".format(
+                sel=selection[:3]).split()]
+            res.columns = ["target", "score", "p-value", "fdr"]
+            return target.Results(res.copy())
+
+        targets = {
+            "default": {
+                selection: get_results(selection)
+                for selection in selections
+            }
+        }
+    else:
+        raise IOError("Invalid target results format.")
+    return targets

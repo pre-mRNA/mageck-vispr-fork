@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block breadcrumbs %}
+<li class="active">compare experiments</li>
+{% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-md-6">
@@ -7,9 +10,13 @@
             <div class="form-group">
                 <label for="select-overlap-items">Experiments</label>
                 <select name="overlap-items" id="select-overlap-items" class="selectpicker" multiple>
-                    {% for item in overlap_items %}
-                    <option selected>{{ item }}</option>
+            {% for screen in screens %}
+                {% for condition, selections in screen.targets.items() %}
+                    {% for selection in selections %}
+                    <option selected value="{{ screen.name }}|{{ condition }}|{{ selection }}">{{ screen.name }} | {{ condition + " | " if condition != "default" }}{{ selection }}</option>
                     {% endfor %}
+                {% endfor %}
+            {% endfor %}
                 </select>
             </div>
             <div class="form-group">
@@ -83,14 +90,19 @@ function plot_overlap() {
             .on("click", function(d, i) {
                 var overlap_param = "&overlap-items=";
                 d.sets.forEach(function(item) {
-                    var screen = item.substr(0, item.length - 2);
-                    var sel = "positive";
-                    if(item.substr(item.length - 1) == "-") {
-                        sel = "negative";
+                    function parse(item) {
+                        item = item.split(" | ");
+                        if(item.length == 2) {
+                            item.splice(1, 0, "default");
+                        }
+                        return item
+                    }
+                    function encode(item) {
+                        return encodeURIComponent(parse(item).join("|"));
                     }
 
-                    items = d.sets.map(encodeURIComponent);
-                    window.open("/targets/" + screen + "/" + sel + "?fdr=" + fdr + overlap_param + items.join(overlap_param));
+                    items = d.sets.map(encode);
+                    window.open("/targets/" + parse(item).join("/") + "?fdr=" + fdr + overlap_param + items.join(overlap_param));
                 });
             });
 
