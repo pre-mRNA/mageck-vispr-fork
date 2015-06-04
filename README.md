@@ -39,19 +39,6 @@ data by executing
     vispr test
 
 
-Config file format (TODO update this)
--------------------------------------
-
-The config file has to be in YAML format. It has to contain a section for
-each experiment. Each experiment contains two entries, one pointing to the
-target (or gene) result file provided by "MAGeCK test", one pointing to a
-file with normalized read counts as provided by "MAGeCK count":
-
-    myexperiment:
-        target_results: gene_summary.txt
-        rna_counts: normalized_counts.txt
-
-
 Installing VISPR with another Python distribution (for experts)
 ---------------------------------------------------------------
 
