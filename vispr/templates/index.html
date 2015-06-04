@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block breadcrumbs %}
+<li class="active">{{ screen.name }}</li>
+{% endblock %}
 {% block content %}
 <div id="frontpage">
     <h1> Visualization of CRISPR knockout screens </h1>

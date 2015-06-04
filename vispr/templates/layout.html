@@ -49,10 +49,10 @@ function vega_draw(chart, el) {
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Experiment <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         {% for _screen in screens %}
-                        {% set invisible = "invisible" if _screen != screen.name else "" %}
+                        {% set invisible = "invisible" if _screen.name != screen.name else "" %}
                         <li>
-                            <a href="/{{ _screen }}">
-                                <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen }}
+                            <a href="/{{ _screen.name }}">
+                                <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen.name }}
                             </a>
                         </li>
                         {% endfor %}
@@ -62,15 +62,25 @@ function vega_draw(chart, el) {
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Results <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        {% for selection in ["positive", "negative"] %}
-                        <li><a href="/targets/{{ screen.name }}/{{ selection }}">{{ selection }} selection</a></li>
+                    {% for condition in screen.targets %}
+                        {% if condition != "default" %}
+                        <li role="presentation" class="dropdown-header">{{ condition }}</li>"
+                        {% endif %}
+                        {% for selection in ["positive selection", "negative selection"] %}
+                        <li role="presentation"><a href="/targets/{{ screen.name }}/{{ condition }}/{{ selection }}">{{ selection }}</a></li>
                         {% endfor %}
+                    {% endfor %}
                     </ul>
                 </li>
                 <li><a href="/compare/{{ screen.name }}">Compare Experiments</a></li>
             </ul>
             <ul class="nav navbar-right">
-                <li><p class="navbar-text">{{ screen.name }}</p></li>
+                <li>
+                    <ol class="breadcrumb navbar-text" style="padding: 0px; background: none">
+                    {% block breadcrumbs %}
+                    {% endblock %}
+                    </ol>
+                </li>
             </ul>
         </div>
     </div>
