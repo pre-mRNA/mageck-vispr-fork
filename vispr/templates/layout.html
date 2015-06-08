@@ -26,6 +26,25 @@
 <script>
 function vega_draw(chart, el) {
     var plt = chart({el: el}).update();
+
+    $(el).popover({
+        container: "body",
+        html: true,
+        content: function() {
+            var svg = $(this).append('<div class="shadow-svg"></div>').find(".shadow-svg");
+            chart({el: svg[0], renderer: "svg"}).update();
+            svg.find("svg").attr("version", 1.2)
+                           .attr("xmlns", "http://www.w3.org/2000/svg")
+                           .css("font-family", "Helvetica, Arial, sans-serif");
+            var data = btoa(svg.html());
+            var name = "{{ screen.name }}." + $(el).attr("id");
+            $(this).remove(".shadow-svg");
+            return $(this).attr("data-desc") +
+            '<hr/><div class="text-right"><a download="' + name +
+            '.svg" class="btn btn-default download-plot-svg" href="data:image/svg+xml;base64,' +
+            data + '">Download SVG</a></div>';
+        }
+    });
     return plt;
 }
 </script>

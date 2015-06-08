@@ -244,6 +244,13 @@ def plt_zerocounts(screen):
     return plt
 
 
+@app.route("/plt/gini_index/<screen>")
+def plt_gini_index(screen):
+    screen = app.screens[screen]
+    plt = screen.mapstats.plot_gini_index()
+    return plt
+
+
 @app.route("/plt/readcount_cdf/<screen>")
 def plt_readcounts(screen):
     screen = app.screens[screen]

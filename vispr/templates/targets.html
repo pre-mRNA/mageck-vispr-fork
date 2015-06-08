@@ -61,6 +61,7 @@
                     <input type="hidden" name="db" value="all">
                     <input type="hidden" name="target_set" value="{{ gorilla_targets }}">
                     <input type="hidden" name="background_set" value="{{ gorilla_background }}">
+                    <input type="hidden" name="output_revigo" value="true">
                     <div class="form-group">
                         <label for="pvalue_thresh">maximum enrichment p-value</label>
                         <select class="selectpicker" name="pvalue_thresh">
@@ -90,11 +91,11 @@
         <h4>Target results</h4>
         <table id="targets" class="table table-striped">
             <thead>
-                <th data-dynatable-column="target">Target</th>
+                <th data-dynatable-column="target">target</th>
                 {% if has_rna_info %}
                 <th style="display: none" data-dynatable-column="locus">Locus</th>
                 {% endif %}
-                <th data-dynatable-column="score">RRA-score</th>
+                <th data-dynatable-column="score">score</th>
                 <th data-dynatable-column="p-value">p-value</th>
                 <th data-dynatable-column="fdr">FDR</th>
                 <th style="text-align: right;" data-dynatable-no-sort="true">
@@ -138,8 +139,8 @@
             <div class="col-md-12">
                 <h4>p-values</h4>
                 <div class="text-center">
-                    <div id="score-plot" class="plot"></div>
-                    <div id="pval-hist-plot" class="plot"></div>
+                    <div id="score-plot" class="plot" data-toggle="popover" data-desc="Target ranks plotted against p-values. Smallest FDR greater or equal to 5% and 25% are displayed."></div>
+                    <div id="pval-hist-plot" class="plot" data-toggle="popover" data-placement="left" data-desc="Histogram of p-values. Small p-values should be enriched. If one-sided test was performed, p-values toward 1.0 are expected to be enriched as well."></div>
                 </div>
             </div>
         </div>
@@ -239,7 +240,7 @@ var dt = $("#targets").dynatable({
         ajax: true,
         ajaxUrl: "/tbl/targets/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}",
         ajaxOnLoad: true,
-        perPageDefault: 20,
+        perPageDefault: 10,
         records: [],
         inputs: {
             paginationClass: 'pagination',
