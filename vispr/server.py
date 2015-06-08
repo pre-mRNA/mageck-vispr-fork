@@ -96,11 +96,8 @@ def plt_pval_hist(screen, condition, selection):
     return plt
 
 
-@app.route("/tbl/targets/<screen>/<condition>/<selection>", methods=["GET"])
-def tbl_targets(screen, condition, selection):
+def tbl_targets(screen, condition, selection, offset=None, perpage=None, add_locus=False):
     screen = app.screens[screen]
-    offset = int(request.args.get("offset", 0))
-    perpage = int(request.args.get("perPage", 20))
 
     # sort and slice records
     records = screen.targets[condition][selection][:]
@@ -140,7 +137,8 @@ def tbl_targets(screen, condition, selection):
     columns, ascending = get_sorting()
     if columns:
         records = records.sort(columns, ascending=ascending)
-    records = records[offset:offset + perpage]
+    if offset is not None:
+        records = records[offset:offset + perpage]
 
     # formatting
     def fmt_col(col):
@@ -150,14 +148,27 @@ def tbl_targets(screen, condition, selection):
 
     records = records.apply(fmt_col)
 
-    if screen.rnas.info is not None:
+    if add_locus and screen.rnas.info is not None:
         records["locus"] = ["{}:{}-{}".format(*screen.rnas.target_locus(target)) for target in records["target"]]
 
+    return records, filter_count, total_count
+
+
+@app.route("/tbl/targets/json/<screen>/<condition>/<selection>", methods=["GET"])
+def tbl_targets_json(screen, condition, selection):
+    offset = int(request.args.get("offset", 0))
+    perpage = int(request.args.get("perPage", 20))
+    records, filter_count, total_count = tbl_targets(screen, condition, selection, offset=offset, perpage=perpage, add_locus=True)
     return render_template("dyntable.json",
                            records=records.to_json(orient="records",
                                                    double_precision=15),
                            filter_count=filter_count,
                            total_count=total_count)
+
+@app.route("/tbl/targets/txt/<screen>/<condition>/<selection>", methods=["GET"])
+def tbl_targets_txt(screen, condition, selection):
+    records, _, _ = tbl_targets(screen, condition, selection)
+    return records[["target", "score", "p-value", "fdr"]].to_csv(sep="\t", index=False)
 
 
 @app.route("/tbl/pvals_highlight/<screen>/<selection>/<targets>")

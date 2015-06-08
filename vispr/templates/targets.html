@@ -102,6 +102,7 @@
                     <div class="btn-group">
                         {% if has_rna_info %}
                         <div class="btn-group">
+                            <a class="btn btn-default" type="button" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection }}.txt">Download</a>
                             <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
                                 IGV
                                 <span class="caret"></span>
@@ -238,7 +239,7 @@ vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ condition }}/{{ selection }}",
 var dt = $("#targets").dynatable({
     dataset: {
         ajax: true,
-        ajaxUrl: "/tbl/targets/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}",
+        ajaxUrl: "/tbl/targets/json/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}",
         ajaxOnLoad: true,
         perPageDefault: 10,
         records: [],
