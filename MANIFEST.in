@@ -1,6 +1,7 @@
 recursive-include vispr/templates *
 recursive-include vispr/static *
 recursive-include vispr/tests *
+include vispr/example.config.yaml
 recursive-include bin *
 recursive-include vispr/workflow *
 include requirements.txt

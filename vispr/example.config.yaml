@@ -1,0 +1,15 @@
+# Example VISPR config
+experiment: myexperiment
+species: homo_sapiens
+assembly: hg19
+targets:
+    results: myexperiment.gene_summary.txt  # results of mageck test
+    genes: true  # specify if targets are genes (enabling various link-outs)
+    controls: ribosomal_genes.txt  # list of targets to hide per default
+sgrnas:
+    counts: myexperiment.normalized.txt  # normalized read counts (mageck count)
+    info: myexperiment.sgrna.bed  # position and score (e.g. efficiency score) for each sgRNA
+    mapstats: myexperiment.countsummary.txt  # mapping statistics (mageck count)
+fastqc:
+    sample1: fastqc/sample1/fastqc_data.txt  # fastqc output for sample1
+    sample2: fastqc/sample2/fastqc_data.txt  # fastqc output for sample2

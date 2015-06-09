@@ -57,6 +57,12 @@ def main():
                           help="Start the VISPR server with some included "
                           "test data.")
 
+    config = subparsers.add_parser(
+        "config",
+        help="Print an example VISPR config file. Pipe the output into a file "
+        "and edit it to setup a new experiment to be displayed in VISPR."
+    )
+
     workflow = subparsers.add_parser(
         "init-workflow",
         help="Initialize the MAGeCK/VISPR workflow "
@@ -97,6 +103,8 @@ def main():
                 if f in ["Snakefile", "config.yaml"] and os.path.exists(target):
                     shutil.copy(target, target + ".old")
                 shutil.copy(source, target)
+        elif args.subcommand == "config":
+            print(open(os.path.join(os.path.dirname(__file__), "example.config.yaml")).read())
         else:
             parser.print_help()
             exit(1)
