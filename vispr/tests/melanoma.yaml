@@ -1,5 +1,5 @@
 experiment: melanoma
-species: human
+species: homo_sapiens
 assembly: hg19
 targets:
     results: melanoma.gene_summary.txt

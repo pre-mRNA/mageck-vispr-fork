@@ -1,10 +1,9 @@
 {
     "width": 150,
     "height": 150,
-    "background": "white",
     "data": [
         {
-            "name": "gc",
+            "name": "dist",
             "values": {{ data }}
         }
     ],
@@ -13,31 +12,45 @@
             "name": "x",
             "type": "linear",
             "range": "width",
-            "domain": {"data": "gc", "field": "data.gc"}
+            "domain": {"data": "dist", "field": "data.count"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
             "nice": true,
-            "domain": {"data": "gc", "field": "data.density"}
+            "domain": {"data": "dist", "field": "data.density"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "gc", "field": "data.sample"},
+            "domain": {"data": "dist", "field": "data.sample"},
             "range": "category20"
         }
     ],
     "axes": [
-        {"type": "x", "scale": "x", "nice": true, "ticks": 6, "offset": 5, "title": "mean % GC content"},
-        {"type": "y", "scale": "y", "nice": true, "ticks": 6, "offset": 5, "title": "density", "titleOffset": 50}
+        {
+            "type": "x",
+            "scale": "x",
+            "nice": true,
+            "ticks": 6,
+            "offset": 5,
+            "title": "log10 read count",
+            "properties": {
+                "labels": {
+                    "angle": { "value": -45 },
+                    "baseline": { "value": "middle" },
+                    "align": {"value": "right"}
+                }
+            }
+        },
+        {"type": "y", "scale": "y", "nice": true, "ticks": 6, "offset": 5, "title": "CDF"}
     ],
     "marks": [
         {
             "type": "group",
             "from": {
-                "data": "gc",
+                "data": "dist",
                 "transform": [{"type": "facet", "keys": ["data.sample"]}]
             },
             "marks": [
@@ -45,7 +58,7 @@
                     "type": "line",
                     "properties": {
                         "enter": {
-                            "x": {"scale": "x", "field": "data.gc"},
+                            "x": {"scale": "x", "field": "data.count"},
                             "y": {"scale": "y", "field": "data.density"},
                             "opacity": {"value": 0.5},
                             "stroke": {"scale": "c", "field": "data.sample"},
@@ -64,9 +77,6 @@
                 "symbols": {
                     "stroke": {"value": "transparent"},
                     "opacity": {"value": 0.5}
-                },
-                "legend": {
-                    "x": {"value": 170}
                 }
             }
         }

@@ -1,4 +1,5 @@
 import json
+from functools import partial
 
 from flask import render_template
 import pandas as pd
@@ -82,8 +83,20 @@ class Results(AbstractResults):
                                data=data.to_json(orient="records"),
                                width=width)
 
-    def plot_distributions(self):
-        pass
+    def plot_readcount_cdf(self):
+        counts = np.log10(self.counts() + 1)
+
+        data = []
+        for sample in counts.columns:
+            d = counts[sample].value_counts(normalize=True, sort=False, bins=100).cumsum()
+            data.append(pd.DataFrame({
+                "density": d,
+                "count": d.index,
+                "sample": sample
+            }))
+        data = pd.concat(data)
+        return render_template("plots/readcounts.json",
+                               data=data.to_json(orient="records"))
 
 
     def counts(self):

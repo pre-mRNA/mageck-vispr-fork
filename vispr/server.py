@@ -8,11 +8,13 @@ from flask import Flask, render_template, request, session, abort
 from jinja2 import Markup
 
 app = Flask(__name__)
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 
 
 @app.route("/")
 def index():
-    screen = app.screens[next(iter(app.screens))]
+    screen = next(iter(app.screens))
     return render_template("index.html", screens=app.screens, screen=screen)
 
 
@@ -25,20 +27,41 @@ def index_screen(screen):
     return render_template("index.html", screens=app.screens, screen=screen)
 
 
-@app.route("/targets/<screen>/<selection>")
-def targets(screen, selection):
+@app.route("/targets/<screen>/<condition>/<selection>")
+def targets(screen, condition, selection):
     screen = app.screens[screen]
     table_args = request.query_string.decode()
+
+    gorilla = screen.species in GORILLA_SPECIES and screen.is_genes
+    targets = ""
+    background = ""
+    if gorilla:
+        overlap_args = get_overlap_args()
+        targets = screen.targets[condition][selection][:]["target"]
+        if overlap_args:
+            overlap = app.screens.overlap(*overlap_args)
+            filter = targets.apply(lambda target: target in overlap)
+            background = targets[~filter]
+            targets = targets[filter]
+            background = background.to_csv(None, index=False)
+        targets = targets.to_csv(None, index=False)
+
     return render_template(
         "targets.html",
         screens=app.screens,
         selection=selection,
+        condition=condition,
         screen=screen,
         control_targets=screen.control_targets,
         hide_control_targets=session.get("hide_control_targets", True),
         table_args=table_args,
         samples=screen.rnas.samples,
-        has_rna_info=screen.rnas.info is not None)
+        has_rna_info=screen.rnas.info is not None,
+        gorilla=gorilla,
+        gorilla_targets=targets,
+        gorilla_background=background,
+        gorilla_mode="hg" if background else "mhg",
+        gorilla_species=screen.species)
 
 
 @app.route("/qc/<screen>")
@@ -54,36 +77,30 @@ def qc(screen):
 @app.route("/compare/<screen>")
 def compare(screen):
     screen = app.screens[screen]
-    overlap_items = ["{} {}".format(_screen, sel)
-                     for _screen in app.screens for sel in "+-"]
     return render_template("compare.html",
                            screens=app.screens,
-                           screen=screen,
-                           overlap_items=overlap_items)
+                           screen=screen)
 
 
-@app.route("/plt/pvals/<screen>/<selection>")
-def plt_pvals(screen, selection):
+@app.route("/plt/pvals/<screen>/<condition>/<selection>")
+def plt_pvals(screen, condition, selection):
     screen = app.screens[screen]
-    plt = get_targets(screen, selection).plot_pvals(screen.control_targets)
+    plt = screen.targets[condition][selection].plot_pvals(screen.control_targets)
     return plt
 
 
-@app.route("/plt/pvalhist/<screen>/<selection>")
-def plt_pval_hist(screen, selection):
+@app.route("/plt/pvalhist/<screen>/<condition>/<selection>")
+def plt_pval_hist(screen, condition, selection):
     screen = app.screens[screen]
-    plt = get_targets(screen, selection).plot_pval_hist()
+    plt = screen.targets[condition][selection].plot_pval_hist()
     return plt
 
 
-@app.route("/tbl/targets/<screen>/<selection>", methods=["GET"])
-def tbl_targets(screen, selection):
+def tbl_targets(screen, condition, selection, offset=None, perpage=None, add_locus=False):
     screen = app.screens[screen]
-    offset = int(request.args.get("offset", 0))
-    perpage = int(request.args.get("perPage", 20))
 
     # sort and slice records
-    records = get_targets(screen, selection)[:]
+    records = screen.targets[condition][selection][:]
     total_count = records.shape[0]
     filter_count = total_count
 
@@ -120,7 +137,8 @@ def tbl_targets(screen, selection):
     columns, ascending = get_sorting()
     if columns:
         records = records.sort(columns, ascending=ascending)
-    records = records[offset:offset + perpage]
+    if offset is not None:
+        records = records[offset:offset + perpage]
 
     # formatting
     def fmt_col(col):
@@ -130,14 +148,27 @@ def tbl_targets(screen, selection):
 
     records = records.apply(fmt_col)
 
-    if screen.rnas.info is not None:
+    if add_locus and screen.rnas.info is not None:
         records["locus"] = ["{}:{}-{}".format(*screen.rnas.target_locus(target)) for target in records["target"]]
 
+    return records, filter_count, total_count
+
+
+@app.route("/tbl/targets/json/<screen>/<condition>/<selection>", methods=["GET"])
+def tbl_targets_json(screen, condition, selection):
+    offset = int(request.args.get("offset", 0))
+    perpage = int(request.args.get("perPage", 20))
+    records, filter_count, total_count = tbl_targets(screen, condition, selection, offset=offset, perpage=perpage, add_locus=True)
     return render_template("dyntable.json",
                            records=records.to_json(orient="records",
                                                    double_precision=15),
                            filter_count=filter_count,
                            total_count=total_count)
+
+@app.route("/tbl/targets/txt/<screen>/<condition>/<selection>", methods=["GET"])
+def tbl_targets_txt(screen, condition, selection):
+    records, _, _ = tbl_targets(screen, condition, selection)
+    return records[["target", "score", "p-value", "fdr"]].to_csv(sep="\t", index=False)
 
 
 @app.route("/tbl/pvals_highlight/<screen>/<selection>/<targets>")
@@ -224,6 +255,19 @@ def plt_zerocounts(screen):
     return plt
 
 
+@app.route("/plt/gini_index/<screen>")
+def plt_gini_index(screen):
+    screen = app.screens[screen]
+    plt = screen.mapstats.plot_gini_index()
+    return plt
+
+
+@app.route("/plt/readcount_cdf/<screen>")
+def plt_readcounts(screen):
+    screen = app.screens[screen]
+    plt = screen.rnas.plot_readcount_cdf()
+    return plt
+
 @app.route("/plt/overlap_chord")
 def plt_overlap_chord():
     return app.screens.plot_overlap_chord(*get_overlap_args())
@@ -241,15 +285,11 @@ def set_hide_control_targets(value):
 
 
 def get_overlap_args():
-    def parse_item(item):
-        screen, sel = item.split()
-        return screen, sel == "+"
-
     if "fdr" not in request.values and "overlap-items" not in request.form:
         return None
 
     fdr = float(request.values.get("fdr", 0.25))
-    items = list(map(parse_item, request.values.getlist("overlap-items")))
+    items = list(map(lambda item: item.split("|"), request.values.getlist("overlap-items")))
     return fdr, items
 
 
@@ -269,3 +309,8 @@ def get_search(pattern=re.compile("search\[(?P<target>.+)\]")):
 
 def get_targets(screen, selection):
     return screen.targets(selection == "positive")
+
+
+GORILLA_SPECIES = ("HOMO_SAPIENS ARABIDOPSIS_THALIANA SACCHAROMYCES_CEREVISIAE "
+                   "CAENORHABDITIS_ELEGANS DROSOPHILA_MELANOGASTER DANIO_RERIO "
+                   "MUS_MUSCULUS RATTUS_NORVEGICUS".split())

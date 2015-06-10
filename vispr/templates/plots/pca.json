@@ -34,7 +34,14 @@
             "nice": true,
             "offset": 5,
             "title": "{{ xlabel }}",
-            "ticks": 6
+            "ticks": 6,
+            "properties": {
+                "labels": {
+                    "angle": { "value": -45 },
+                    "baseline": { "value": "middle" },
+                    "align": {"value": "right"}
+                }
+            }
         },
         {
             "type": "y",

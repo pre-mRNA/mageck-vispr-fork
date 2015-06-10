@@ -12,20 +12,14 @@ from vispr.results.common import lru_cache, AbstractResults
 class Results(AbstractResults):
     """Keep and display target results."""
 
-    def __init__(self, dataframe, positive=True):
+    def __init__(self, dataframe):
         """
         Arguments
 
         dataframe -- path to file containing MAGeCK target (gene) summary. Alternatively, a dataframe.
         controls  -- path to file containing control genes. Alternatively, a dataframe.
         """
-        super(Results, self).__init__(dataframe)
-        if positive:
-            self.df = self.df[["id", "lo.pos", "p.pos", "fdr.pos"]]
-        else:
-            self.df = self.df[["id", "lo.neg", "p.neg", "fdr.neg"]]
-        self.df.columns = ["target", "score", "p-value", "fdr"]
-
+        self.df = dataframe
         self.df.sort("p-value", inplace=True)
         self.df.reset_index(drop=True, inplace=True)
         self.df["log10-p-value"] = -np.log10(self.df[["p-value"]])

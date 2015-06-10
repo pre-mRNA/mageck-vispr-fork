@@ -1,6 +1,6 @@
 package:
   name: vispr
-  version: "0.1"
+  version: "0.2.2"
 source:
   path: ../../
 build:
@@ -10,14 +10,20 @@ requirements:
   build:
     - python
     - setuptools
+    - numpy
+    - flask
+    - pandas
+    - pyyaml
+    - scipy
+    - scikit-learn
   run:
     - python
     - numpy
     - flask
     - pandas
     - pyyaml
-    - scikit-learn
     - scipy
+    - scikit-learn
 about:
   home: https://bitbucket.org/johanneskoester/vispr
   license: MIT License

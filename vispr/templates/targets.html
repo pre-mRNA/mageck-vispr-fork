@@ -1,34 +1,133 @@
 {% extends "layout.html" %}
+{% block breadcrumbs %}
+<li>{{ screen.name }}</li>
+<li>results</li>
+{% if condition != "default" %}
+<li>{{ condition }}</li>
+{% endif %}
+<li class="active">{{ selection }}</li>
+{% endblock %}
 {% block content %}
+
+<div class="modal fade" id="modal-igv">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Open IGV</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    VISPR allows you to display read counts and positions of sgRNAs in IGV.
+                    You can open IGV directly via JAVA Web Start (not recommended on Mac OS)
+                    or download an installable instance.
+                </p>
+                <p>
+                    Once an IGV instance is open, you can select to load the current results
+                    from the IGV menu in VISPR and jump to each target via the
+                    <span class="glyphicon glyphicon-equalizer"></span> buttons.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <a href="http://www.broadinstitute.org/igv/projects/current/igv.php" class="btn btn-default">Open via JAVA Web Start</a>
+                    <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default">Download</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-gorilla">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">GO term enrichment with GOrilla</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Perform a GO term enrichment of the currently displayed table
+                    with the GOrilla web service.
+
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" enctype="multipart/form-data" target="_blank" action="http://cbl-gorilla.cs.technion.ac.il/servlet/GOrilla" name="gorilla">
+                    <input type="hidden" name="application" value="gorilla">
+                    <input type="hidden" name="species" value="{{ gorilla_species }}">
+                    <input type="hidden" name="run_mode" value="{{ gorilla_mode }}">
+                    <input type="hidden" name="db" value="all">
+                    <input type="hidden" name="target_set" value="{{ gorilla_targets }}">
+                    <input type="hidden" name="background_set" value="{{ gorilla_background }}">
+                    <input type="hidden" name="output_revigo" value="true">
+                    <div class="form-group">
+                        <label for="pvalue_thresh">maximum enrichment p-value</label>
+                        <select class="selectpicker" name="pvalue_thresh">
+                            <option value="0.001" selected>0.001</option>
+                            <option value="0.0001">0.0001</option>
+                            <option value="0.00001">1e-05</option>
+                            <option value="0.000001">1e-06</option>
+                            <option value="0.0000001">1e-07</option>
+                            <option value="0.00000001">1e-08</option>
+                            <option value="0.000000001">1e-09</option>
+                            <option value="0.0000000001">1e-10</option>
+                            <option value="0.00000000001">1e-11</option>
+                        </select>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-default">OK</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-6">
-        <h4>Results for {{ selection }} selection</h4>
+        <h4>Target results</h4>
         <table id="targets" class="table table-striped">
             <thead>
-                <th data-dynatable-column="target">Target</th>
-{% if has_rna_info %}
+                <th data-dynatable-column="target">target</th>
+                {% if has_rna_info %}
                 <th style="display: none" data-dynatable-column="locus">Locus</th>
-{% endif %}
-                <th data-dynatable-column="score">RRA-score</th>
+                {% endif %}
+                <th data-dynatable-column="score">score</th>
                 <th data-dynatable-column="p-value">p-value</th>
                 <th data-dynatable-column="fdr">FDR</th>
                 <th style="text-align: right;" data-dynatable-no-sort="true">
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
-                            <span class="glyphicon glyphicon-menu-hamburger"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-{% if has_rna_info %}
-                            <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
-{% endif %}
-                            <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
-{% if has_rna_info %}
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.broadinstitute.org/igv/projects/current/igv.php?sessionURL={{ request.url_root }}igv/session/{{ screen.name }}.xml">Open IGV</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="http://127.0.0.1:60151?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Show in existing IGV</a></li>
-{% endif %}
-                        </ul>
+                    <div class="btn-group">
+                        {% if has_rna_info %}
+                        <div class="btn-group">
+                            <a class="btn btn-default" type="button" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection }}.txt">Download</a>
+                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
+                                IGV
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">Open IGV</a></li>
+                                <li role="presentation"><a role="menuitem" id="load-igv" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                        {% if gorilla %}
+                        <a class="btn btn-default" data-toggle="modal" data-target="#modal-gorilla" href="#">GOrilla</a>
+                        {% endif %}
+                        <div class="btn-group">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
+                                Selection
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
+                                {% if has_rna_info %}
+                                <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                                {% endif %}
+                                <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </th>
             <thead>
@@ -41,8 +140,8 @@
             <div class="col-md-12">
                 <h4>p-values</h4>
                 <div class="text-center">
-                    <div id="score-plot" class="plot"></div>
-                    <div id="pval-hist-plot" class="plot"></div>
+                    <div id="score-plot" class="plot" data-toggle="popover" data-desc="Target ranks plotted against p-values. Smallest FDR greater or equal to 5% and 25% are displayed."></div>
+                    <div id="pval-hist-plot" class="plot" data-toggle="popover" data-placement="left" data-desc="Histogram of p-values. Small p-values should be enriched. If one-sided test was performed, p-values toward 1.0 are expected to be enriched as well."></div>
                 </div>
             </div>
         </div>
@@ -63,263 +162,263 @@
     </div>
 </div>
 
-        <script>
+<script>
 
-        var plt_pval = null;
-        var plt_rna = null;
-        var selected = {};
-        var rna_dimensions = null;
-        var rna_dimensions_aux = ["efficiency", "chrom pos", "rna"];
+var plt_pval = null;
+var plt_rna = null;
+var selected = {};
+var rna_dimensions = null;
+var rna_dimensions_aux = ["efficiency", "chrom pos", "rna"];
 
-        function get_selected() {
-            var targets = [];
-            for(target in selected) {
-                targets.push(target);
-            }
-            return targets;
-        }
+function get_selected() {
+    var targets = [];
+    for(target in selected) {
+        targets.push(target);
+    }
+    return targets;
+}
 
-        vg.parse.spec("/plt/pvals/{{ screen.name }}/{{ selection }}", function(chart) {
-            plt_pval = vega_draw(chart, "#score-plot");
-        });
+vg.parse.spec("/plt/pvals/{{ screen.name }}/{{ condition }}/{{ selection }}", function(chart) {
+    plt_pval = vega_draw(chart, "#score-plot");
+});
 
 
-        function update_pval_highlights() {
-            var selected = get_selected();
-            if(selected.length == 0) {
-                plt_pval.data({ "highlight": [] });
-                plt_pval.update();
-            }
-            else {
-                d3.json("/tbl/pvals_highlight/{{ screen.name }}/{{ selection }}/" + selected.join("|"), function(error, json) {
-                    plt_pval.data(
-                        { "highlight": json }
-                    );
-                    plt_pval.update();
-                });
-            }
-        }
-
-        function clear_pval_highlights() {
-            plt_pval.data({"highlight": []});
+function update_pval_highlights() {
+    var selected = get_selected();
+    if(selected.length == 0) {
+        plt_pval.data({ "highlight": [] });
+        plt_pval.update();
+    }
+    else {
+        d3.json("/tbl/pvals_highlight/{{ screen.name }}/{{ condition }}/{{ selection }}/" + selected.join("|"), function(error, json) {
+            plt_pval.data(
+                { "highlight": json }
+            );
             plt_pval.update();
-        }
-
-        function highlight_targets_init() {
-            // highlight the first 5 targets
-            $(".btn-select-target:lt(5)").each(function(idx, e) {
-                var target = $(e).attr("name");
-                selected[target] = true;
-            });
-        }
-
-        function update_dimensions() {
-            var sel = [];
-            $("#choose-samples option:selected").each(function() {
-                sel.push($(this).text());
-            });
-            var new_dimensions = [];
-            rna_dimensions.forEach(function(d) {
-                if(sel.indexOf(d) != -1 || rna_dimensions_aux.indexOf(d) != -1) {
-                    new_dimensions.push(d);
-                }
-            });
-            sel.forEach(function(d) {
-                if(new_dimensions.indexOf(d) == -1) {
-                    new_dimensions.push(d);
-                }
-            });
-            rna_dimensions = new_dimensions;
-            plt_rna.dimensions(rna_dimensions);
-        }
-
-        vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ selection }}", function(chart) {
-            vega_draw(chart, "#pval-hist-plot");
         });
+    }
+}
 
-        var dt = $("#targets").dynatable({
-            dataset: {
-                ajax: true,
-                ajaxUrl: "/tbl/targets/{{ screen.name }}/{{ selection }}?{{ table_args|safe }}",
-                ajaxOnLoad: true,
-                perPageDefault: 20,
-                records: [],
-                inputs: {
-                    paginationClass: 'pagination',
-                    paginationActiveClass: 'active',
-                    paginationDisabledClass: 'disabled'
-                }
-            }
-        });
-        var filters = $("#dynatable-query-search-targets").addClass("form-control").css("margin-right", "2px").parent();
-        filters.addClass("form-inline").css("margin-right", "8px");
+function clear_pval_highlights() {
+    plt_pval.data({"highlight": []});
+    plt_pval.update();
+}
 
-        {% if control_targets %}
-            filters.append('<div class="btn-group" data-toggle="buttons"><label class="btn btn-default"><input type="checkbox" id="hide-controls">hide controls</label></div>');
-            {% if hide_control_targets %}
-                $("#hide-controls").click();
-            {% endif %}
-            $("#hide-controls").change(function() {
-                if(this.checked) {
-                    $.get("/set/hide_control_targets/1", function() {
-                        dt.data('dynatable').process();
-                    });
-                }
-                else {
-                    $.get("/set/hide_control_targets/0", function() {
-                        dt.data('dynatable').process();
-                    });
-                }
-            });
-        {% endif %}
+function highlight_targets_init() {
+    // highlight the first 5 targets
+    $(".btn-select-target:lt(5)").each(function(idx, e) {
+        var target = $(e).attr("name");
+        selected[target] = true;
+    });
+}
 
-        $("#dynatable-per-page-targets").addClass("selectpicker");
+function update_dimensions() {
+    var sel = [];
+    $("#choose-samples option:selected").each(function() {
+        sel.push($(this).text());
+    });
+    var new_dimensions = [];
+    rna_dimensions.forEach(function(d) {
+        if(sel.indexOf(d) != -1 || rna_dimensions_aux.indexOf(d) != -1) {
+            new_dimensions.push(d);
+        }
+    });
+    sel.forEach(function(d) {
+        if(new_dimensions.indexOf(d) == -1) {
+            new_dimensions.push(d);
+        }
+    });
+    rna_dimensions = new_dimensions;
+    plt_rna.dimensions(rna_dimensions);
+}
 
-        // Perform actions when paging the table.
-        dt.on("dynatable:afterUpdate", function() {
-            {% if screen.is_genes %}
-            $("#targets tr td:first-child").each(function(idx, cell) {
-                var target = $(cell).html();
-                $(cell).html(
-                    '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' +
-                    target + '">' + target + '</a>'
-                );
-            });
-            {% endif %}
+vg.parse.spec("/plt/pvalhist/{{ screen.name }}/{{ condition }}/{{ selection }}", function(chart) {
+    vega_draw(chart, "#pval-hist-plot");
+});
 
-            $("#targets tr td:last-child").each(function(idx, cell) {
-                var target = $(cell).parent().children(":first").children(":first").html();
-                var locus = $(cell).parent().children(":eq(1)").html();
-                $(cell).html(
-                    '<div class="btn-group" role="group">' +
-{% if has_rna_info %}
-                    '<a class="btn btn-default btn-show-igv" data-toggle="tooltip" ' +
-                    'title="Show in IGV (an instance of IGV can be opened in the menu at the top of this column)." ' +
-                    'href="http://127.0.0.1:60151/goto?locus=' +
-                    locus + '"><span class="glyphicon glyphicon-equalizer"></span></a>' +
+var dt = $("#targets").dynatable({
+    dataset: {
+        ajax: true,
+        ajaxUrl: "/tbl/targets/json/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}",
+        ajaxOnLoad: true,
+        perPageDefault: 10,
+        records: [],
+        inputs: {
+            paginationClass: 'pagination',
+            paginationActiveClass: 'active',
+            paginationDisabledClass: 'disabled'
+        }
+    }
+});
+var filters = $("#dynatable-query-search-targets").addClass("form-control").css("margin-right", "2px").parent();
+filters.addClass("form-inline").css("margin-right", "8px");
+
+{% if control_targets %}
+filters.append('<div class="btn-group" data-toggle="buttons"><label class="btn btn-default"><input type="checkbox" id="hide-controls">hide controls</label></div>');
+{% if hide_control_targets %}
+$("#hide-controls").click();
 {% endif %}
-                    '<button type="button" class="btn btn-default btn-plt-rnas" name="' +
-                    target + '" data-toggle="tooltip" title="Show RNA counts.">' +
-                    '<span class="glyphicon glyphicon-stats"></span></button>' +
-                    '<button type="button" class="btn btn-default btn-select-target" name="' +
-                    target + '" data-toggle="tooltip" title="Select target and highlight in p-value plot.">' +
-                    '<span class="glyphicon glyphicon-ok"></span></button>' +
-                    '</div>'
-                );
-            });
-
-            highlight_targets_init();
-            highlight_targets_init = function() {};
-{% if table_args %}
-            update_pval_highlights();
+$("#hide-controls").change(function() {
+    if(this.checked) {
+        $.get("/set/hide_control_targets/1", function() {
+            dt.data('dynatable').process();
+        });
+    }
+    else {
+        $.get("/set/hide_control_targets/0", function() {
+            dt.data('dynatable').process();
+        });
+    }
+});
 {% endif %}
 
-            // Display parallel coordinates plot of RNA counts.
-            $(".btn-plt-rnas").click(function() {
-                var target = $(this).attr("name");
+$("#dynatable-per-page-targets").addClass("selectpicker");
 
-                $(".btn-plt-rnas").removeClass("active");
-                $(this).addClass("active");
+// Perform actions when paging the table.
+dt.on("dynatable:afterUpdate", function() {
+    {% if screen.is_genes %}
+    $("#targets tr td:first-child").each(function(idx, cell) {
+        var target = $(cell).html();
+        $(cell).html(
+            '<a target="_blank" href="http://www.ensembl.org/{{ screen.species }}/Gene/Summary?g=' +
+            target + '">' + target + '</a>'
+        );
+    });
+    {% endif %}
 
-                d3.json("/tbl/rnas/{{ screen.name }}/" + target, function(error, data) {
-                    if (error) return console.warn(error);
-                    $("#rna-plot").empty();
+    $("#targets tr td:last-child").each(function(idx, cell) {
+        var target = $(cell).parent().children(":first").children(":first").html();
+        var locus = $(cell).parent().children(":eq(1)").html();
+        $(cell).html(
+            '<div class="btn-group" role="group">' +
+            {% if has_rna_info %}
+            '<a class="btn btn-default btn-show-igv" data-toggle="tooltip" ' +
+            'title="Show in IGV (an instance of IGV can be opened in the menu at the top of this column)." ' +
+            'href="http://127.0.0.1:60151/goto?locus=' +
+            locus + '"><span class="glyphicon glyphicon-equalizer"></span></a>' +
+            {% endif %}
+            '<button type="button" class="btn btn-default btn-plt-rnas" name="' +
+            target + '" data-toggle="tooltip" title="Show RNA counts.">' +
+            '<span class="glyphicon glyphicon-stats"></span></button>' +
+            '<button type="button" class="btn btn-default btn-select-target" name="' +
+            target + '" data-toggle="tooltip" title="Select target and highlight in p-value plot.">' +
+            '<span class="glyphicon glyphicon-ok"></span></button>' +
+            '</div>'
+        );
+    });
 
-                    var names = data.map(function(rec) { return rec.rna });
-                    var colors = d3.scale.category10().domain(names);
+    highlight_targets_init();
+    highlight_targets_init = function() {};
+    {% if table_args %}
+    update_pval_highlights();
+    {% endif %}
 
-                    plt_rna = d3.parcoords(
-                            {
-                                dimensionTitleRotation: -45,
-                            }
-                        )("#rna-plot")
-                        .data(data)
-                        .margin({ top: 80, left: 80, bottom: 12, right: 0 })
-                        .height(Math.max(data.length * 12, 300))
-                        .color(function(record) { return colors(record.rna) })
-                        .render();
+    // Display parallel coordinates plot of RNA counts.
+    $(".btn-plt-rnas").click(function() {
+        var target = $(this).attr("name");
 
-                    if(rna_dimensions == null) {
-                        rna_dimensions = plt_rna.dimensions();
+        $(".btn-plt-rnas").removeClass("active");
+        $(this).addClass("active");
+
+        d3.json("/tbl/rnas/{{ screen.name }}/" + target, function(error, data) {
+            if (error) return console.warn(error);
+            $("#rna-plot").empty();
+
+            var names = data.map(function(rec) { return rec.rna });
+            var colors = d3.scale.category10().domain(names);
+
+            plt_rna = d3.parcoords(
+                    {
+                        dimensionTitleRotation: -45,
                     }
+                )("#rna-plot")
+                .data(data)
+                .margin({ top: 80, left: 80, bottom: 12, right: 0 })
+                .height(Math.max(data.length * 12, 300))
+                .color(function(record) { return colors(record.rna) })
+                .render();
 
-                    update_dimensions();
+            if(rna_dimensions == null) {
+                rna_dimensions = plt_rna.dimensions();
+            }
 
-                    var max_count = 0;
-                    rna_dimensions.forEach(function(d) {
-                        if(rna_dimensions_aux.indexOf(d) == -1) {
-                            max_count = Math.max(max_count, d3.max(data, function(rec) { return rec[d] }));
-                        }
-                    });
-                    rna_dimensions.forEach(function(d) {
-                        if(rna_dimensions_aux.indexOf(d) == -1) {
-                            plt_rna.scale(d, [0, max_count]);
-                        }
-                    });
+            update_dimensions();
 
-                    plt_rna.on("render", function() {
-                        rna_dimensions = plt_rna.dimensions();
-                        plt_rna.svg.selectAll("text").style("font-size", "10px");
-                        $("#rna-plot svg .axis > :contains(rna)").css("opacity", "0");
-                        $("#rna-plot svg .axis > :contains(rna)").parent().find(".domain").css("opacity", "0");
-                        $("#rna-plot svg .axis > :contains(rna)").parent().find(".tick line").css("opacity", "0");
-                        $("#rna-plot svg .axis .label").attr("text-anchor", "left");
-                    });
-
-                    plt_rna.createAxes()
-                        .brushMode("1D-axes")
-                        .reorderable()
-                        .interactive()
-                        .render();
-                });
-            });
-
-            // Display gene in hockey stick and update "selected".
-            $(".btn-select-target").click(function() {
-                var target = $(this).attr("name");
-
-                if(!$(this).hasClass("active")) {
-                    $(this).addClass("active");
-                    selected[target] = true;
-                    update_pval_highlights();
+            var max_count = 0;
+            rna_dimensions.forEach(function(d) {
+                if(rna_dimensions_aux.indexOf(d) == -1) {
+                    max_count = Math.max(max_count, d3.max(data, function(rec) { return rec[d] }));
                 }
-                else {
-                    $(this).removeClass("active");
-                    delete selected[target];
-                    $(this).blur();
-                    update_pval_highlights();
+            });
+            rna_dimensions.forEach(function(d) {
+                if(rna_dimensions_aux.indexOf(d) == -1) {
+                    plt_rna.scale(d, [0, max_count]);
                 }
             });
 
-            for(target in selected) {
-                $("button.btn-select-target[name=" + target + "]").addClass("active");
-            }
+            plt_rna.on("render", function() {
+                rna_dimensions = plt_rna.dimensions();
+                plt_rna.svg.selectAll("text").style("font-size", "10px");
+                $("#rna-plot svg .axis > :contains(rna)").css("opacity", "0");
+                $("#rna-plot svg .axis > :contains(rna)").parent().find(".domain").css("opacity", "0");
+                $("#rna-plot svg .axis > :contains(rna)").parent().find(".tick line").css("opacity", "0");
+                $("#rna-plot svg .axis .label").attr("text-anchor", "left");
+            });
 
-            $(".btn-plt-rnas:first").click();
-            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: "hover"})
+            plt_rna.createAxes()
+                .brushMode("1D-axes")
+                .reorderable()
+                .interactive()
+                .render();
         });
+    });
 
-        $(".btn-show-igv").click(function() {
-            $(this).focusout();
-            $(this).tooltip('hide');
-        });
+    // Display gene in hockey stick and update "selected".
+    $(".btn-select-target").click(function() {
+        var target = $(this).attr("name");
 
-        // Show selected genes in GeneMANIA.
-        $("#btn-genemania").click(function() {
-            var url = "http://genemania.org/link?o=human&g=";
-            window.open(encodeURI(url + get_selected().join("|")), '_blank');
-        });
+        if(!$(this).hasClass("active")) {
+            $(this).addClass("active");
+            selected[target] = true;
+            update_pval_highlights();
+        }
+        else {
+            $(this).removeClass("active");
+            delete selected[target];
+            $(this).blur();
+            update_pval_highlights();
+        }
+    });
 
-        // Deselect all genes.
-        $("#btn-deselect").click(function() {
-            for(target in selected) {
-                delete selected[target];
-            }
-            clear_pval_highlights();
-            $(".btn-select-target").removeClass("active");
-        });
+    for(target in selected) {
+        $("button.btn-select-target[name=" + target + "]").addClass("active");
+    }
 
-        $("#choose-samples").change(update_dimensions);
+    $(".btn-plt-rnas:first").click();
+    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: "hover"});
+});
 
-        </script>
-        {% endblock %}
+$(".btn-show-igv").click(function() {
+    $(this).focusout();
+    $(this).tooltip('hide');
+});
+
+// Show selected genes in GeneMANIA.
+$("#btn-genemania").click(function() {
+    var url = "http://genemania.org/link?o=human&g=";
+    window.open(encodeURI(url + get_selected().join("|")), '_blank');
+});
+
+// Deselect all genes.
+$("#btn-deselect").click(function() {
+    for(target in selected) {
+        delete selected[target];
+    }
+    clear_pval_highlights();
+    $(".btn-select-target").removeClass("active");
+});
+
+$("#choose-samples").change(update_dimensions);
+
+</script>
+{% endblock %}

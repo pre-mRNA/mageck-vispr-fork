@@ -1,5 +1,5 @@
 experiment: leukemia
-species: human
+species: homo_sapiens
 assembly: hg19
 targets:
     results: leukemia.gene_summary.txt
@@ -8,7 +8,7 @@ targets:
 sgrnas:
     counts: leukemia.normalized.txt
     info: leukemia.sgrna.fake.bed
-    mapstats: test.countsummary.txt
+    mapstats: fake.countsummary.txt
 fastqc:
     sample1: fastqc/sample1.fake.txt
     sample2: fastqc/sample2.fake.txt
