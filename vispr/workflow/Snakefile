@@ -114,7 +114,7 @@ def vispr_config(input, output, wildcards):
             "counts": relpath(input.counts),
         }
     }
-    if "fastqc" in input:
+    if "fastqc" in input.keys():
         vispr_config["fastqc"] = {
             sample: [
                 relpath(os.path.join(fastqc, data, "fastqc_data.txt"))
@@ -122,7 +122,7 @@ def vispr_config(input, output, wildcards):
             ]
             for sample, fastqc in zip(config["samples"], input.fastqc)
         }
-    if "mapstats" in input:
+    if "mapstats" in input.keys():
         vispr_config["sgrnas"]["mapstats"] = relpath(input.mapstats)
     if "controls" in config["targets"]:
         vispr_config["targets"]["controls"] = config["targets"]["controls"]
