@@ -1,6 +1,6 @@
 #vim: set syntax=python
 
-__author__ = "Johannes Köste"
+__author__ = "Johannes Köster"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
@@ -28,15 +28,12 @@ rule fastqc:
     input:
         lambda wildcards: config["samples"][wildcards.sample]
     output:
-        "results/qc/{sample}/fastqc_data.txt"
-    params:
-        dir="results/qc/{sample}"
+        "results/qc/{sample}"
     log:
         "logs/fastqc/{sample}.log"
     shell:
-        "rm -f {params.dir}/*.zip; "
-        "fastqc --extract -o {params.dir} {input} 2> {log} && "
-        "unzip -p {params.dir}/*.zip '*/fastqc_data.txt' > {output}"
+        "mkdir -p {output}; rm -rf {output}/*; "
+        "fastqc -f fastq --extract -o {output} {input} 2> {log}"
 
 
 rule mageck_count:
@@ -56,7 +53,7 @@ rule mageck_count:
     shell:
         "mageck count --output-prefix {params.prefix} "
         "--list-seq {input.library} "
-        "--fastq {input.fastq} --sample-label {params.labels} "
+        "--fastq {params.fastqs} --sample-label {params.labels} "
         "--trim-5 {config[sgrnas][trim-5]} --sgrna-len {config[sgrnas][len]} 2> {log}"
 
 
@@ -83,7 +80,7 @@ rule vispr:
         results="results/test/{experiment}.gene_summary.txt",
         counts="results/count/all.count.median_normalized.txt",
         mapstats="results/count/all.countsummary.txt",
-        fastqc=expand("results/qc/{sample}/fastqc_data.txt", sample=config["samples"])
+        fastqc=expand("results/qc/{sample}", sample=config["samples"])
     output:
         "results/{experiment}.vispr.yaml"
     run:
@@ -101,7 +98,10 @@ rule vispr:
                 "mapstats": relpath(input.mapstats)
             },
             "fastqc": {
-                sample: relpath(fastqc)
+                sample: [
+                    relpath(os.path.join(fastqc, data, "fastqc_data.txt"))
+                    for data in sorted(os.listdir(fastqc))
+                ]
                 for sample, fastqc in zip(config["samples"], input.fastqc)
             }
         }
