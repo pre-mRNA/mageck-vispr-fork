@@ -75,6 +75,9 @@ rule mageck_test:
         "--control-id {params.control} 2> {log}"
 
 
+ruleorder: vispr > vispr_nosamples
+
+
 rule vispr:
     input:
         results="results/test/{experiment}.gene_summary.txt",
@@ -84,34 +87,50 @@ rule vispr:
     output:
         "results/{experiment}.vispr.yaml"
     run:
-        relpath = lambda path: os.path.relpath(path, "results")
-        vispr_config = {
-            "experiment": wildcards.experiment,
-            "species": config["species"],
-            "assembly": config["assembly"],
-            "targets": {
-                "results": relpath(input.results),
-                "genes": config["targets"]["genes"]
-            },
-            "sgrnas": {
-                "counts": relpath(input.counts),
-                "mapstats": relpath(input.mapstats)
-            },
-            "fastqc": {
-                sample: [
-                    relpath(os.path.join(fastqc, data, "fastqc_data.txt"))
-                    for data in sorted(os.listdir(fastqc))
-                ]
-                for sample, fastqc in zip(config["samples"], input.fastqc)
-            }
+        vispr_config(input, output, wildcards)
+
+
+rule vispr_nosamples:
+    input:
+        results="results/test/{experiment}.gene_summary.txt",
+        counts="results/count/all.count.median_normalized.txt"
+    output:
+        "results/{experiment}.vispr.yaml"
+    run:
+        vispr_config(input, output, wildcards)
+
+
+def vispr_config(input, output, wildcards):
+    relpath = lambda path: os.path.relpath(path, "results")
+    vispr_config = {
+        "experiment": wildcards.experiment,
+        "species": config["species"],
+        "assembly": config["assembly"],
+        "targets": {
+            "results": relpath(input.results),
+            "genes": config["targets"]["genes"]
+        },
+        "sgrnas": {
+            "counts": relpath(input.counts),
         }
-        if "controls" in config["targets"]:
-            vispr_config["targets"]["controls"] = config["targets"]["controls"]
-        if "info" in config["sgrnas"]:
-            vispr_config["sgrnas"]["info"] = config["sgrnas"]["info"]
-        with open(output[0], "w") as f:
-            yaml.dump(
-                vispr_config,
-                f,
-                default_flow_style=False
-            )
+    }
+    if "fastqc" in input:
+        vispr_config["fastqc"] = {
+            sample: [
+                relpath(os.path.join(fastqc, data, "fastqc_data.txt"))
+                for data in sorted(os.listdir(fastqc))
+            ]
+            for sample, fastqc in zip(config["samples"], input.fastqc)
+        }
+    if "mapstats" in input:
+        vispr_config["sgrnas"]["mapstats"] = relpath(input.mapstats)
+    if "controls" in config["targets"]:
+        vispr_config["targets"]["controls"] = config["targets"]["controls"]
+    if "info" in config["sgrnas"]:
+        vispr_config["sgrnas"]["info"] = config["sgrnas"]["info"]
+    with open(output[0], "w") as f:
+        yaml.dump(
+            vispr_config,
+            f,
+            default_flow_style=False
+        )
