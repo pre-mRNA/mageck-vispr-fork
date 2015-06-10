@@ -37,7 +37,7 @@
             "type": "group",
             "from": {
                 "data": "basequal",
-                "transform": [{"type": "facet", "keys": ["data.sample"]}]
+                "transform": [{"type": "facet", "keys": ["data.filename"]}]
             },
             "marks": [
                 {

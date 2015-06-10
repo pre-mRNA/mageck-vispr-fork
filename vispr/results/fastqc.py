@@ -6,46 +6,59 @@ import pandas as pd
 from flask import render_template
 
 
+from vispr.results.common import templates
+
+
 class Results(object):
     def __init__(self, **fastqc_data):
         self.gc_content = []
         self.base_quality = []
         self.seq_quality = []
-        for sample, path in fastqc_data.items():
-            for name, data in parse_fastqc_data(path):
-                if name == "Per sequence GC content":
-                    data.columns = ["gc", "density"]
+        for sample, paths in fastqc_data.items():
+            for path in paths:
+                filename = parse_fastqc_filename(path)
+                for name, data in parse_fastqc_data(path):
+                    if name == "Per sequence GC content":
+                        data.columns = ["gc", "density"]
+                        data["density"] /= data["density"].sum()
+                        self.gc_content.append(data)
+                    elif name == "Per base sequence quality":
+                        data.columns = ["base", "mean", "median", "lo", "hi", "q10", "q90"]
+                        self.base_quality.append(data)
+                    elif name == "Per sequence quality scores":
+                        data.columns = ["qual", "density"]
+                        data["density"] /= data["density"].sum()
+                        self.seq_quality.append(data)
                     data["sample"] = sample
-                    data["density"] /= data["density"].sum()
-                    self.gc_content.append(data)
-                elif name == "Per base sequence quality":
-                    data.columns = ["base", "mean", "median", "lo", "hi", "q10", "q90"]
-                    data["sample"] = sample
-                    self.base_quality.append(data)
-                elif name == "Per sequence quality scores":
-                    data.columns = ["qual", "density"]
-                    data["density"] /= data["density"].sum()
-                    data["sample"] = sample
-                    self.seq_quality.append(data)
+                    data["filename"] = filename
         self.gc_content = pd.concat(self.gc_content)
         self.base_quality = pd.concat(self.base_quality)
         self.seq_quality = pd.concat(self.seq_quality)
 
     def plot_gc_content(self):
-        plt = render_template("plots/gc_content.json", data=self.gc_content.to_json(orient="records"))
+        plt = templates.get_template("plots/gc_content.json").render(data=self.gc_content.to_json(orient="records"))
         return plt
 
     def plot_base_quality(self):
-        plt = render_template(
-            "plots/base_quality.json",
+        plt = templates.get_template(
+            "plots/base_quality.json").render(
             data=self.base_quality.to_json(orient="records"))
         return plt
 
     def plot_seq_quality(self):
-        plt = render_template(
-            "plots/seq_quality.json",
+        plt = templates.get_template(
+            "plots/seq_quality.json").render(
             data=self.seq_quality.to_json(orient="records"))
         return plt
+
+
+def parse_fastqc_filename(path, pattern=re.compile(r"Filename\t(?P<name>.*)")):
+    with open(path) as f:
+        match = pattern.search(f.read())
+        if match:
+            return match.group("name")
+    raise IOError("Invalid FastQC format.")
+
 
 def parse_fastqc_data(path, pattern=re.compile(r"\n\>\>(?P<name>[\w ]+)\t(pass|fail)\n\#(?P<data>.+?)\n\>\>END_MODULE", flags=re.MULTILINE | re.DOTALL)):
     with open(path) as f:

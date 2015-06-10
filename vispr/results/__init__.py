@@ -79,14 +79,14 @@ class Screen(object):
         self.fastqc = None
         if "fastqc" in config:
             self.fastqc = fastqc.Results(**{
-                sample: get_path(path)
-                for sample, path in config["fastqc"].items()
+                sample: map(get_path, paths)
+                for sample, paths in config["fastqc"].items()
             })
 
         self.control_targets = set()
         if "controls" in config["targets"]:
             self.control_targets = set(
-                pd.read_table(config["targets"]["controls"],
+                pd.read_table(get_path(config["targets"]["controls"]),
                               header=None,
                               squeeze=True,
                               na_filter=False))

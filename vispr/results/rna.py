@@ -8,7 +8,7 @@ from sklearn.decomposition import PCA
 from scipy.cluster.hierarchy import complete, leaves_list
 from scipy.spatial.distance import pdist, squareform
 
-from vispr.results.common import lru_cache, AbstractResults
+from vispr.results.common import lru_cache, AbstractResults, templates
 
 
 class Results(AbstractResults):
@@ -79,7 +79,7 @@ class Results(AbstractResults):
             "q90": counts.quantile(0.9),
         })
         width = 20 * counts.shape[1]
-        return render_template("plots/normalization.json",
+        return templates.get_template("plots/normalization.json").render(
                                data=data.to_json(orient="records"),
                                width=width)
 
@@ -95,7 +95,7 @@ class Results(AbstractResults):
                 "sample": sample
             }))
         data = pd.concat(data)
-        return render_template("plots/readcounts.json",
+        return templates.get_template("plots/readcounts.json").render(
                                data=data.to_json(orient="records"))
 
 
@@ -123,11 +123,11 @@ class Results(AbstractResults):
             "y": pca[pca.columns[comp_y - 1]],
         })
 
-        plt = render_template("plots/pca.json",
+        plt = templates.get_template("plots/pca.json").render(
                               data=data.to_json(orient="records"),
                               xlabel=pca.columns[comp_x - 1],
                               ylabel=pca.columns[comp_y - 1],
-                              legend=legend, )
+                              legend=legend)
         return plt
 
     @lru_cache()
@@ -158,7 +158,7 @@ class Results(AbstractResults):
 
         size = max(min(50 * len(labels), 700), 300)
 
-        plt = render_template("plots/correlation.json",
+        plt = templates.get_template("plots/correlation.json").render(
                               data=json.dumps(data),
                               size=size)
         return plt

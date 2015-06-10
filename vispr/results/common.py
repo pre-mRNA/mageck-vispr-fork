@@ -1,5 +1,9 @@
 
 import pandas as pd
+from jinja2 import Environment, PackageLoader
+
+
+templates = Environment(loader=PackageLoader('vispr', 'templates'))
 
 
 try:

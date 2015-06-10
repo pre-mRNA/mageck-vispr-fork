@@ -11,7 +11,7 @@
             <div class="col-md-12">
                 <h4>GC content</h4>
                 <div class="text-center">
-                    <div id="gc-content" class="plot" data-toggle="popover" data-desc="Per sample distribution of mean GC content of reads. The mean should be between 40 and 50."></div>
+                    <div id="gc-content" class="plot" data-toggle="popover" data-desc="{{ captions["gc-content"] }}"></div>
                 </div>
             </div>
         </div>
@@ -23,8 +23,8 @@
             <div class="col-md-12">
                 <h4>Base quality</h4>
                 <div class="text-center">
-                    <div id="base-quality" class="plot" data-toggle="popover" data-desc="Median base quality per-read base for each sample."></div>
-                    <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="Distribution of per-read mean base quality for each sample. The peak should be beyond 30."></div>
+                    <div id="base-quality" class="plot" data-toggle="popover" data-desc="{{ captions["base-quality"] }}"></div>
+                    <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["seq-quality"] }}"></div>
                 </div>
             </div>
         </div>
@@ -36,9 +36,9 @@
     <div class="col-md-12">
         <h4>Mapping statistics</h4>
         <div class="text-center">
-            <div id="mapped-unmapped" class="plot" data-toggle="popover" data-desc="Mapped and unmapped reads for each sample. Percentage of unmapped reads is printed on each bar."></div>
-            <div id="zerocounts" class="plot" data-toggle="popover" data-desc="Per-sample number of missed gRNAs, i.e. gRNAs with zero mapped reads."></div>
-            <div id="gini-index" class="plot" data-toggle="popover" data-placement="left" data-desc="Gini Index for each sample. This measures inequality between read counts. 1.0 means maximum inequality (e.g. all reads mapping to one gRNA), 0.0 corresponds to having the same read count for all gRNAs."></div>
+            <div id="mapped-unmapped" class="plot" data-toggle="popover" data-desc="{{ captions["mapped-unmapped"] }}"></div>
+            <div id="zerocounts" class="plot" data-toggle="popover" data-desc="{{ captions["zerocounts"] }}"></div>
+            <div id="gini-index" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["gini-index"] }}"></div>
         </div>
     </div>
 </div>
@@ -49,8 +49,8 @@
             <div class="col-md-12">
                 <h4>Normalized read count distributions</h4>
                 <div class="text-center">
-                    <div id="readcounts" class="plot" data-toggle="popover" data-desc="Distribution of normalized read counts for each sample."></div>
-                    <div id="readcount-cdf" class="plot" data-toggle="popover" data-desc="Cumulative distribution function of normalized read counts for each sample."></div>
+                    <div id="readcounts" class="plot" data-toggle="popover" data-desc="{{ captions["readcounts"] }}"></div>
+                    <div id="readcount-cdf" class="plot" data-toggle="popover" data-desc="{{ captions["readcount-cdf"] }}"></div>
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
             <div class="col-md-12">
                 <h4>Sample correlation</h4>
                 <div class="text-center">
-                    <div id="correlation" class="plot" data-toggle="popover" data-desc="Correlation between normalized log10 read counts of samples."></div>
+                    <div id="correlation" class="plot" data-toggle="popover" data-desc="{{ captions["correlation"] }}"></div>
                 </div>
             </div>
         </div>
@@ -68,9 +68,9 @@
             <div class="col-md-12">
                 <h4>Principal component analysis</h4>
                 <div class="text-center">
-                    <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="Principal component analysis on normalized log10 read counts of samples. The axis labels show principal components and percentage of explained variants."></div>
-                    <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="Principal component analysis on normalized log10 read counts of samples. The axis labels show principal components and percentage of explained variants."></div>
-                    <div id="pca-pc2-pc3" class="plot" data-toggle="popover" data-placement="left" data-desc="Principal component analysis on normalized log10 read counts of samples. The axis labels show principal components and percentage of explained variants."></div>
+                    <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
+                    <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
+                    <div id="pca-pc2-pc3" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["pca"] }}"></div>
                 </div>
             </div>
         </div>

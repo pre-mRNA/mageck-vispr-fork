@@ -11,5 +11,7 @@ sgrnas:
     info: myexperiment.sgrna.bed  # position and score (e.g. efficiency score) for each sgRNA
     mapstats: myexperiment.countsummary.txt  # mapping statistics (mageck count)
 fastqc:
-    sample1: fastqc/sample1/fastqc_data.txt  # fastqc output for sample1
-    sample2: fastqc/sample2/fastqc_data.txt  # fastqc output for sample2
+    sample1:
+        - fastqc/sample1/fastqc_data.txt  # fastqc output for sample1
+    sample2:
+        - fastqc/sample2/fastqc_data.txt  # fastqc output for sample2

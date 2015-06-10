@@ -11,7 +11,7 @@ import shutil
 
 import yaml
 
-from vispr import Screens, VisprError
+from vispr import Screens, VisprError, Screen
 from vispr.server import app
 
 
@@ -20,12 +20,12 @@ def init_server(*configs):
     for path in configs:
         with open(path) as f:
             config = yaml.load(f)
-            try:
-                app.screens.add(config, parentdir=os.path.dirname(path))
-            except KeyError as e:
-                raise VisprError(
-                    "Syntax error in config file {}. Missing key {}.".format(
-                        path, e))
+        try:
+            app.screens.add(config, parentdir=os.path.dirname(path))
+        except KeyError as e:
+            raise VisprError(
+                "Syntax error in config file {}. Missing key {}.".format(path,
+                                                                         e))
     app.secret_key = ''.join(
         random.choice(string.ascii_uppercase + string.digits)
         for _ in range(30))
@@ -37,6 +37,64 @@ def init_server(*configs):
     app.run()
 
 
+def init_workflow(directory):
+    try:
+        os.makedirs(directory)
+    except OSError:
+        # either directory exists (then we can ignore) or it will fail in the
+        # next step.
+        pass
+    for f in ["Snakefile", "config.yaml", "README.md", "conda.txt"]:
+        source = os.path.join(os.path.dirname(__file__), "workflow", f)
+        target = os.path.join(directory, f)
+        if f in ["Snakefile", "config.yaml"] and os.path.exists(target):
+            shutil.copy(target, target + ".old")
+        shutil.copy(source, target)
+
+
+def test_server():
+    os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
+    init_server("leukemia.yaml", "melanoma.yaml")
+
+
+def print_example_config():
+    print(open(os.path.join(os.path.dirname(__file__),
+                            "example.config.yaml")).read())
+
+
+def plots(configpath, prefix):
+    directory = os.path.dirname(prefix)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with open(configpath) as f:
+        screen = Screen(yaml.load(f), parentdir=os.path.dirname(configpath))
+
+    def write(json, name):
+        with open(prefix + name + ".vega.json", "w") as out:
+            print(json, file=out)
+
+    if screen.fastqc is not None:
+        write(screen.fastqc.plot_gc_content(), "gc-content")
+        write(screen.fastqc.plot_base_quality(), "base-quality")
+        write(screen.fastqc.plot_seq_quality(), "seq-quality")
+    if screen.mapstats is not None:
+        write(screen.mapstats.plot_mapstats(), "mapped-unmapped")
+        write(screen.mapstats.plot_zerocounts(), "zerocounts")
+        write(screen.mapstats.plot_gini_index(), "gini-index")
+    write(screen.rnas.plot_normalization(), "readcounts")
+    write(screen.rnas.plot_readcount_cdf(), "readcount-cdf")
+    write(screen.rnas.plot_correlation(), "correlation")
+    write(screen.rnas.plot_pca(1, 2), "pca-1-2")
+    write(screen.rnas.plot_pca(1, 3), "pca-1-3")
+    write(screen.rnas.plot_pca(2, 3), "pca-2-3")
+    for condition, results in screen.targets.items():
+        for selection, results in results.items():
+            pre = ".".join(([] if condition == "default" else [condition]) + [selection.replace(" ", "-")])
+            write(results.plot_pvals(), pre + ".p-values")
+            write(results.plot_pval_hist(), pre + ".p-value-hist")
+
+
 def main():
     # create arg parser
     parser = argparse.ArgumentParser(
@@ -46,22 +104,26 @@ def main():
                         help="Print debug info.")
     subparsers = parser.add_subparsers(dest="subcommand")
 
+    config = subparsers.add_parser(
+        "config",
+        help="Print an example VISPR config file. Pipe the output into a file "
+        "and edit it to setup a new experiment to be displayed in VISPR.")
+
     server = subparsers.add_parser("server", help="Start the VISPR server.")
     server.add_argument(
         "config",
         nargs="+",
         help="YAML config files. Each file points to the results of one "
-        "MAGeCK test run.")
+        "MAGeCK run.")
 
-    subparsers.add_parser("test",
-                          help="Start the VISPR server with some included "
-                          "test data.")
-
-    config = subparsers.add_parser(
-        "config",
-        help="Print an example VISPR config file. Pipe the output into a file "
-        "and edit it to setup a new experiment to be displayed in VISPR."
-    )
+    plot = subparsers.add_parser(
+        "plot",
+        help="Plot visualizations in VEGA JSON format.")
+    plot.add_argument("config",
+                      help="YAML config file pointing to MAGeCK results.")
+    plot.add_argument("prefix",
+                      help="Prefix of all resulting plots. "
+                      "This can be a path to a subdirectory.")
 
     workflow = subparsers.add_parser(
         "init-workflow",
@@ -77,6 +139,10 @@ def main():
                           help="Path to the directory where the "
                           "workflow shall be initialized.")
 
+    subparsers.add_parser("test",
+                          help="Start the VISPR server with some included "
+                          "test data.")
+
     args = parser.parse_args()
 
     logging.basicConfig(format="%(message)s",
@@ -88,23 +154,13 @@ def main():
         if args.subcommand == "server":
             init_server(*args.config)
         elif args.subcommand == "test":
-            os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
-            init_server("leukemia.yaml", "melanoma.yaml")
+            test_server()
         elif args.subcommand == "init-workflow":
-            try:
-                os.makedirs(args.directory)
-            except OSError:
-                # either directory exists (then we can ignore) or it will fail in the
-                # next step.
-                pass
-            for f in ["Snakefile", "config.yaml", "README.md", "conda.txt"]:
-                source = os.path.join(os.path.dirname(__file__), "workflow", f)
-                target = os.path.join(args.directory, f)
-                if f in ["Snakefile", "config.yaml"] and os.path.exists(target):
-                    shutil.copy(target, target + ".old")
-                shutil.copy(source, target)
+            init_workflow(args.directory)
         elif args.subcommand == "config":
-            print(open(os.path.join(os.path.dirname(__file__), "example.config.yaml")).read())
+            print_example_config()
+        elif args.subcommand == "plot":
+            plots(args.config, args.prefix)
         else:
             parser.print_help()
             exit(1)

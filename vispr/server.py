@@ -1,15 +1,20 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function
 
-import re, json
+import re, json, os
 
 import numpy as np
 from flask import Flask, render_template, request, session, abort
 from jinja2 import Markup
+import yaml
 
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
+
+
+with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
+    CAPTIONS = yaml.load(f)
 
 
 @app.route("/")
@@ -48,6 +53,7 @@ def targets(screen, condition, selection):
 
     return render_template(
         "targets.html",
+        captions=CAPTIONS,
         screens=app.screens,
         selection=selection,
         condition=condition,
@@ -68,6 +74,7 @@ def targets(screen, condition, selection):
 def qc(screen):
     screen = app.screens[screen]
     return render_template("qc.html",
+                           captions=CAPTIONS,
                            screens=app.screens,
                            screen=screen,
                            fastqc=screen.fastqc is not None,
@@ -77,15 +84,14 @@ def qc(screen):
 @app.route("/compare/<screen>")
 def compare(screen):
     screen = app.screens[screen]
-    return render_template("compare.html",
-                           screens=app.screens,
-                           screen=screen)
+    return render_template("compare.html", screens=app.screens, screen=screen)
 
 
 @app.route("/plt/pvals/<screen>/<condition>/<selection>")
 def plt_pvals(screen, condition, selection):
     screen = app.screens[screen]
-    plt = screen.targets[condition][selection].plot_pvals(screen.control_targets)
+    plt = screen.targets[condition][selection].plot_pvals(
+        screen.control_targets)
     return plt
 
 
@@ -96,7 +102,10 @@ def plt_pval_hist(screen, condition, selection):
     return plt
 
 
-def tbl_targets(screen, condition, selection, offset=None, perpage=None, add_locus=False):
+def tbl_targets(screen, condition, selection,
+                offset=None,
+                perpage=None,
+                add_locus=False):
     screen = app.screens[screen]
 
     # sort and slice records
@@ -149,26 +158,37 @@ def tbl_targets(screen, condition, selection, offset=None, perpage=None, add_loc
     records = records.apply(fmt_col)
 
     if add_locus and screen.rnas.info is not None:
-        records["locus"] = ["{}:{}-{}".format(*screen.rnas.target_locus(target)) for target in records["target"]]
+        records["locus"] = [
+            "{}:{}-{}".format(*screen.rnas.target_locus(target))
+            for target in records["target"]
+        ]
 
     return records, filter_count, total_count
 
 
-@app.route("/tbl/targets/json/<screen>/<condition>/<selection>", methods=["GET"])
+@app.route("/tbl/targets/json/<screen>/<condition>/<selection>",
+           methods=["GET"])
 def tbl_targets_json(screen, condition, selection):
     offset = int(request.args.get("offset", 0))
     perpage = int(request.args.get("perPage", 20))
-    records, filter_count, total_count = tbl_targets(screen, condition, selection, offset=offset, perpage=perpage, add_locus=True)
+    records, filter_count, total_count = tbl_targets(screen, condition,
+                                                     selection,
+                                                     offset=offset,
+                                                     perpage=perpage,
+                                                     add_locus=True)
     return render_template("dyntable.json",
                            records=records.to_json(orient="records",
                                                    double_precision=15),
                            filter_count=filter_count,
                            total_count=total_count)
 
-@app.route("/tbl/targets/txt/<screen>/<condition>/<selection>", methods=["GET"])
+
+@app.route("/tbl/targets/txt/<screen>/<condition>/<selection>",
+           methods=["GET"])
 def tbl_targets_txt(screen, condition, selection):
     records, _, _ = tbl_targets(screen, condition, selection)
-    return records[["target", "score", "p-value", "fdr"]].to_csv(sep="\t", index=False)
+    return records[["target", "score", "p-value", "fdr"]].to_csv(sep="\t",
+                                                                 index=False)
 
 
 @app.route("/tbl/pvals_highlight/<screen>/<selection>/<targets>")
@@ -268,6 +288,7 @@ def plt_readcounts(screen):
     plt = screen.rnas.plot_readcount_cdf()
     return plt
 
+
 @app.route("/plt/overlap_chord")
 def plt_overlap_chord():
     return app.screens.plot_overlap_chord(*get_overlap_args())
@@ -289,7 +310,8 @@ def get_overlap_args():
         return None
 
     fdr = float(request.values.get("fdr", 0.25))
-    items = list(map(lambda item: item.split("|"), request.values.getlist("overlap-items")))
+    items = list(map(lambda item: item.split("|"),
+                     request.values.getlist("overlap-items")))
     return fdr, items
 
 
@@ -311,6 +333,7 @@ def get_targets(screen, selection):
     return screen.targets(selection == "positive")
 
 
-GORILLA_SPECIES = ("HOMO_SAPIENS ARABIDOPSIS_THALIANA SACCHAROMYCES_CEREVISIAE "
-                   "CAENORHABDITIS_ELEGANS DROSOPHILA_MELANOGASTER DANIO_RERIO "
-                   "MUS_MUSCULUS RATTUS_NORVEGICUS".split())
+GORILLA_SPECIES = (
+    "HOMO_SAPIENS ARABIDOPSIS_THALIANA SACCHAROMYCES_CEREVISIAE "
+    "CAENORHABDITIS_ELEGANS DROSOPHILA_MELANOGASTER DANIO_RERIO "
+    "MUS_MUSCULUS RATTUS_NORVEGICUS".split())

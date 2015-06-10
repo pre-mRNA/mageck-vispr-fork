@@ -6,7 +6,7 @@ from flask import render_template
 import pandas as pd
 import numpy as np
 
-from vispr.results.common import lru_cache, AbstractResults
+from vispr.results.common import lru_cache, AbstractResults, templates
 
 
 class Results(AbstractResults):
@@ -26,7 +26,7 @@ class Results(AbstractResults):
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
-    def plot_pvals(self, control_targets):
+    def plot_pvals(self, control_targets=None):
         """
         Plot the gene ranking in form of their p-values as line plot.
 
@@ -49,7 +49,7 @@ class Results(AbstractResults):
             top5 = top5[valid]
         top5 = top5.ix[:5]
 
-        plt = render_template("plots/pvals.json",
+        plt = templates.get_template("plots/pvals.json").render(
                               pvals=data.to_json(orient="records"),
                               highlight=top5.to_json(orient="records"),
                               fdr5=fdr5,
@@ -68,7 +68,7 @@ class Results(AbstractResults):
         bins = edges[1:]
 
         hist = pd.DataFrame({"bin": bins, "count": counts})
-        return render_template("plots/pval_hist.json",
+        return templates.get_template("plots/pval_hist.json").render(
                                hist=hist.to_json(orient="records"))
 
     def ids(self, fdr):

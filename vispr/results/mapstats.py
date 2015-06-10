@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from flask import render_template
 
-from vispr.results.common import AbstractResults
+from vispr.results.common import AbstractResults, templates
 
 class Results(AbstractResults):
     def __init__(self, dataframe):
@@ -14,7 +14,7 @@ class Results(AbstractResults):
         data["unmapped_percentage"] = ((self.df["reads"] - self.df["mapped"]) / self.df["reads"]).apply("{:.1%}".format)
 
         width = 20 * data.shape[0]
-        return render_template("plots/mapstats.json",
+        return templates.get_template("plots/mapstats.json").render(
                                data=data.to_json(orient="records"),
                                width=width)
 
@@ -23,7 +23,7 @@ class Results(AbstractResults):
         data["zerocounts"] = np.log10(self.df["zerocounts"])
 
         width = 20 * data.shape[0]
-        return render_template("plots/zerocounts.json",
+        return templates.get_template("plots/zerocounts.json").render(
                                data=data.to_json(orient="records"),
                                width=width)
 
@@ -31,6 +31,6 @@ class Results(AbstractResults):
         data = self.df[["label", "giniindex"]]
 
         width = 20 * data.shape[0]
-        return render_template("plots/gini_index.json",
+        return templates.get_template("plots/gini_index.json").render(
                                data=data.to_json(orient="records"),
                                width=width)

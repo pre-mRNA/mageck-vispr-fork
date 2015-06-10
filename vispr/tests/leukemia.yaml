@@ -10,5 +10,7 @@ sgrnas:
     info: leukemia.sgrna.fake.bed
     mapstats: fake.countsummary.txt
 fastqc:
-    sample1: fastqc/sample1.fake.txt
-    sample2: fastqc/sample2.fake.txt
+    sample1:
+        - fastqc/sample1.fake.txt
+    sample2:
+        - fastqc/sample2.fake.txt
