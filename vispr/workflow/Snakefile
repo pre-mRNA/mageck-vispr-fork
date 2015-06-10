@@ -126,7 +126,7 @@ def vispr_config(input, output, wildcards):
         vispr_config["sgrnas"]["mapstats"] = relpath(input.mapstats)
     if "controls" in config["targets"]:
         vispr_config["targets"]["controls"] = config["targets"]["controls"]
-    if "info" in config["sgrnas"]:
+    if config["sgrnas"] is not None and "info" in config["sgrnas"]:
         vispr_config["sgrnas"]["info"] = config["sgrnas"]["info"]
     with open(output[0], "w") as f:
         yaml.dump(
