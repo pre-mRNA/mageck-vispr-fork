@@ -6,8 +6,6 @@ To install VISPR, we recommend the Miniconda Python distribution (see below).
 Currently, VISPR is under heavy development and not yet recommended for public
 use.
 
-Author: Johannes Köster <koester@jimmy.harvard.edu>, Liu lab, Department of Biostatistics and Computational Biology, Dana-Farber Cancer Institute.
-
 Installing VISPR with the Miniconda Python distribution
 -------------------------------------------------------
 
@@ -68,3 +66,16 @@ or
 
 if you want to install VISPR without admin rights.
 All remaining dependencies will be installed automatically.
+
+Author
+------
+
+Johannes Köster <koester@jimmy.harvard.edu>,
+Liu lab,
+Department of Biostatistics and Computational Biology,
+Dana-Farber Cancer Institute
+
+License
+-------
+
+Licensed under the MIT license http://opensource.org/licenses/MIT. This project may not be copied, modified, or distributed except according to those terms.
