@@ -77,7 +77,7 @@ rule mageck_test:
 
 rule mageck_mle:
     input:
-        counts="results/count/all.median_normalized.txt",
+        counts="results/count/all.count.median_normalized.txt",
         designmatrix=lambda wildcards: config["experiments"][wildcards.experiment]["designmatrix"]
     output:
         "results/test/{experiment}.gene_summary.txt",
