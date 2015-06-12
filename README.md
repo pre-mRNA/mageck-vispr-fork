@@ -16,6 +16,9 @@ With miniconda installed, you can issue
     conda install -c johanneskoester vispr
 
 to install VISPR with all dependencies.
+To update vispr, you can issue
+
+    conda update -c johanneskoester vispr
 
 Usage
 -----
