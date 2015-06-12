@@ -13,6 +13,7 @@ import yaml
 
 from vispr import Screens, VisprError, Screen
 from vispr.server import app
+from vispr.version import __version__
 
 
 def init_server(*configs):
@@ -99,6 +100,8 @@ def main():
     # create arg parser
     parser = argparse.ArgumentParser(
         "An HTML5-based interactive visualization of CRISPR/Cas9 screen data.")
+    parser.add_argument("--version",
+        action="store_true", help="Print version info.")
     parser.add_argument("--debug",
                         action="store_true",
                         help="Print debug info.")
@@ -151,6 +154,9 @@ def main():
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     try:
+        if args.version:
+            print(__version__)
+            exit(0)
         if args.subcommand == "server":
             init_server(*args.config)
         elif args.subcommand == "test":
