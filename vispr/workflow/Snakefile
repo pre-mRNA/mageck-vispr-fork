@@ -13,7 +13,7 @@ configfile: "config.yaml"
 
 
 import yaml
-from vispr.workflow import postprocess_config, experiments
+from vispr.workflow import postprocess_config, vispr_config
 
 
 postprocess_config(config)
