@@ -59,15 +59,14 @@ def targets(screen, condition, selection):
         condition=condition,
         screen=screen,
         control_targets=screen.control_targets,
-        hide_control_targets=session.get("hide_control_targets", True),
+        hide_control_targets=session.get("control_targets_mode", "hide") == "hide",
         table_args=table_args,
         samples=screen.rnas.samples,
         has_rna_info=screen.rnas.info is not None,
         gorilla=gorilla,
         gorilla_targets=targets,
         gorilla_background=background,
-        gorilla_mode="hg" if background else "mhg",
-        gorilla_species=screen.species)
+        gorilla_mode="hg" if background else "mhg")
 
 
 @app.route("/qc/<screen>")
@@ -126,10 +125,14 @@ def tbl_targets(screen, condition, selection,
     if search:
         filter &= records["target"].str.contains(search)
 
-    if session.get("hide_control_targets", True):
-        control_targets = screen.control_targets
+    control_targets_mode = session.get("control_targets_mode", "hide")
+    control_targets = screen.control_targets
+    if control_targets_mode == "hide":
         filter &= records["target"].apply(
             lambda target: target not in control_targets)
+    elif control_targets_mode == "show-only":
+        filter &= records["target"].apply(
+            lambda target: target in control_targets)
 
     # filtering
     if not np.all(filter):
@@ -299,9 +302,9 @@ def plt_overlap_venn():
     return app.screens.plot_overlap_venn(*get_overlap_args())
 
 
-@app.route("/set/hide_control_targets/<int:value>")
-def set_hide_control_targets(value):
-    session["hide_control_targets"] = value == 1
+@app.route("/set/control_targets_mode/<mode>")
+def set_control_targets_mode(mode):
+    session["control_targets_mode"] = mode
     return ""
 
 
