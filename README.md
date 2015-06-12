@@ -6,6 +6,7 @@ To install VISPR, we recommend the Miniconda Python distribution (see below).
 Currently, VISPR is under heavy development and not yet recommended for public
 use.
 
+Author: Johannes Köster <koester@jimmy.harvard.edu>
 
 Installing VISPR with the Miniconda Python distribution
 -------------------------------------------------------
@@ -32,11 +33,24 @@ After successful installation, you can run VISPR by executing the command
 
     vispr server path/to/config.yaml
 
+This starts a server process. The VISPR user interface will be rendered in a webbrowser.
 See below for the config file format.
 If you only want to test VISPR, you can run a test instance with example
 data by executing
 
     vispr test
+
+
+Configuring VISPR
+-----------------
+
+VISPR takes MAGeCK and FastQC results as input. These are provided along with additional parameters as config files. One config file defines one set of results (i.e. one experiment).
+VISPR can be invoked with multiple config files (i.e. multiple experiments), allowing to select and compare experiments via the user interface.
+The command
+
+    vispr config
+
+prints a config file template to the terminal.
 
 
 Installing VISPR with another Python distribution (for experts)
