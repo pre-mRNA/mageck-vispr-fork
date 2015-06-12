@@ -1,4 +1,10 @@
 # coding: utf-8
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+
 from __future__ import absolute_import, division, print_function
 
 import re, json, os
@@ -11,7 +17,6 @@ import yaml
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
-
 
 with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
     CAPTIONS = yaml.load(f)
@@ -51,22 +56,22 @@ def targets(screen, condition, selection):
             background = background.to_csv(None, index=False)
         targets = targets.to_csv(None, index=False)
 
-    return render_template(
-        "targets.html",
-        captions=CAPTIONS,
-        screens=app.screens,
-        selection=selection,
-        condition=condition,
-        screen=screen,
-        control_targets=screen.control_targets,
-        hide_control_targets=session.get("control_targets_mode", "hide") == "hide",
-        table_args=table_args,
-        samples=screen.rnas.samples,
-        has_rna_info=screen.rnas.info is not None,
-        gorilla=gorilla,
-        gorilla_targets=targets,
-        gorilla_background=background,
-        gorilla_mode="hg" if background else "mhg")
+    return render_template("targets.html",
+                           captions=CAPTIONS,
+                           screens=app.screens,
+                           selection=selection,
+                           condition=condition,
+                           screen=screen,
+                           control_targets=screen.control_targets,
+                           hide_control_targets=session.get(
+                               "control_targets_mode", "hide") == "hide",
+                           table_args=table_args,
+                           samples=screen.rnas.samples,
+                           has_rna_info=screen.rnas.info is not None,
+                           gorilla=gorilla,
+                           gorilla_targets=targets,
+                           gorilla_background=background,
+                           gorilla_mode="hg" if background else "mhg")
 
 
 @app.route("/qc/<screen>")
@@ -90,7 +95,8 @@ def compare(screen):
 def plt_pvals(screen, condition, selection):
     screen = app.screens[screen]
     plt = screen.targets[condition][selection].plot_pvals(
-        screen.control_targets, mode=session.get("control_targets_mode", "hide"))
+        screen.control_targets,
+        mode=session.get("control_targets_mode", "hide"))
     return plt
 
 
@@ -198,7 +204,8 @@ def tbl_targets_txt(screen, condition, selection):
 def tbl_pvals_highlight(screen, condition, selection, targets):
     screen = app.screens[screen]
     targets = targets.split("|")
-    records = screen.targets[condition][selection].get_pvals_highlight_targets(targets)
+    records = screen.targets[condition][selection].get_pvals_highlight_targets(
+        targets)
     return records.to_json(orient="records")
 
 

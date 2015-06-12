@@ -1,3 +1,10 @@
+# coding: utf-8
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+
 import json
 from itertools import combinations
 from operator import itemgetter
@@ -46,20 +53,22 @@ class Results(AbstractResults):
         top5 = self.df[["idx", "log10-p-value", "target"]]
         if control_targets:
             if mode == "hide":
-                valid = self.df["target"].apply(lambda target: target not in control_targets)
+                valid = self.df["target"].apply(lambda target: target not in
+                                                control_targets)
                 top5 = top5[valid]
             elif mode == "show-only":
-                valid = self.df["target"].apply(lambda target: target in control_targets)
+                valid = self.df["target"].apply(lambda target: target in
+                                                control_targets)
                 top5 = top5[valid]
         top5 = top5.ix[:5]
 
         plt = templates.get_template("plots/pvals.json").render(
-                              pvals=data.to_json(orient="records"),
-                              highlight=top5.to_json(orient="records"),
-                              fdr5=fdr5,
-                              fdr25=fdr25,
-                              fdr5label=fdr5label,
-                              fdr25label=fdr25label)
+            pvals=data.to_json(orient="records"),
+            highlight=top5.to_json(orient="records"),
+            fdr5=fdr5,
+            fdr25=fdr25,
+            fdr5label=fdr5label,
+            fdr25label=fdr25label)
         return plt
 
     def get_pvals_highlight_targets(self, highlight_targets):
@@ -73,7 +82,7 @@ class Results(AbstractResults):
 
         hist = pd.DataFrame({"bin": bins, "count": counts})
         return templates.get_template("plots/pval_hist.json").render(
-                               hist=hist.to_json(orient="records"))
+            hist=hist.to_json(orient="records"))
 
     def ids(self, fdr):
         valid = self.df["fdr"] <= fdr

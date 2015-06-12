@@ -1,3 +1,10 @@
+# coding: utf-8
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+
 import numpy as np
 import pandas as pd
 from flask import render_template

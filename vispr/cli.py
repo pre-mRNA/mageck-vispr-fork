@@ -1,4 +1,10 @@
 # coding: utf-8
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+
 from __future__ import absolute_import, division, print_function
 
 import argparse
@@ -91,7 +97,8 @@ def plots(configpath, prefix):
     write(screen.rnas.plot_pca(2, 3), "pca-2-3")
     for condition, results in screen.targets.items():
         for selection, results in results.items():
-            pre = ".".join(([] if condition == "default" else [condition]) + [selection.replace(" ", "-")])
+            pre = ".".join(([] if condition == "default" else [condition]) +
+                           [selection.replace(" ", "-")])
             write(results.plot_pvals(), pre + ".p-values")
             write(results.plot_pval_hist(), pre + ".p-value-hist")
 
@@ -101,7 +108,8 @@ def main():
     parser = argparse.ArgumentParser(
         "An HTML5-based interactive visualization of CRISPR/Cas9 screen data.")
     parser.add_argument("--version",
-        action="store_true", help="Print version info.")
+                        action="store_true",
+                        help="Print version info.")
     parser.add_argument("--debug",
                         action="store_true",
                         help="Print debug info.")
@@ -150,7 +158,7 @@ def main():
 
     logging.basicConfig(format="%(message)s",
                         level=logging.DEBUG if args.debug else logging.INFO,
-                        stream=sys.stderr, )
+                        stream=sys.stderr)
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     try:
