@@ -6,7 +6,7 @@ To install VISPR, we recommend the Miniconda Python distribution (see below).
 Currently, VISPR is under heavy development and not yet recommended for public
 use.
 
-Author: Johannes Köster <koester@jimmy.harvard.edu>
+Author: Johannes Köster <koester@jimmy.harvard.edu>, Liu lab, Department of Biostatistics and Computational Biology, Dana-Farber Cancer Institute.
 
 Installing VISPR with the Miniconda Python distribution
 -------------------------------------------------------
