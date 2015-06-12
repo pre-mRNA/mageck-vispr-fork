@@ -6,26 +6,19 @@ To install VISPR, we recommend the Miniconda Python distribution (see below).
 Currently, VISPR is under heavy development and not yet recommended for public
 use.
 
-Installing VISPR with the Miniconda Python distribution
--------------------------------------------------------
+Installation
+------------
 
-Install Miniconda for Python 3 from here:
-
-http://conda.pydata.org/miniconda.html
-
-This will install a minimal Python 3, together with the conda
-package manager (if preferred, you can also use Python 2).
-
-Then, open a terminal and execute
+The easiest way to install VISPR is to use the Miniconda Python distribution (http://conda.pydata.org/miniconda.html). 
+We recommend to use the Python 3.4 variant.
+With miniconda installed, you can issue
 
     conda install -c johanneskoester vispr
 
 to install VISPR with all dependencies.
-See below for running a test instance of VISPR.
 
-
-Running VISPR
--------------
+Usage
+-----
 
 After successful installation, you can run VISPR by executing the command
 
