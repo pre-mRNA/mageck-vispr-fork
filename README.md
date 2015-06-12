@@ -78,4 +78,4 @@ Dana-Farber Cancer Institute
 License
 -------
 
-Licensed under the MIT license http://opensource.org/licenses/MIT. This project may not be copied, modified, or distributed except according to those terms.
+Licensed under the MIT license (http://opensource.org/licenses/MIT). This project may not be copied, modified, or distributed except according to those terms.
