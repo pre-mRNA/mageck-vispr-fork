@@ -110,6 +110,7 @@
                         {% endif %}
                         {% if gorilla %}
                             <li role="presentation" class="dropdown-header">Table</li>
+                            <li role="presentaiton"><a role="menuitem" tabindex="-1" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection.replace(" ", "-") }}.txt">Download</a></li>
                             <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-gorilla" href="#">GO enrichment</a></li>
                         {% endif %}
                             <li role="presentation" class="dropdown-header">Selection</li>

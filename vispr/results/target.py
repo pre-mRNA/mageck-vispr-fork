@@ -26,7 +26,7 @@ class Results(AbstractResults):
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
-    def plot_pvals(self, control_targets=None):
+    def plot_pvals(self, control_targets=None, mode="hide"):
         """
         Plot the gene ranking in form of their p-values as line plot.
 
@@ -45,8 +45,12 @@ class Results(AbstractResults):
 
         top5 = self.df[["idx", "log10-p-value", "target"]]
         if control_targets:
-            valid = self.df["target"].apply(lambda target: target not in control_targets)
-            top5 = top5[valid]
+            if mode == "hide":
+                valid = self.df["target"].apply(lambda target: target not in control_targets)
+                top5 = top5[valid]
+            elif mode == "show-only":
+                valid = self.df["target"].apply(lambda target: target in control_targets)
+                top5 = top5[valid]
         top5 = top5.ix[:5]
 
         plt = templates.get_template("plots/pvals.json").render(

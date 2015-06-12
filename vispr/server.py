@@ -90,7 +90,7 @@ def compare(screen):
 def plt_pvals(screen, condition, selection):
     screen = app.screens[screen]
     plt = screen.targets[condition][selection].plot_pvals(
-        screen.control_targets)
+        screen.control_targets, mode=session.get("control_targets_mode", "hide"))
     return plt
 
 
@@ -194,12 +194,11 @@ def tbl_targets_txt(screen, condition, selection):
                                                                  index=False)
 
 
-@app.route("/tbl/pvals_highlight/<screen>/<selection>/<targets>")
-def tbl_pvals_highlight(screen, selection, targets):
+@app.route("/tbl/pvals_highlight/<screen>/<condition>/<selection>/<targets>")
+def tbl_pvals_highlight(screen, condition, selection, targets):
     screen = app.screens[screen]
     targets = targets.split("|")
-    records = get_targets(screen,
-                          selection).get_pvals_highlight_targets(targets)
+    records = screen.targets[condition][selection].get_pvals_highlight_targets(targets)
     return records.to_json(orient="records")
 
 
