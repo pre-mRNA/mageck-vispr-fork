@@ -110,8 +110,8 @@ def parse_target_results(path,
     max_depth = max(map(len, paths))
     if max_depth == 3:
         # MLE format
-        def get_results(selection):
-            res = results["id {cond}|beta {cond}|{sel}|p-value {cond}|{sel}|fdr".format(
+        def get_results(condition, selection):
+            res = results[[results.columns[0]] + "{cond}|beta {cond}|{sel}|p-value {cond}|{sel}|fdr".format(
                 cond=condition,
                 sel=selection[:3]).split()]
             res.columns = ["target", "beta", "p-value", "fdr"]
@@ -120,14 +120,15 @@ def parse_target_results(path,
         conditions = [path[0] for path in paths if len(path) > 1]
         targets = {
             condition:
-            {selection: get_results(selection)
+            {selection: get_results(condition, selection)
              for selection in selections}
+             for condition in conditions
         }
 
     elif max_depth == 2:
         # RRA format
         def get_results(selection):
-            res = results["id {sel}|score {sel}|p-value {sel}|fdr".format(
+            res = results[[results.columns[0]] + "{sel}|score {sel}|p-value {sel}|fdr".format(
                 sel=selection[:3]).split()]
             res.columns = ["target", "score", "p-value", "fdr"]
             return target.Results(res.copy())
