@@ -8,6 +8,8 @@
 <script src="/static/bootstrap-select.min.js"></script>
 <link rel="stylesheet" href="/static/bootstrap-select.min.css">
 
+<link rel="stylesheet" href="/static/dropdowns-enhancement.css">
+
 <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
 <script src="http://trifacta.github.io/vega/vega.js"></script>
 
@@ -60,19 +62,17 @@ function vega_draw(chart, el) {
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">VISPR</a>
+            <a class="navbar-brand" href="/">VISPR <span class="small">{{ version }}</span></a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Experiment <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-placeholder="false" data-toggle="dropdown" role="button" aria-expanded="false">Experiment <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         {% for _screen in screens %}
-                        {% set invisible = "invisible" if _screen.name != screen.name else "" %}
+                        {% set checked = "checked" if _screen.name == screen.name else "" %}
                         <li>
-                            <a href="/{{ _screen.name }}">
-                                <span class="glyphicon glyphicon-ok {{ invisible }}" aria-hidden="true"></span> {{ _screen.name }}
-                            </a>
+                            <input type="radio" name="screen" value="{{ _screen.name }}" id="screen-{{ _screen.name }}" {{ checked }}><label for="screen-{{ _screen.name }}">{{ _screen.name }}</label>
                         </li>
                         {% endfor %}
                     </ul>
@@ -83,7 +83,7 @@ function vega_draw(chart, el) {
                     <ul class="dropdown-menu" role="menu">
                     {% for condition in screen.targets %}
                         {% if condition != "default" %}
-                        <li role="presentation" class="dropdown-header">{{ condition }}</li>"
+                        <li role="presentation" class="dropdown-header">{{ condition }}</li>
                         {% endif %}
                         {% for selection in ["positive selection", "negative selection"] %}
                         <li role="presentation"><a href="/targets/{{ screen.name }}/{{ condition }}/{{ selection }}">{{ selection }}</a></li>
@@ -110,6 +110,9 @@ function vega_draw(chart, el) {
 </div>
 <script>
 $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: "hover"})
+$("input[name=screen]").change(function() {
+    window.location = "/" + $(this).val();
+});
 </script>
 </body>
 </html>

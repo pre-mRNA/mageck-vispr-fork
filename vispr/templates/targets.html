@@ -56,7 +56,7 @@
             <div class="modal-footer">
                 <form method="post" enctype="multipart/form-data" target="_blank" action="http://cbl-gorilla.cs.technion.ac.il/servlet/GOrilla" name="gorilla">
                     <input type="hidden" name="application" value="gorilla">
-                    <input type="hidden" name="species" value="{{ gorilla_species }}">
+                    <input type="hidden" name="species" value="{{ screen.species.upper() }}">
                     <input type="hidden" name="run_mode" value="{{ gorilla_mode }}">
                     <input type="hidden" name="db" value="all">
                     <input type="hidden" name="target_set" value="{{ gorilla_targets }}">
@@ -99,35 +99,31 @@
                 <th data-dynatable-column="p-value">p-value</th>
                 <th data-dynatable-column="fdr">FDR</th>
                 <th style="text-align: right;" data-dynatable-no-sort="true">
-                    <div class="btn-group">
-                        {% if has_rna_info %}
-                        <div class="btn-group">
-                            <a class="btn btn-default" type="button" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection }}.txt">Download</a>
-                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
-                                IGV
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-                                <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">Open IGV</a></li>
-                                <li role="presentation"><a role="menuitem" id="load-igv" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
-                            </ul>
-                        </div>
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" data-placeholder="false" type="button" id="table-menu" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon-menu-hamburger glyphicon"></span> <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="table-menu">
+                        {% if screen.is_genes %}
+                            <li role="presentation" class="dropdown-header">Control genes</li>
+                            <li role="presentation"><input type="radio" id="control-hide" name="controls" value="hide"><label for="control-hide">hide</label></li>
+                            <li role="presentation"><input type="radio" id="control-show" name="controls" value="show" checked><label for="control-show">show</label></li>
+                            <li role="presentation"><input type="radio" id="control-show-only" name="controls" value="show-only"><label for="control-show-only">show only</label></li>
                         {% endif %}
                         {% if gorilla %}
-                        <a class="btn btn-default" data-toggle="modal" data-target="#modal-gorilla" href="#">GOrilla</a>
+                            <li role="presentation" class="dropdown-header">Table</li>
+                            <li role="presentaiton"><a role="menuitem" tabindex="-1" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection.replace(" ", "-") }}.txt">Download</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-gorilla" href="#">GO enrichment</a></li>
                         {% endif %}
-                        <div class="btn-group">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="selection-menu" data-toggle="dropdown" aria-expanded="true">
-                                Selection
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="selection-menu">
-                                {% if has_rna_info %}
-                                <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
-                                {% endif %}
-                                <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
-                            </ul>
-                        </div>
+                            <li role="presentation" class="dropdown-header">Selection</li>
+                        {% if has_rna_info %}
+                            <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                        {% endif %}
+                            <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+                        {% if has_rna_info %}
+                            <li role="presentation" class="dropdown-header">IGV</li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">Open IGV</a></li>
+                            <li role="presentation"><a role="menuitem" id="load-igv" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
+                        {% endif %}
+                        </ul>
                     </div>
                 </th>
             <thead>
@@ -254,18 +250,23 @@ var filters = $("#dynatable-query-search-targets").addClass("form-control").css(
 filters.addClass("form-inline").css("margin-right", "8px");
 
 {% if control_targets %}
-filters.append('<div class="btn-group" data-toggle="buttons"><label class="btn btn-default"><input type="checkbox" id="hide-controls">hide controls</label></div>');
 {% if hide_control_targets %}
-$("#hide-controls").click();
+$("#control-hide").click();
 {% endif %}
-$("#hide-controls").change(function() {
-    if(this.checked) {
-        $.get("/set/hide_control_targets/1", function() {
+$("input[name=controls]").change(function() {
+    var mode = $(this).val();
+    if(mode == "show") {
+        $.get("/set/control_targets_mode/show", function() {
             dt.data('dynatable').process();
         });
     }
-    else {
-        $.get("/set/hide_control_targets/0", function() {
+    else if(mode == "hide") {
+        $.get("/set/control_targets_mode/hide", function() {
+            dt.data('dynatable').process();
+        });
+    }
+    else if(mode == "show-only") {
+        $.get("/set/control_targets_mode/show-only", function() {
             dt.data('dynatable').process();
         });
     }
@@ -273,6 +274,10 @@ $("#hide-controls").change(function() {
 {% endif %}
 
 $("#dynatable-per-page-targets").addClass("selectpicker");
+
+dt.on("dynatable:beforeUpdate", function() {
+    $('[data-toggle="tooltip"]').tooltip("hide");
+});
 
 // Perform actions when paging the table.
 dt.on("dynatable:afterUpdate", function() {
@@ -405,7 +410,7 @@ $(".btn-show-igv").click(function() {
 
 // Show selected genes in GeneMANIA.
 $("#btn-genemania").click(function() {
-    var url = "http://genemania.org/link?o=human&g=";
+    var url = "http://genemania.org/link?o={{ screen.species.lower() }}&g=";
     window.open(encodeURI(url + get_selected().join("|")), '_blank');
 });
 
@@ -419,6 +424,8 @@ $("#btn-deselect").click(function() {
 });
 
 $("#choose-samples").change(update_dimensions);
+
+
 
 </script>
 {% endblock %}

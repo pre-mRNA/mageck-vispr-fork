@@ -1,6 +1,12 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function
 
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+
 import argparse
 import logging
 import sys
@@ -13,9 +19,10 @@ import yaml
 
 from vispr import Screens, VisprError, Screen
 from vispr.server import app
+from vispr.version import __version__
 
 
-def init_server(*configs):
+def init_server(*configs, port=5000):
     app.screens = Screens()
     for path in configs:
         with open(path) as f:
@@ -30,11 +37,11 @@ def init_server(*configs):
         random.choice(string.ascii_uppercase + string.digits)
         for _ in range(30))
     print("Starting server.", "",
-          "Open:  go to http://127.0.0.1:5000 in your browser.",
+          "Open:  go to http://127.0.0.1:{} in your browser.".format(port),
           "Close: hit Ctrl-C in this terminal.",
           file=sys.stderr,
           sep="\n")
-    app.run()
+    app.run(port=port)
 
 
 def init_workflow(directory):
@@ -52,9 +59,9 @@ def init_workflow(directory):
         shutil.copy(source, target)
 
 
-def test_server():
+def test_server(port=None):
     os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
-    init_server("leukemia.yaml", "melanoma.yaml")
+    init_server("leukemia.yaml", "melanoma.yaml", port=port)
 
 
 def print_example_config():
@@ -90,7 +97,8 @@ def plots(configpath, prefix):
     write(screen.rnas.plot_pca(2, 3), "pca-2-3")
     for condition, results in screen.targets.items():
         for selection, results in results.items():
-            pre = ".".join(([] if condition == "default" else [condition]) + [selection.replace(" ", "-")])
+            pre = ".".join(([] if condition == "default" else [condition]) +
+                           [selection.replace(" ", "-")])
             write(results.plot_pvals(), pre + ".p-values")
             write(results.plot_pval_hist(), pre + ".p-value-hist")
 
@@ -99,6 +107,9 @@ def main():
     # create arg parser
     parser = argparse.ArgumentParser(
         "An HTML5-based interactive visualization of CRISPR/Cas9 screen data.")
+    parser.add_argument("--version",
+                        action="store_true",
+                        help="Print version info.")
     parser.add_argument("--debug",
                         action="store_true",
                         help="Print debug info.")
@@ -115,6 +126,7 @@ def main():
         nargs="+",
         help="YAML config files. Each file points to the results of one "
         "MAGeCK run.")
+    server.add_argument("--port", help="Port to listen for client connection.")
 
     plot = subparsers.add_parser(
         "plot",
@@ -139,22 +151,26 @@ def main():
                           help="Path to the directory where the "
                           "workflow shall be initialized.")
 
-    subparsers.add_parser("test",
+    test = subparsers.add_parser("test",
                           help="Start the VISPR server with some included "
                           "test data.")
+    test.add_argument("--port", help="Port to listen for client connection.")
 
     args = parser.parse_args()
 
     logging.basicConfig(format="%(message)s",
                         level=logging.DEBUG if args.debug else logging.INFO,
-                        stream=sys.stderr, )
+                        stream=sys.stderr)
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     try:
+        if args.version:
+            print(__version__)
+            exit(0)
         if args.subcommand == "server":
-            init_server(*args.config)
+            init_server(*args.config, port=args.port)
         elif args.subcommand == "test":
-            test_server()
+            test_server(port=args.port)
         elif args.subcommand == "init-workflow":
             init_workflow(args.directory)
         elif args.subcommand == "config":

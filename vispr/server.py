@@ -1,6 +1,11 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function
 
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
 import re, json, os
 
 import numpy as np
@@ -8,10 +13,11 @@ from flask import Flask, render_template, request, session, abort
 from jinja2 import Markup
 import yaml
 
+from vispr import __version__
+
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
-
 
 with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
     CAPTIONS = yaml.load(f)
@@ -20,7 +26,10 @@ with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
 @app.route("/")
 def index():
     screen = next(iter(app.screens))
-    return render_template("index.html", screens=app.screens, screen=screen)
+    return render_template("index.html",
+                           screens=app.screens,
+                           screen=screen,
+                           version=__version__)
 
 
 @app.route("/<screen>")
@@ -29,7 +38,10 @@ def index_screen(screen):
         screen = app.screens[screen]
     except KeyError:
         abort(404)
-    return render_template("index.html", screens=app.screens, screen=screen)
+    return render_template("index.html",
+                           screens=app.screens,
+                           screen=screen,
+                           version=__version__)
 
 
 @app.route("/targets/<screen>/<condition>/<selection>")
@@ -51,23 +63,23 @@ def targets(screen, condition, selection):
             background = background.to_csv(None, index=False)
         targets = targets.to_csv(None, index=False)
 
-    return render_template(
-        "targets.html",
-        captions=CAPTIONS,
-        screens=app.screens,
-        selection=selection,
-        condition=condition,
-        screen=screen,
-        control_targets=screen.control_targets,
-        hide_control_targets=session.get("hide_control_targets", True),
-        table_args=table_args,
-        samples=screen.rnas.samples,
-        has_rna_info=screen.rnas.info is not None,
-        gorilla=gorilla,
-        gorilla_targets=targets,
-        gorilla_background=background,
-        gorilla_mode="hg" if background else "mhg",
-        gorilla_species=screen.species)
+    return render_template("targets.html",
+                           captions=CAPTIONS,
+                           screens=app.screens,
+                           selection=selection,
+                           condition=condition,
+                           screen=screen,
+                           control_targets=screen.control_targets,
+                           hide_control_targets=session.get(
+                               "control_targets_mode", "hide") == "hide",
+                           table_args=table_args,
+                           samples=screen.rnas.samples,
+                           has_rna_info=screen.rnas.info is not None,
+                           gorilla=gorilla,
+                           gorilla_targets=targets,
+                           gorilla_background=background,
+                           gorilla_mode="hg" if background else "mhg",
+                           version=__version__)
 
 
 @app.route("/qc/<screen>")
@@ -78,20 +90,25 @@ def qc(screen):
                            screens=app.screens,
                            screen=screen,
                            fastqc=screen.fastqc is not None,
-                           mapstats=screen.mapstats is not None)
+                           mapstats=screen.mapstats is not None,
+                           version=__version__)
 
 
 @app.route("/compare/<screen>")
 def compare(screen):
     screen = app.screens[screen]
-    return render_template("compare.html", screens=app.screens, screen=screen)
+    return render_template("compare.html",
+                           screens=app.screens,
+                           screen=screen,
+                           version=__version__)
 
 
 @app.route("/plt/pvals/<screen>/<condition>/<selection>")
 def plt_pvals(screen, condition, selection):
     screen = app.screens[screen]
     plt = screen.targets[condition][selection].plot_pvals(
-        screen.control_targets)
+        screen.control_targets,
+        mode=session.get("control_targets_mode", "hide"))
     return plt
 
 
@@ -126,10 +143,14 @@ def tbl_targets(screen, condition, selection,
     if search:
         filter &= records["target"].str.contains(search)
 
-    if session.get("hide_control_targets", True):
-        control_targets = screen.control_targets
+    control_targets_mode = session.get("control_targets_mode", "hide")
+    control_targets = screen.control_targets
+    if control_targets_mode == "hide":
         filter &= records["target"].apply(
             lambda target: target not in control_targets)
+    elif control_targets_mode == "show-only":
+        filter &= records["target"].apply(
+            lambda target: target in control_targets)
 
     # filtering
     if not np.all(filter):
@@ -191,12 +212,12 @@ def tbl_targets_txt(screen, condition, selection):
                                                                  index=False)
 
 
-@app.route("/tbl/pvals_highlight/<screen>/<selection>/<targets>")
-def tbl_pvals_highlight(screen, selection, targets):
+@app.route("/tbl/pvals_highlight/<screen>/<condition>/<selection>/<targets>")
+def tbl_pvals_highlight(screen, condition, selection, targets):
     screen = app.screens[screen]
     targets = targets.split("|")
-    records = get_targets(screen,
-                          selection).get_pvals_highlight_targets(targets)
+    records = screen.targets[condition][selection].get_pvals_highlight_targets(
+        targets)
     return records.to_json(orient="records")
 
 
@@ -299,9 +320,9 @@ def plt_overlap_venn():
     return app.screens.plot_overlap_venn(*get_overlap_args())
 
 
-@app.route("/set/hide_control_targets/<int:value>")
-def set_hide_control_targets(value):
-    session["hide_control_targets"] = value == 1
+@app.route("/set/control_targets_mode/<mode>")
+def set_control_targets_mode(mode):
+    session["control_targets_mode"] = mode
     return ""
 
 

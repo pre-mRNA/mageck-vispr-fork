@@ -1,6 +1,12 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function
 
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
+__email__ = "koester@jimmy.harvard.edu"
+__license__ = "MIT"
+
+
 import os
 from itertools import filterfalse
 
@@ -34,7 +40,7 @@ class Screens(object):
             else:
                 return screen, selection
         return {
-            " | ".join(label(screen, condition, selection)):
+            "\n".join(label(screen, condition, selection)):
             self.screens[screen].targets[condition][selection].ids(fdr)
             for screen, condition, selection in items
         }
