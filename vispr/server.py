@@ -6,13 +6,14 @@ __copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
-
 import re, json, os
 
 import numpy as np
 from flask import Flask, render_template, request, session, abort
 from jinja2 import Markup
 import yaml
+
+from vispr import __version__
 
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
@@ -25,7 +26,10 @@ with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
 @app.route("/")
 def index():
     screen = next(iter(app.screens))
-    return render_template("index.html", screens=app.screens, screen=screen)
+    return render_template("index.html",
+                           screens=app.screens,
+                           screen=screen,
+                           version=__version__)
 
 
 @app.route("/<screen>")
@@ -34,7 +38,10 @@ def index_screen(screen):
         screen = app.screens[screen]
     except KeyError:
         abort(404)
-    return render_template("index.html", screens=app.screens, screen=screen)
+    return render_template("index.html",
+                           screens=app.screens,
+                           screen=screen,
+                           version=__version__)
 
 
 @app.route("/targets/<screen>/<condition>/<selection>")
@@ -71,7 +78,8 @@ def targets(screen, condition, selection):
                            gorilla=gorilla,
                            gorilla_targets=targets,
                            gorilla_background=background,
-                           gorilla_mode="hg" if background else "mhg")
+                           gorilla_mode="hg" if background else "mhg",
+                           version=__version__)
 
 
 @app.route("/qc/<screen>")
@@ -82,13 +90,17 @@ def qc(screen):
                            screens=app.screens,
                            screen=screen,
                            fastqc=screen.fastqc is not None,
-                           mapstats=screen.mapstats is not None)
+                           mapstats=screen.mapstats is not None,
+                           version=__version__)
 
 
 @app.route("/compare/<screen>")
 def compare(screen):
     screen = app.screens[screen]
-    return render_template("compare.html", screens=app.screens, screen=screen)
+    return render_template("compare.html",
+                           screens=app.screens,
+                           screen=screen,
+                           version=__version__)
 
 
 @app.route("/plt/pvals/<screen>/<condition>/<selection>")

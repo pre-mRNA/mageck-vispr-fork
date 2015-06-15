@@ -22,7 +22,7 @@ from vispr.server import app
 from vispr.version import __version__
 
 
-def init_server(*configs):
+def init_server(*configs, port=5000):
     app.screens = Screens()
     for path in configs:
         with open(path) as f:
@@ -37,11 +37,11 @@ def init_server(*configs):
         random.choice(string.ascii_uppercase + string.digits)
         for _ in range(30))
     print("Starting server.", "",
-          "Open:  go to http://127.0.0.1:5000 in your browser.",
+          "Open:  go to http://127.0.0.1:{} in your browser.".format(port),
           "Close: hit Ctrl-C in this terminal.",
           file=sys.stderr,
           sep="\n")
-    app.run()
+    app.run(port=port)
 
 
 def init_workflow(directory):
@@ -59,9 +59,9 @@ def init_workflow(directory):
         shutil.copy(source, target)
 
 
-def test_server():
+def test_server(port=None):
     os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
-    init_server("leukemia.yaml", "melanoma.yaml")
+    init_server("leukemia.yaml", "melanoma.yaml", port=port)
 
 
 def print_example_config():
@@ -126,6 +126,7 @@ def main():
         nargs="+",
         help="YAML config files. Each file points to the results of one "
         "MAGeCK run.")
+    server.add_argument("--port", help="Port to listen for client connection.")
 
     plot = subparsers.add_parser(
         "plot",
@@ -150,9 +151,10 @@ def main():
                           help="Path to the directory where the "
                           "workflow shall be initialized.")
 
-    subparsers.add_parser("test",
+    test = subparsers.add_parser("test",
                           help="Start the VISPR server with some included "
                           "test data.")
+    test.add_argument("--port", help="Port to listen for client connection.")
 
     args = parser.parse_args()
 
@@ -166,9 +168,9 @@ def main():
             print(__version__)
             exit(0)
         if args.subcommand == "server":
-            init_server(*args.config)
+            init_server(*args.config, port=args.port)
         elif args.subcommand == "test":
-            test_server()
+            test_server(port=args.port)
         elif args.subcommand == "init-workflow":
             init_workflow(args.directory)
         elif args.subcommand == "config":

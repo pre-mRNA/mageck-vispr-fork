@@ -56,7 +56,7 @@
             <div class="modal-footer">
                 <form method="post" enctype="multipart/form-data" target="_blank" action="http://cbl-gorilla.cs.technion.ac.il/servlet/GOrilla" name="gorilla">
                     <input type="hidden" name="application" value="gorilla">
-                    <input type="hidden" name="species" value="{{ screen.species }}">
+                    <input type="hidden" name="species" value="{{ screen.species.upper() }}">
                     <input type="hidden" name="run_mode" value="{{ gorilla_mode }}">
                     <input type="hidden" name="db" value="all">
                     <input type="hidden" name="target_set" value="{{ gorilla_targets }}">
@@ -275,6 +275,10 @@ $("input[name=controls]").change(function() {
 
 $("#dynatable-per-page-targets").addClass("selectpicker");
 
+dt.on("dynatable:beforeUpdate", function() {
+    $('[data-toggle="tooltip"]').tooltip("hide");
+});
+
 // Perform actions when paging the table.
 dt.on("dynatable:afterUpdate", function() {
     {% if screen.is_genes %}
@@ -406,7 +410,7 @@ $(".btn-show-igv").click(function() {
 
 // Show selected genes in GeneMANIA.
 $("#btn-genemania").click(function() {
-    var url = "http://genemania.org/link?o={{ screen.species }}&g=";
+    var url = "http://genemania.org/link?o={{ screen.species.lower() }}&g=";
     window.open(encodeURI(url + get_selected().join("|")), '_blank');
 });
 
