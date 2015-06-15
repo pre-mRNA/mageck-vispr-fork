@@ -40,7 +40,7 @@ class Screens(object):
             else:
                 return screen, selection
         return {
-            " | ".join(label(screen, condition, selection)):
+            "\n".join(label(screen, condition, selection)):
             self.screens[screen].targets[condition][selection].ids(fdr)
             for screen, condition, selection in items
         }

@@ -91,7 +91,7 @@ function plot_overlap() {
                 var overlap_param = "&overlap-items=";
                 d.sets.forEach(function(item) {
                     function parse(item) {
-                        item = item.split(" | ");
+                        item = item.split("\n");
                         if(item.length == 2) {
                             item.splice(1, 0, "default");
                         }
