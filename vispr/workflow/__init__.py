@@ -37,7 +37,7 @@ def vispr_config(input, output, wildcards, config):
         vispr_config["fastqc"] = {
             sample: [
                 relpath(os.path.join(fastqc, data, "fastqc_data.txt"))
-                for data in sorted(os.listdir(fastqc))
+                for data in sorted(glob.iglob("{}/*_fastqc".format(fastqc)))
             ]
             for sample, fastqc in zip(config["samples"], input.fastqc)
         }
