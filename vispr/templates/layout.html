@@ -26,19 +26,28 @@
 <link rel="stylesheet" href="/static/style.css">
 
 <script>
+var font = "sans-serif,Helvetica,Arial"
+vg.config.render.font = font;
+vg.config.axis.titleFont = font;
+vg.config.axis.tickLabelFont = font;
+vg.config.legend.labelFont = font;
+vg.config.legend.titleFont = font;
+
 function vega_draw(chart, el) {
     var plt = chart({el: el}).update();
 
     $(el).popover({
         container: "body",
         html: true,
+        trigger: "hover",
+        delay: { "show": 100, "hide": 1000 },
         content: function() {
             var svg = $(this).append('<div class="shadow-svg"></div>').find(".shadow-svg");
             chart({el: svg[0], renderer: "svg"}).update();
-            svg.find("svg").attr("version", 1.2)
+            svg.find("svg").attr("version", 1.1)
                            .attr("xmlns", "http://www.w3.org/2000/svg")
-                           .css("font-family", "Helvetica, Arial, sans-serif");
-            var data = btoa(svg.html());
+                           .attr("xmlns:xlink", "http://www.w3.org/1999/xlink");
+            var data = btoa('<?xml version="1.0"?>' + svg.children().html());
             var name = "{{ screen.name }}." + $(el).attr("id");
             $(this).remove(".shadow-svg");
             return $(this).attr("data-desc") +
@@ -46,6 +55,9 @@ function vega_draw(chart, el) {
             '.svg" class="btn btn-default download-plot-svg" href="data:image/svg+xml;base64,' +
             data + '">Download SVG</a></div>';
         }
+    });
+    $(el).on("show.bs.popover", function() {
+        $('[data-toggle="popover"]').not(el).popover("hide");
     });
     return plt;
 }

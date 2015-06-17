@@ -12,7 +12,8 @@
       "name": "x",
       "type": "ordinal",
       "range": "width",
-      "domain": {"data": "mapstats", "field": "data.label"}
+      "domain": {"data": "mapstats", "field": "data.label"},
+      "padding": {{ padding }}
     },
     {
       "name": "y",
@@ -47,17 +48,39 @@
   ],
   "marks": [
     {
-      "type": "rect",
-      "from": {"data": "mapstats"},
+      "type": "group",
+      "from": {
+        "data": "mapstats",
+        "transform": [{"type": "facet", "keys": ["data.label"]}]
+      },
       "properties": {
         "enter": {
-          "x": {"scale": "x", "field": "data.label"},
-          "width": {"scale": "x", "band": true, "offset": -1},
-          "y": {"scale": "y", "field": "data.zerocounts"},
-          "y2": {"scale": "y", "value": 0},
-          "fill": {"value": "steelblue"}
+          "x": {"scale": "x", "field": "key"},
+          "width": {"scale": "x", "band": true}
         }
-      }
+      },
+      "scales": [
+        {
+          "name": "file",
+          "range": "width",
+          "domain": {"field": "data.file"},
+          "type": "ordinal"
+        }
+      ],
+      "marks": [
+        {
+          "type": "rect",
+          "properties": {
+            "enter": {
+              "x": {"scale": "file", "field": "data.file"},
+              "width": {"scale": "file", "band": true, "offset": -1},
+              "y": {"scale": "y", "field": "data.zerocounts"},
+              "y2": {"scale": "y", "value": 0},
+              "fill": {"value": "steelblue"}
+            }
+          }
+        }
+      ]
     }
   ]
 }

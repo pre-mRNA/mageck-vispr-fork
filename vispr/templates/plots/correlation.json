@@ -1,6 +1,6 @@
 {
-    "width": {{size}},
-    "height": {{ size - 80 }},
+    "width": {{ size }},
+    "height": {{ size - 20 }},
     "padding": "strict",
     "data": [
         {
@@ -34,19 +34,6 @@
             "domain": {
                 "data": "correlation",
                 "field": "data.value"
-            }
-        }
-    ],
-    "legends": [
-        {
-            "fill": "c",
-            "orient": "right",
-            "title": "correlation",
-            "properties": {
-                "gradient": {
-                    "stroke": {"value": "transparent"},
-                    "width": {"value": 67}
-                }
             }
         }
     ],
@@ -121,7 +108,8 @@
                     "align": {"value": "center"},
                     "baseline": {"value": "middle"},
                     "fill": {"value": "#000"},
-                    "text": {"field": "data.value"}
+                    "text": {"field": "data.value"},
+                    "fontSize": {"value": 9}
                 }
             }
         }

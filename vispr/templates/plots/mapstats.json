@@ -12,7 +12,8 @@
       "name": "x",
       "type": "ordinal",
       "range": "width",
-      "domain": {"data": "mapstats", "field": "data.label"}
+      "domain": {"data": "mapstats", "field": "data.label"},
+      "padding": {{ padding }}
     },
     {
       "name": "y",
@@ -54,46 +55,66 @@
   ],
   "marks": [
     {
-      "type": "rect",
-      "from": {"data": "mapstats"},
+      "type": "group",
+      "from": {
+        "data": "mapstats",
+        "transform": [{"type": "facet", "keys": ["data.label"]}]
+      },
       "properties": {
         "enter": {
-          "x": {"scale": "x", "field": "data.label"},
-          "width": {"scale": "x", "band": true, "offset": -1},
-          "y": {"scale": "y", "field": "data.reads"},
-          "y2": {"scale": "y", "value": 0},
-          "fill": {"scale": "color", "value": "unmapped"}
+          "x": {"scale": "x", "field": "key"},
+          "width": {"scale": "x", "band": true}
         }
-      }
-    },
-    {
-      "type": "rect",
-      "from": {"data": "mapstats"},
-      "properties": {
-        "enter": {
-          "x": {"scale": "x", "field": "data.label"},
-          "width": {"scale": "x", "band": true, "offset": -1},
-          "y": {"scale": "y", "field": "data.mapped"},
-          "y2": {"scale": "y", "value": 0},
-          "fill": {"scale": "color", "value": "mapped"}
+      },
+      "scales": [
+        {
+          "name": "file",
+          "range": "width",
+          "domain": {"field": "data.file"},
+          "type": "ordinal"
         }
-      }
-    },
-    {
-        "type": "text",
-        "from": {"data": "mapstats"},
-        "properties": {
+      ],
+      "marks": [
+        {
+          "type": "rect",
+          "properties": {
             "enter": {
-                "x": {"scale": "x", "field": "data.label"},
-                "dy": {"scale": "x", "band": true, "mult": 0.5},
-                "y": {"scale": "y", "field": "data.mapped", "offset": -2},
-                "align": {"value": "left"},
-                "baseline": {"value": "middle"},
-                "fill": {"value": "#000"},
-                "text": {"field": "data.unmapped_percentage"},
-                "angle": {"value": -90}
+              "x": {"scale": "file", "field": "data.file"},
+              "width": {"scale": "file", "band": true, "offset": -1},
+              "y": {"scale": "y", "field": "data.reads"},
+              "y2": {"scale": "y", "value": 0},
+              "fill": {"scale": "color", "value": "unmapped"}
             }
+          }
+        },
+        {
+          "type": "rect",
+          "properties": {
+            "enter": {
+              "x": {"scale": "file", "field": "data.file"},
+              "width": {"scale": "file", "band": true, "offset": -1},
+              "y": {"scale": "y", "field": "data.mapped"},
+              "y2": {"scale": "y", "value": 0},
+              "fill": {"scale": "color", "value": "mapped"}
+            }
+          }
+        },
+        {
+          "type": "text",
+          "properties": {
+            "enter": {
+              "x": {"scale": "file", "field": "data.file"},
+              "dy": {"scale": "file", "band": true, "mult": 0.5},
+              "y": {"scale": "y", "field": "data.mapped", "offset": -2},
+              "align": {"value": "left"},
+              "baseline": {"value": "middle"},
+              "fill": {"value": "#000"},
+              "text": {"field": "data.unmapped_percentage"},
+              "angle": {"value": -90}
+            }
+          }
         }
+      ]
     }
   ],
   "legends": [
