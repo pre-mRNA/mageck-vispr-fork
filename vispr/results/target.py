@@ -78,7 +78,7 @@ class Results(AbstractResults):
         return data.ix[highlight_targets]
 
     def plot_pval_hist(self):
-        edges = np.arange(0, 1.1, 0.1)
+        edges = np.arange(0, 1.01, 0.05)
         counts, _ = np.histogram(self.df["p-value"], bins=edges)
         bins = edges[1:]
 
@@ -86,9 +86,18 @@ class Results(AbstractResults):
         return templates.get_template("plots/pval_hist.json").render(
             hist=hist.to_json(orient="records"))
 
+    def plot_pval_qq(self):
+        data = self.df[["log10-p-value"]]
+        data["nulldist"] = -np.log10(np.arange(1, len(self) + 1) / len(self))
+        return templates.get_template("plots/pval_qq.json").render(
+            data=data.to_json(orient="records"))
+
     def ids(self, fdr):
         valid = self.df["fdr"] <= fdr
         return set(self.df.ix[valid, "target"])
+
+    def __len__(self):
+        return self.df.shape[0]
 
 
 def overlap(*targets):
