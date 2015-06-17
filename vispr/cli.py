@@ -59,7 +59,7 @@ def init_workflow(directory):
         shutil.copy(source, target)
 
 
-def test_server(port=None):
+def test_server(port=5000):
     os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
     init_server("leukemia.yaml", "melanoma.yaml", port=port)
 
@@ -126,7 +126,7 @@ def main():
         nargs="+",
         help="YAML config files. Each file points to the results of one "
         "MAGeCK run.")
-    server.add_argument("--port", help="Port to listen for client connection.")
+    server.add_argument("--port", default=5000, type=int, help="Port to listen for client connection.")
 
     plot = subparsers.add_parser(
         "plot",
@@ -154,7 +154,7 @@ def main():
     test = subparsers.add_parser("test",
                           help="Start the VISPR server with some included "
                           "test data.")
-    test.add_argument("--port", help="Port to listen for client connection.")
+    test.add_argument("--port", default=5000, type=int, help="Port to listen for client connection.")
 
     args = parser.parse_args()
 
