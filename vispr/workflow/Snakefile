@@ -87,7 +87,7 @@ rule mageck_mle:
     log:
         "logs/mageck/test/{experiment}.log"
     shell:
-        "mageck mle --output-prefix {params.prefix} "
+        "mageck mle --output-prefix {params.prefix} --genes-var 0"
         "--count-table {input.counts} "
         "--design-matrix {input.designmatrix} 2> {log}"
 
