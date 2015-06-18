@@ -24,6 +24,7 @@ from vispr.version import __version__
 
 def init_server(*configs, port=5000):
     app.screens = Screens()
+    print("Loading data.")
     for path in configs:
         with open(path) as f:
             config = yaml.load(f)

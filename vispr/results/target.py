@@ -31,7 +31,7 @@ class Results(AbstractResults):
         self.df = dataframe
         self.df.sort("p-value", inplace=True)
         self.df.reset_index(drop=True, inplace=True)
-        self.df["log10-p-value"] = -np.log10(self.df["p-value"] + np.finfo(np.float64).eps)
+        self.df["log10-p-value"] = np.minimum(1000.0, -np.log10(self.df["p-value"]))
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
