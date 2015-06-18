@@ -33,8 +33,8 @@ vg.config.axis.tickLabelFont = font;
 vg.config.legend.labelFont = font;
 vg.config.legend.titleFont = font;
 
-function vega_draw(chart, el) {
-    var plt = chart({el: el}).update();
+function vega_draw(chart, el, url) {
+    var plt = chart({el: el, renderer: "svg"}).update();
 
     $(el).popover({
         container: "body",
@@ -42,15 +42,15 @@ function vega_draw(chart, el) {
         trigger: "hover",
         delay: { "show": 100, "hide": 1000 },
         content: function() {
-            var svg = $(this).append('<div class="shadow-svg"></div>').find(".shadow-svg");
-            chart({el: svg[0], renderer: "svg"}).update();
-            svg.find("svg").attr("version", 1.1)
+            /*var svg = $(this).append('<div class="shadow-svg"></div>').find(".shadow-svg");
+            chart({el: svg[0], renderer: "svg"}).update();*/
+            el.find("svg").attr("version", 1.1)
                            .attr("xmlns", "http://www.w3.org/2000/svg")
                            .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
                            .css("font-family", font);
-            var data = btoa('<?xml version="1.0"?>' + svg.children().html());
+            var data = btoa('<?xml version="1.0"?>' + el.children().html());
             var name = "{{ screen.name }}." + $(el).attr("id");
-            $(this).remove(".shadow-svg");
+            //$(this).remove(".shadow-svg");
             return $(this).attr("data-desc") +
             '<hr/><div class="text-right"><a download="' + name +
             '.svg" class="btn btn-default download-plot-svg" href="data:image/svg+xml;base64,' +

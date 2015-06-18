@@ -170,5 +170,4 @@ class Results(AbstractResults):
         plt = templates.get_template("plots/correlation.json").render(
                               data=json.dumps(data),
                               size=size)
-        print(size)
         return plt
