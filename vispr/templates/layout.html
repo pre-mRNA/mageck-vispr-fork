@@ -48,7 +48,7 @@ function vega_draw(chart, el, url) {
                            .attr("xmlns", "http://www.w3.org/2000/svg")
                            .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
                            .css("font-family", font);
-            var data = btoa('<?xml version="1.0"?>' + el.children().html());
+            var data = btoa('<?xml version="1.0"?>' + $(el).children().html());
             var name = "{{ screen.name }}." + $(el).attr("id");
             //$(this).remove(".shadow-svg");
             return $(this).attr("data-desc") +
