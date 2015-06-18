@@ -7,6 +7,7 @@ __license__ = "MIT"
 
 import os
 import glob
+import shutil
 
 import yaml
 
@@ -22,6 +23,7 @@ def postprocess_config(config):
 
 def vispr_config(input, output, wildcards, config):
     relpath = lambda path: os.path.relpath(path, "results")
+    copy = lambda path: shutil.copy(path, "results")
     vispr_config = {
         "experiment": wildcards.experiment,
         "species": config["species"],
@@ -45,9 +47,11 @@ def vispr_config(input, output, wildcards, config):
     if "mapstats" in input.keys():
         vispr_config["sgrnas"]["mapstats"] = relpath(input.mapstats)
     if "controls" in config["targets"]:
-        vispr_config["targets"]["controls"] = config["targets"]["controls"]
+        copy(config["targets"]["controls"])
+        vispr_config["targets"]["controls"] = os.path.basename(config["targets"]["controls"])
     if config["sgrnas"] is not None and "info" in config["sgrnas"]:
-        vispr_config["sgrnas"]["info"] = config["sgrnas"]["info"]
+        copy(config["sgrnas"]["info"])
+        vispr_config["sgrnas"]["info"] = os.path.basename(config["sgrnas"]["info"])
     with open(output[0], "w") as f:
         yaml.dump(
             vispr_config,
