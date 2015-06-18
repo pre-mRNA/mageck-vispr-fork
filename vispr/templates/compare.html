@@ -13,7 +13,7 @@
             {% for screen in screens %}
                 {% for condition, selections in screen.targets.items() %}
                     {% for selection in selections %}
-                    <option selected value="{{ screen.name }}|{{ condition }}|{{ selection }}">{{ screen.name }} | {{ condition + " | " if condition != "default" }}{{ selection }}</option>
+                    <option value="{{ screen.name }}|{{ condition }}|{{ selection }}">{{ screen.name }} | {{ condition + " | " if condition != "default" }}{{ selection }}</option>
                     {% endfor %}
                 {% endfor %}
             {% endfor %}
@@ -30,11 +30,12 @@
             </div>
         </form>
         <div class="text-center">
-            <div id="overlap-venn-plot" class="plot"></div>
+            <div id="experiment-overlap" class="plot" data-toggle="popover" data-desc="{{ captions["overlap"] }}"></div>
         </div>
     </div>
 </div>
 <script>
+add_caption($("#experiment-overlap")[0]);
 var venn_chart = venn.VennDiagram()
                .width(500)
                .height(500);
@@ -44,7 +45,7 @@ function plot_overlap() {
     var fdr = $("#choose-fdr").val();
 
     $.get("/plt/overlap_venn", config, function(json, status) {
-        var div = d3.select("#overlap-venn-plot");
+        var div = d3.select("#experiment-overlap");
         div.datum(json).call(venn_chart);
 
         // add a tooltip

@@ -98,6 +98,7 @@ def qc(screen):
 def compare(screen):
     screen = app.screens[screen]
     return render_template("compare.html",
+                           captions=CAPTIONS,
                            screens=app.screens,
                            screen=screen,
                            version=__version__)

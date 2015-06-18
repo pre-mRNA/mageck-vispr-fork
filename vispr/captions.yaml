@@ -10,3 +10,4 @@ correlation: Correlation between normalized log10 read counts of samples.
 pca: Principal component analysis on normalized log10 read counts of samples. The axis labels show principal components and percentage of explained variants.
 p-values: Target ranks plotted against p-values. Smallest FDR greater or equal to 5% and 25% are displayed.
 p-value-hist: Histogram of p-values. Small p-values should be enriched. If one-sided test was performed, p-values toward 1.0 are expected to be enriched as well.
+overlap: Euler diagram visualizing common and exclusive significant targets between selected experiments.
