@@ -4,6 +4,5 @@ recursive-include vispr/tests *
 include vispr/example.config.yaml
 include vispr/captions.yaml
 recursive-include bin *
-recursive-include vispr/workflow *
 include requirements.txt
 include README.md

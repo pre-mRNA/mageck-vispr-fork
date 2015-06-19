@@ -36,27 +36,11 @@ def init_server(*configs, port=5000):
     app.secret_key = ''.join(
         random.choice(string.ascii_uppercase + string.digits)
         for _ in range(30))
-    print("Starting server.", "",
-          "Open:  go to http://127.0.0.1:{} in your browser.".format(port),
-          "Close: hit Ctrl-C in this terminal.",
-          file=sys.stderr,
-          sep="\n")
+    logging.info("Starting server.")
+    logging.info("")
+    logging.info("Open:  go to http://127.0.0.1:{} in your browser.".format(port))
+    logging.info("Close: hit Ctrl-C in this terminal.")
     app.run(port=port)
-
-
-def init_workflow(directory):
-    try:
-        os.makedirs(directory)
-    except OSError:
-        # either directory exists (then we can ignore) or it will fail in the
-        # next step.
-        pass
-    for f in ["Snakefile", "config.yaml", "README.md", "conda.txt"]:
-        source = os.path.join(os.path.dirname(__file__), "workflow", f)
-        target = os.path.join(directory, f)
-        if f in ["Snakefile", "config.yaml"] and os.path.exists(target):
-            shutil.copy(target, target + ".old")
-        shutil.copy(source, target)
 
 
 def test_server(port=5000):
@@ -171,8 +155,6 @@ def main():
             init_server(*args.config, port=args.port)
         elif args.subcommand == "test":
             test_server(port=args.port)
-        elif args.subcommand == "init-workflow":
-            init_workflow(args.directory)
         elif args.subcommand == "config":
             print_example_config()
         elif args.subcommand == "plot":
@@ -184,8 +166,7 @@ def main():
         logging.error(e)
         exit(1)
     except ImportError as e:
-        print("{}. Please ensure that all dependencies from "
-              "requirements.txt are installed.".format(e),
-              file=sys.stderr)
+        logging.error("{}. Please ensure that all dependencies from "
+              "requirements.txt are installed.".format(e))
         exit(1)
     exit(0)

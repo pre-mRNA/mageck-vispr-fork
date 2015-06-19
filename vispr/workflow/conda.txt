@@ -1,4 +1,0 @@
-fastqc
-mageck
-vispr
-snakemake
