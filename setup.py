@@ -23,7 +23,7 @@ setup(
     name="vispr",
     version=__version__,
     author="Johannes Köster",
-    author_email="johannes.koester@tu-dortmund.de",
+    author_email="koester@jimmy.harvard.edu",
     description="Interactive HTML5 visualization for CRISPR/Cas9 knockout screen experiments.",
     license="MIT",
     url="",
