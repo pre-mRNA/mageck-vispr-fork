@@ -114,7 +114,7 @@ def parse_target_results(path,
             res = results[[results.columns[0]] + "{cond}|beta {cond}|{sel}|p-value {cond}|{sel}|fdr".format(
                 cond=condition,
                 sel=selection[:3]).split()]
-            res.columns = ["target", "beta", "p-value", "fdr"]
+            res.columns = ["target", "score", "p-value", "fdr"]
             return target.Results(res.copy())
 
         conditions = [path[0] for path in paths if len(path) > 1]
