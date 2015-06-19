@@ -2,9 +2,6 @@ VISPR - A visualization server for CRISPR data.
 ===============================================
 
 VISPR is a visualization framework for CRISPR/Cas9 knockout screen experiments.
-To install VISPR, we recommend the Miniconda Python distribution (see below).
-Currently, VISPR is under heavy development and not yet recommended for public
-use.
 
 Installation
 ------------
