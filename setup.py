@@ -26,7 +26,7 @@ setup(
     author_email="koester@jimmy.harvard.edu",
     description="Interactive HTML5 visualization for CRISPR/Cas9 knockout screen experiments.",
     license="MIT",
-    url="",
+    url="https://bitbucket.org/johanneskoester/vispr",
     packages=["vispr", "vispr.tests", "vispr.results"],
     include_package_data=True,
     zip_safe=False,
