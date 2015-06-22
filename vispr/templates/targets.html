@@ -187,6 +187,8 @@ function update_pval_highlights() {
     }
     else {
         d3.json("/tbl/pvals_highlight/{{ screen.name }}/{{ condition }}/{{ selection }}/" + selected.join("|"), function(error, json) {
+            plt_pval.data({ "highlight": [] });
+            plt_pval.update();
             plt_pval.data(
                 { "highlight": json }
             );

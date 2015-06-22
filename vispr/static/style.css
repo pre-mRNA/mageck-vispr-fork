@@ -48,3 +48,7 @@
 .shadow-svg {
     display: block;
 }
+
+.qc-level h4 {
+    border-bottom: 1px solid #EEE;
+}

@@ -4,75 +4,63 @@
 <li class="active">quality control</li>
 {% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-md-5">
-        {% if fastqc %}
-        <div class="row">
-            <div class="col-md-12">
-                <h4>GC content</h4>
-                <div class="text-center">
-                    <div id="gc-content" class="plot" data-toggle="popover" data-desc="{{ captions["gc-content"] }}"></div>
-                </div>
-            </div>
+
+{% if fastqc %}
+<div class="qc-level readcount">
+    <h4>Sequence level</h4>
+    <div class="row" class="qc-level seq">
+        <div class="col-sm-6 col-md-4 text-center">
+            <div id="gc-content" class="plot" data-toggle="popover" data-desc="{{ captions["gc-content"] }}"></div>
         </div>
-        {% endif %}
-    </div>
-    <div class="col-md-7">
-        {% if fastqc %}
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Base quality</h4>
-                <div class="text-center">
-                    <div id="base-quality" class="plot" data-toggle="popover" data-desc="{{ captions["base-quality"] }}"></div>
-                    <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["seq-quality"] }}"></div>
-                </div>
-            </div>
+        <div class="col-sm-6 col-md-4 text-center">
+            <div id="base-quality" class="plot" data-toggle="popover" data-desc="{{ captions["base-quality"] }}"></div>
         </div>
-        {% endif %}
+        <div class="col-sm-6 col-md-4 text-center">
+            <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["seq-quality"] }}"></div>
+        </div>
     </div>
 </div>
+{% endif %}
+
 {% if mapstats %}
-<div class="row">
-    <div class="col-md-12">
-        <h4>Mapping statistics</h4>
-        <div class="text-center">
+<div class="qc-level readcount">
+    <h4>Read count level</h4>
+    <div class="row">
+        <div class="col-sm-6 col-md-4 text-center">
             <div id="mapped-unmapped" class="plot" data-toggle="popover" data-desc="{{ captions["mapped-unmapped"] }}"></div>
+        </div>
+        <div class="col-sm-6 col-md-4 text-center">
             <div id="zerocounts" class="plot" data-toggle="popover" data-desc="{{ captions["zerocounts"] }}"></div>
+        </div>
+        <div class="col-sm-6 col-md-4 text-center">
             <div id="gini-index" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["gini-index"] }}"></div>
         </div>
     </div>
 </div>
 {% endif %}
-<div class="row">
-    <div class="col-md-5">
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Normalized read count distributions</h4>
-                <div class="text-center">
-                    <div id="readcounts" class="plot" data-toggle="popover" data-desc="{{ captions["readcounts"] }}"></div>
-                    <div id="readcount-cdf" class="plot" data-toggle="popover" data-desc="{{ captions["readcount-cdf"] }}"></div>
-                </div>
-            </div>
+
+<div class="qc-level sample">
+    <h4>Sample level</h4>
+    <div class="row">
+        <div class="col-sm-6 col-md-3 text-center">
+            <div id="readcount-cdf" class="plot" data-toggle="popover" data-desc="{{ captions["readcount-cdf"] }}"></div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Sample correlation</h4>
-                <div class="text-center">
-                    <div id="correlation" class="plot" data-toggle="popover" data-desc="{{ captions["correlation"] }}"></div>
-                </div>
-            </div>
+        <div class="col-sm-6 col-md-3 text-center">
+            <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
+        </div>
+        <div class="col-sm-6 col-md-3 text-center">
+            <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
+        </div>
+        <div class="col-sm-6 col-md-3 text-center">
+            <div id="pca-pc2-pc3" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["pca"] }}"></div>
         </div>
     </div>
-    <div class="col-md-7">
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Principal component analysis</h4>
-                <div class="text-center">
-                    <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
-                    <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
-                    <div id="pca-pc2-pc3" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["pca"] }}"></div>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-sm-1 col-md-6 text-center">
+            <div id="readcounts" class="plot" data-toggle="popover" data-desc="{{ captions["readcounts"] }}"></div>
+        </div>
+        <div class="col-sm-1 col-md-6 text-center">
+            <div id="correlation" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["correlation"] }}"></div>
         </div>
     </div>
 </div>

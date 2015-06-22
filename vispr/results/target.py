@@ -74,8 +74,11 @@ class Results(AbstractResults):
         return plt
 
     def get_pvals_highlight_targets(self, highlight_targets):
+        print(highlight_targets)
         data = self.df[["idx", "log10-p-value", "target"]]
-        return data.ix[highlight_targets]
+        data = data.ix[highlight_targets]
+        print(data)
+        return data
 
     def plot_pval_hist(self):
         edges = np.arange(0, 1.01, 0.05)
