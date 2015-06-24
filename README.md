@@ -1,5 +1,5 @@
-VISPR - A visualization server for CRISPR data.
-===============================================
+VISPR - A visualization framework for CRISPR data.
+==================================================
 
 VISPR is a web-based, interactive visualization framework for CRISPR/Cas9 knockout screen experiments.
 
