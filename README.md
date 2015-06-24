@@ -10,7 +10,7 @@ The easiest way to install VISPR is to use the Miniconda Python distribution (ht
 We recommend to use the Python 3.4 variant.
 With miniconda installed, you can issue
 
-    conda install -c johanneskoester vispr
+    conda install -c liulab vispr
 
 to install or update VISPR with all dependencies.
 
