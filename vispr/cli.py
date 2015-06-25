@@ -6,7 +6,6 @@ __copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
-
 import argparse
 import logging
 import sys
@@ -14,12 +13,21 @@ import string
 import random
 import os
 import shutil
+import tarfile
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import urlopen
 
 import yaml
+from appdirs import AppDirs
 
 from vispr import Screens, VisprError, Screen
 from vispr.server import app
 from vispr.version import __version__
+from vispr.archive import archive as _archive
+
+appdirs = AppDirs("VISPR", "liulab")
 
 
 def init_server(*configs, port=5000):
@@ -39,14 +47,26 @@ def init_server(*configs, port=5000):
         for _ in range(30))
     logging.info("Starting server.")
     logging.info("")
-    logging.info("Open:  go to http://127.0.0.1:{} in your browser.".format(port))
+    logging.info(
+        "Open:  go to http://127.0.0.1:{} in your browser.".format(port))
     logging.info("Close: hit Ctrl-C in this terminal.")
     app.run(port=port)
 
 
 def test_server(port=5000):
-    os.chdir(os.path.join(os.path.dirname(__file__), "tests"))
-    init_server("leukemia.yaml", "melanoma.yaml", port=port)
+    testdir = os.path.join(appdirs.user_cache_dir, "testdata")
+    datasets = "ESC-MLE Leukemia-MLE Melanoma-MLE".split()
+    for dataset in datasets:
+        if not os.path.exists(os.path.join(testdir, dataset)):
+            logging.info("Downloading {} test data.".format(dataset))
+            testdata = tarfile.open(fileobj=urlopen(
+                "https://bitbucket.org/liulab/"
+                "vispr/downloads/{}.testdata.tar.bz2".format(dataset)),
+                                    mode="r|bz2")
+            testdata.extractall(os.path.join(testdir, dataset))
+    init_server(*[os.path.join(testdir, dataset, "vispr.yaml")
+                  for dataset in datasets],
+                port=port)
 
 
 def print_example_config():
@@ -91,6 +111,7 @@ def plots(configpath, prefix):
 def main():
     # create arg parser
     parser = argparse.ArgumentParser(
+        description=
         "An HTML5-based interactive visualization of CRISPR/Cas9 screen data.")
     parser.add_argument("--version",
                         action="store_true",
@@ -102,44 +123,50 @@ def main():
 
     config = subparsers.add_parser(
         "config",
-        help="Print an example VISPR config file. Pipe the output into a file "
+        description=
+        "Print an example VISPR config file. Pipe the output into a file "
         "and edit it to setup a new experiment to be displayed in VISPR.")
 
-    server = subparsers.add_parser("server", help="Start the VISPR server.")
+    server = subparsers.add_parser("server",
+                                   description="Start the VISPR server.")
     server.add_argument(
         "config",
         nargs="+",
         help="YAML config files. Each file points to the results of one "
         "MAGeCK run.")
-    server.add_argument("--port", default=5000, type=int, help="Port to listen for client connection.")
+    server.add_argument("--port",
+                        default=5000,
+                        type=int,
+                        help="Port to listen for client connection.")
 
     plot = subparsers.add_parser(
         "plot",
-        help="Plot visualizations in VEGA JSON format.")
+        description="Plot visualizations in VEGA JSON format.")
     plot.add_argument("config",
                       help="YAML config file pointing to MAGeCK results.")
     plot.add_argument("prefix",
                       help="Prefix of all resulting plots. "
                       "This can be a path to a subdirectory.")
 
-    workflow = subparsers.add_parser(
-        "init-workflow",
-        help="Initialize the MAGeCK/VISPR workflow "
-        "in a given directory. This will "
-        "install a Snakefile, a README and a "
-        "config file in this directory. "
-        "Configure the config file according "
-        "to your needs, and run the workflow "
-        "with Snakemake "
-        "(https://bitbucket.org/johanneskoester/snakemake).")
-    workflow.add_argument("directory",
-                          help="Path to the directory where the "
-                          "workflow shall be initialized.")
+    test = subparsers.add_parser(
+        "test",
+        description="Start the VISPR server with some included "
+        "test data.")
+    test.add_argument("--port",
+                      default=5000,
+                      type=int,
+                      help="Port to listen for client connection.")
 
-    test = subparsers.add_parser("test",
-                          help="Start the VISPR server with some included "
-                          "test data.")
-    test.add_argument("--port", default=5000, type=int, help="Port to listen for client connection.")
+    archive = subparsers.add_parser(
+        "archive",
+        description=
+        "Create a compressed archive for easy distribution of a given "
+        "config file with all referenced files.")
+    archive.add_argument("config",
+                         help="YAML config file pointing to MAGeCK results.")
+    archive.add_argument("tarfile",
+                         help="The tar archive to write. Has to "
+                         "end with .tar, .tar.gz, or .tar.bz2")
 
     args = parser.parse_args()
 
@@ -160,6 +187,9 @@ def main():
             print_example_config()
         elif args.subcommand == "plot":
             plots(args.config, args.prefix)
+        elif args.subcommand == "archive":
+            print(args.tarfile)
+            _archive(args.config, args.tarfile)
         else:
             parser.print_help()
             exit(1)
@@ -168,6 +198,6 @@ def main():
         exit(1)
     except ImportError as e:
         logging.error("{}. Please ensure that all dependencies from "
-              "requirements.txt are installed.".format(e))
+                      "requirements.txt are installed.".format(e))
         exit(1)
     exit(0)

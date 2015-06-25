@@ -64,6 +64,8 @@ class Screen(object):
         def get_path(relpath):
             if relpath is None:
                 return None
+            if relpath.startswith("http"):
+                return relpath
             return os.path.join(parentdir, relpath)
 
         self.name = config["experiment"]
