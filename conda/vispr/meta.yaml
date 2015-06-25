@@ -1,6 +1,6 @@
 package:
   name: vispr
-  version: "0.3.2"
+  version: "0.3.3"
 source:
   path: ../../
 build:
@@ -16,6 +16,7 @@ requirements:
     - pyyaml
     - scipy
     - scikit-learn
+    - appdirs
   run:
     - python
     - numpy
@@ -24,6 +25,7 @@ requirements:
     - pyyaml
     - scipy
     - scikit-learn
+    - appdirs
 about:
   home: https://bitbucket.org/johanneskoester/vispr
   license: MIT License

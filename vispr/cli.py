@@ -27,6 +27,7 @@ from vispr.server import app
 from vispr.version import __version__
 from vispr.archive import archive as _archive
 
+
 appdirs = AppDirs("VISPR", "liulab")
 
 
