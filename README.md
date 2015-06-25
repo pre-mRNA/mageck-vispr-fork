@@ -1,5 +1,5 @@
-VISPR - A visualization server for CRISPR data.
-===============================================
+VISPR - A visualization framework for CRISPR data.
+==================================================
 
 VISPR is a web-based, interactive visualization framework for CRISPR/Cas9 knockout screen experiments.
 
@@ -10,7 +10,7 @@ The easiest way to install VISPR is to use the Miniconda Python distribution (ht
 We recommend to use the Python 3.4 variant.
 With miniconda installed, you can issue
 
-    conda install -c johanneskoester vispr
+    conda install -c liulab vispr
 
 to install or update VISPR with all dependencies.
 
@@ -22,7 +22,7 @@ After successful installation, you can test VISPR with example data by executing
     vispr test
 
 VISPR takes [MAGeCK](http://liulab.dfci.harvard.edu/Mageck) and [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc) results as input. These are provided along with additional parameters as config files. One config file defines one set of results (i.e. one experiment).
-VISPR can be invoked with multiple config files (i.e. multiple experiments), allowing to select and compare experiments via the user interface. The easiest way to generate your own data for visualization in VISPR is to use the [MAGeCK-VISPR](https://bitbucket.org/johanneskoester/mageck-vispr) workflow.
+VISPR can be invoked with multiple config files (i.e. multiple experiments), allowing to select and compare experiments via the user interface. The easiest way to generate your own data for visualization in VISPR is to use the [MAGeCK-VISPR](https://bitbucket.org/liulab/mageck-vispr) workflow.
 For manual creation of a VISPR config  you can issue
 
     vispr config
