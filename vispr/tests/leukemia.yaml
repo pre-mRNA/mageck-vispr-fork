@@ -7,7 +7,7 @@ targets:
     controls: ribosomal_genes.txt
 sgrnas:
     counts: leukemia.normalized.txt
-    info: leukemia.sgrna.fake.bed
+    annotation: leukemia.sgrna.fake.bed
     mapstats: fake.countsummary.txt
 fastqc:
     sample1:

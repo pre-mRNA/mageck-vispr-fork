@@ -60,13 +60,15 @@ class Results(AbstractResults):
             "na|@chr{}:{}-{}|".format(*row) for _, row in
             self.info.ix[data["rna"], ["chrom", "start", "stop"]].iterrows()
         ]
-        return "#1.2\n{rnas}\t{samples}\n{data}".format(
+        data["score"] = np.asarray(self.info.ix[data["rna"], "score"])
+        gct = "#1.2\n{rnas}\t{samples}\n{data}".format(
             rnas=data.shape[0],
             samples=data.shape[1] - 2,
             data=data.to_csv(sep="\t",
                              index=False,
-                             columns=["rna", "desc"] + self.samples,
-                             header=["Name", "Description"] + self.samples))
+                             columns=["rna", "desc", "score"] + self.samples,
+                             header=["Name", "Description", "Efficiency"] + self.samples))
+        return gct
 
     def target_locus(self, target):
         loci = self.info.ix[self.df.ix[target, "rna"], ["chrom", "start",

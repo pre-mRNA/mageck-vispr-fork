@@ -76,7 +76,7 @@ class Screen(object):
 
         self.rnas = rna.Results(
             get_path(config["sgrnas"]["counts"]),
-            info=get_path(config["sgrnas"].get("info", None)))
+            info=get_path(config["sgrnas"].get("annotation", None)))
         self.mapstats = None
         if "mapstats" in config["sgrnas"]:
             self.mapstats = mapstats.Results(

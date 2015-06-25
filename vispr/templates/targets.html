@@ -23,8 +23,8 @@
                     or download an installable instance.
                 </p>
                 <p>
-                    Once an IGV instance is open, you can select to load the current results
-                    from the IGV menu in VISPR and jump to each target via the
+                    Once an IGV instance is open, you can select to load the current results.
+                    Finally, you can jump to each target via the
                     <span class="glyphicon glyphicon-equalizer"></span> buttons.
                 </p>
             </div>
@@ -32,6 +32,7 @@
                 <div class="btn-group">
                     <a href="http://www.broadinstitute.org/igv/projects/current/igv.php" class="btn btn-default">Open via JAVA Web Start</a>
                     <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default">Download</a>
+                    <a id="load-igv" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml" class="btn btn-default">Load data</a>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -108,21 +109,19 @@
                             <li role="presentation"><input type="radio" id="control-show" name="controls" value="show" checked><label for="control-show">show</label></li>
                             <li role="presentation"><input type="radio" id="control-show-only" name="controls" value="show-only"><label for="control-show-only">show only</label></li>
                         {% endif %}
-                        {% if gorilla %}
                             <li role="presentation" class="dropdown-header">Table</li>
                             <li role="presentaiton"><a role="menuitem" tabindex="-1" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection.replace(" ", "-") }}.txt">Download</a></li>
+                        {% if gorilla %}
                             <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-gorilla" href="#">GO enrichment</a></li>
+                        {% endif %}
+                        {% if has_rna_info %}
+                            <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">IGV</a></li>
                         {% endif %}
                             <li role="presentation" class="dropdown-header">Selection</li>
                         {% if has_rna_info %}
                             <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
                         {% endif %}
                             <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
-                        {% if has_rna_info %}
-                            <li role="presentation" class="dropdown-header">IGV</li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">Open IGV</a></li>
-                            <li role="presentation"><a role="menuitem" id="load-igv" tabindex="-1" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml">Load data</a></li>
-                        {% endif %}
                         </ul>
                     </div>
                 </th>
