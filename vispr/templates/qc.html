@@ -10,16 +10,10 @@
 {% if fastqc %}
 <div class="qc-level readcount">
     <h4>Sequence level</h4>
-    <div class="row" class="qc-level seq">
-        <div class="col-sm-6 col-md-4 text-center">
-            <div id="base-quality" class="plot" data-toggle="popover" data-desc="{{ captions["base-quality"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-4 text-center">
-            <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["seq-quality"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-4 text-center">
-            <div id="gc-content" class="plot" data-toggle="popover" data-desc="{{ captions["gc-content"] }}"></div>
-        </div>
+    <div class="text-center" class="qc-level seq">
+        <div id="base-quality" class="plot" data-toggle="popover" data-desc="{{ captions["base-quality"] }}"></div>
+        <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["seq-quality"] }}"></div>
+        <div id="gc-content" class="plot" data-toggle="popover" data-desc="{{ captions["gc-content"] }}"></div>
     </div>
 </div>
 {% endif %}
@@ -27,43 +21,25 @@
 {% if mapstats %}
 <div class="qc-level readcount">
     <h4>Read count level</h4>
-    <div class="row">
-        <div class="col-sm-6 col-md-4 text-center">
-            <div id="mapped-unmapped" class="plot" data-toggle="popover" data-desc="{{ captions["mapped-unmapped"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-4 text-center">
-            <div id="zerocounts" class="plot" data-toggle="popover" data-desc="{{ captions["zerocounts"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-4 text-center">
-            <div id="gini-index" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["gini-index"] }}"></div>
-        </div>
+    <div class="text-center">
+        <div id="mapped-unmapped" class="plot" data-toggle="popover" data-desc="{{ captions["mapped-unmapped"] }}"></div>
+        <div id="zerocounts" class="plot" data-toggle="popover" data-desc="{{ captions["zerocounts"] }}"></div>
+        <div id="gini-index" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["gini-index"] }}"></div>
     </div>
 </div>
 {% endif %}
 
 <div class="qc-level sample">
     <h4>Sample level</h4>
-    <div class="row">
-        <div class="col-sm-6 col-md-3 text-center">
-            <div id="readcount-cdf" class="plot" data-toggle="popover" data-desc="{{ captions["readcount-cdf"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-3 text-center">
-            <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-3 text-center">
-            <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
-        </div>
-        <div class="col-sm-6 col-md-3 text-center">
-            <div id="pca-pc2-pc3" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["pca"] }}"></div>
-        </div>
+    <div class="text-center">
+        <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
+        <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
+        <div id="pca-pc2-pc3" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["pca"] }}"></div>
     </div>
-    <div class="row">
-        <div class="col-sm-1 col-md-6 text-center">
-            <div id="readcounts" class="plot" data-toggle="popover" data-desc="{{ captions["readcounts"] }}"></div>
-        </div>
-        <div class="col-sm-1 col-md-6 text-center">
-            <div id="correlation" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["correlation"] }}"></div>
-        </div>
+    <div class="text-center">
+        <div id="readcounts" class="plot" data-toggle="popover" data-desc="{{ captions["readcounts"] }}"></div>
+        <div id="readcount-cdf" class="plot" data-toggle="popover" data-desc="{{ captions["readcount-cdf"] }}"></div>
+        <div id="correlation" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["correlation"] }}"></div>
     </div>
 </div>
 
