@@ -1,8 +1,0 @@
-experiment: melanoma
-species: homo_sapiens
-assembly: hg19
-targets:
-    results: melanoma.gene_summary.txt
-    genes: true
-sgrnas:
-    counts: melanoma.normalized.txt
