@@ -27,7 +27,7 @@ setup(
     description="Interactive HTML5 visualization for CRISPR/Cas9 knockout screen experiments.",
     license="MIT",
     url="https://bitbucket.org/johanneskoester/vispr",
-    packages=["vispr", "vispr.tests", "vispr.results"],
+    packages=["vispr", "vispr.results"],
     include_package_data=True,
     zip_safe=False,
     install_requires=["flask", "numpy", "pandas", "pyyaml", "scikit-learn", "scipy", "appdirs"],
