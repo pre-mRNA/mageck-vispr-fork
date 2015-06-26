@@ -3,9 +3,8 @@
 <li class="active">compare experiments</li>
 {% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-md-6">
-        <h4>Target overlap</h4>
+<div id="compare">
+        <h4 class="panel">Target overlap</h4>
         <form action="" class="form-inline text-right" id="config-overlap">
             <div class="form-group">
                 <label for="select-overlap-items">Experiments</label>
@@ -32,8 +31,8 @@
         <div class="text-center">
             <div id="experiment-overlap" class="plot" data-toggle="popover" data-desc="{{ captions["overlap"] }}"></div>
         </div>
-    </div>
 </div>
+
 <script>
 add_caption($("#experiment-overlap")[0]);
 var venn_chart = venn.VennDiagram()

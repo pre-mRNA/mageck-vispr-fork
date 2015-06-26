@@ -31,28 +31,32 @@ class Results(AbstractResults):
         self.df = dataframe
         self.df.sort("p-value", inplace=True)
         self.df.reset_index(drop=True, inplace=True)
-        self.df["log10-p-value"] = np.minimum(1000.0, -np.log10(self.df["p-value"]))
+        self.df["log10-p-value"] = -np.log10(self.df["p-value"])
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
+        pval_cdf = self.df.replace([np.inf, -np.inf], np.nan).dropna()["log10-p-value"].value_counts(normalize=True, sort=False, bins=1000).cumsum()
+        pval_cdf.index = np.maximum(0, pval_cdf.index)
+        self.pval_cdf = pd.DataFrame({"p-value": pval_cdf.index, "cdf": pval_cdf})
+
+    def get_pval_cdf_points(self, pvals):
+        idx = self.pval_cdf["p-value"].searchsorted(pvals, side="right") - 1
+        d = self.pval_cdf.iloc[idx]
+        d.reset_index(drop=True, inplace=True)
+        return d
+
     def plot_pvals(self, control_targets=None, mode="hide"):
         """
-        Plot the gene ranking in form of their p-values as line plot.
-
-        Arguments
-        positive -- if true, plot positive selection scores, else negative selection
+        Plot the gene ranking in form of their p-values as CDF plot.
         """
-        data = self.df[["idx", "log10-p-value"]]
 
-        i5 = self.df["fdr"].searchsorted(0.05)[0]
-        i25 = self.df["fdr"].searchsorted(0.25)[0]
+        fdr_idx = self.df["fdr"].searchsorted([0.05, 0.25], side="right")
 
-        fdr5 = data.iloc[i5]["log10-p-value"]
-        fdr25 = data.iloc[i25]["log10-p-value"]
-        fdr5label = "{:.0%} FDR".format(self.df.iloc[i5]["fdr"])
-        fdr25label = "{:.0%} FDR".format(self.df.iloc[i25]["fdr"])
+        #import pdb; pdb.set_trace()
+        fdrs = pd.DataFrame(self.get_pval_cdf_points(self.df.iloc[fdr_idx]["log10-p-value"]))
+        fdrs.loc[:, "label"] = self.df.iloc[fdr_idx]["fdr"].apply("{:.0%} FDR".format).values
 
-        top5 = self.df[["idx", "log10-p-value", "target"]]
+        top5 = self.df.index
         if control_targets:
             if mode == "hide":
                 valid = self.df["target"].apply(lambda target: target not in
@@ -62,22 +66,19 @@ class Results(AbstractResults):
                 valid = self.df["target"].apply(lambda target: target in
                                                 control_targets)
                 top5 = top5[valid]
-        top5 = top5.ix[:5]
+        top5targets = top5[:5]
+        top5 = pd.DataFrame(self.get_pval_cdf_points(self.df.ix[top5targets, "log10-p-value"]))
+        top5.loc[:, "target"] = top5targets.values
 
         plt = templates.get_template("plots/pvals.json").render(
-            pvals=data.to_json(orient="records"),
+            pvals=self.pval_cdf.to_json(orient="records"),
             highlight=top5.to_json(orient="records"),
-            fdr5=fdr5,
-            fdr25=fdr25,
-            fdr5label=fdr5label,
-            fdr25label=fdr25label)
+            fdrs=fdrs.to_json(orient="records"))
         return plt
 
     def get_pvals_highlight_targets(self, highlight_targets):
-        print(highlight_targets)
-        data = self.df[["idx", "log10-p-value", "target"]]
-        data = data.ix[highlight_targets]
-        print(data)
+        data = pd.DataFrame(self.get_pval_cdf_points(self.df.ix[highlight_targets, "log10-p-value"]))
+        data.loc[:, "target"] = highlight_targets
         return data
 
     def plot_pval_hist(self):

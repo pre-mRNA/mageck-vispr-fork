@@ -54,11 +54,11 @@ def init_server(*configs, port=5000):
     app.run(port=port)
 
 
-def test_server(port=5000):
+def test_server(port=5000, update=False):
     testdir = os.path.join(appdirs.user_cache_dir, "testdata")
     datasets = "ESC-MLE Leukemia-MLE Melanoma-MLE".split()
     for dataset in datasets:
-        if not os.path.exists(os.path.join(testdir, dataset)):
+        if update or not os.path.exists(os.path.join(testdir, dataset)):
             logging.info("Downloading {} test data.".format(dataset))
             testdata = tarfile.open(fileobj=urlopen(
                 "https://bitbucket.org/liulab/"
@@ -151,12 +151,13 @@ def main():
 
     test = subparsers.add_parser(
         "test",
-        description="Start the VISPR server with some included "
-        "test data.")
+        description="Start the VISPR server with test data.")
     test.add_argument("--port",
                       default=5000,
                       type=int,
                       help="Port to listen for client connection.")
+    test.add_argument("--update", action="store_true", help="Update test data. "
+        "This will redownload all test data.")
 
     archive = subparsers.add_parser(
         "archive",
@@ -183,7 +184,7 @@ def main():
         if args.subcommand == "server":
             init_server(*args.config, port=args.port)
         elif args.subcommand == "test":
-            test_server(port=args.port)
+            test_server(port=args.port, update=args.update)
         elif args.subcommand == "config":
             print_example_config()
         elif args.subcommand == "plot":

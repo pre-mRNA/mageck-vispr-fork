@@ -8,6 +8,12 @@
     max-width: 1200px;
 }
 
+#compare {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 800px;
+}
+
 .plot {
     display: inline-block;
     vertical-align: middle;
@@ -37,7 +43,7 @@
     display: inline;
 }
 
-.row h4 {
+h4.panel {
     border-bottom: 1px solid #EEE;
 }
 
@@ -55,8 +61,4 @@
 
 .shadow-svg {
     display: block;
-}
-
-.qc-level h4 {
-    border-bottom: 1px solid #EEE;
 }

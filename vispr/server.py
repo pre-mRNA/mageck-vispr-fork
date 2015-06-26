@@ -104,22 +104,6 @@ def compare(screen):
                            version=__version__)
 
 
-@app.route("/plt/pvals/<screen>/<condition>/<selection>")
-def plt_pvals(screen, condition, selection):
-    screen = app.screens[screen]
-    plt = screen.targets[condition][selection].plot_pvals(
-        screen.control_targets,
-        mode=session.get("control_targets_mode", "hide"))
-    return plt
-
-
-@app.route("/plt/pvalhist/<screen>/<condition>/<selection>")
-def plt_pval_hist(screen, condition, selection):
-    screen = app.screens[screen]
-    plt = screen.targets[condition][selection].plot_pval_hist()
-    return plt
-
-
 def tbl_targets(screen, condition, selection,
                 offset=None,
                 perpage=None,
@@ -239,6 +223,22 @@ def igv_session(screen):
 def igv_track_rnas(screen):
     screen = app.screens[screen]
     return screen.rnas.track()
+
+
+@app.route("/plt/pvals/<screen>/<condition>/<selection>")
+def plt_pvals(screen, condition, selection):
+    screen = app.screens[screen]
+    plt = screen.targets[condition][selection].plot_pvals(
+        screen.control_targets,
+        mode=session.get("control_targets_mode", "hide"))
+    return plt
+
+
+@app.route("/plt/pvalhist/<screen>/<condition>/<selection>")
+def plt_pval_hist(screen, condition, selection):
+    screen = app.screens[screen]
+    plt = screen.targets[condition][selection].plot_pval_hist()
+    return plt
 
 
 @app.route("/plt/normalization/<screen>")

@@ -1,6 +1,6 @@
 {
-    "width": 200,
-    "height": 200,
+    "width": 150,
+    "height": 150,
     "data": [
         {
             "name": "pvals",
@@ -9,6 +9,10 @@
         {
             "name": "highlight",
             "values": {{ highlight }}
+        },
+        {
+            "name": "fdrs",
+            "values": {{ fdrs }}
         }
     ],
     "scales": [
@@ -17,14 +21,15 @@
             "type": "linear",
             "range": "width",
             "zero": false,
-            "domain": {"data": "pvals", "field": "data.idx"}
+            "domain": {"data": "pvals", "field": "data.p-value"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
             "nice": true,
-            "domain": {"data": "pvals", "field": "data.log10-p-value"}
+            "zero": false,
+            "domain": {"data": "pvals", "field": "data.cdf"}
         },
         {
             "name": "c",
@@ -34,8 +39,8 @@
         }
     ],
     "axes": [
-        {"type": "x", "scale": "x", "offset": 5, "title": "targets", "ticks": 4},
-        {"type": "y", "scale": "y", "nice": true, "offset": 5, "title": "-log10 p-value"}
+        {"type": "x", "scale": "x", "nice": true, "offset": 5, "title": "-log10 p-value"},
+        {"type": "y", "scale": "y", "nice": true, "offset": 5, "title": "CDF"}
     ],
     "marks": [
         {
@@ -43,8 +48,8 @@
             "from": {"data": "pvals"},
             "properties": {
                 "enter": {
-                    "x": {"scale": "x", "field": "data.idx"},
-                    "y": {"scale": "y", "field": "data.log10-p-value"},
+                    "x": {"scale": "x", "field": "data.p-value"},
+                    "y": {"scale": "y", "field": "data.cdf"},
                     "stroke": {"value": "steelblue"},
                     "strokeWidth": {"value": 2}
                 }
@@ -55,8 +60,8 @@
             "from": {"data": "highlight"},
             "properties": {
                 "enter": {
-                    "x": {"scale": "x", "field": "data.idx"},
-                    "y": {"scale": "y", "field": "data.log10-p-value"},
+                    "x": {"scale": "x", "field": "data.p-value"},
+                    "y": {"scale": "y", "field": "data.cdf"},
                     "fill": {"scale": "c", "field": "data.target"},
                     "stroke": {"value": "transparent"},
                     "size": {"value": 50}
@@ -65,26 +70,13 @@
         },
         {
             "type": "rect",
+            "from": {"data": "fdrs"},
             "properties": {
                 "enter": {
-                    "x": {"value": 0},
-                    "x2": {"value": 200},
-                    "y": {"scale": "y", "value": {{ fdr5 }}},
-                    "y2": {"scale": "y", "value": {{ fdr5 }}, "offset": 1},
-                    "stroke": {"value": "grey"},
-                    "strokeWidth": {"value": 1},
-                    "strokeDash": {"value": [2,1]}
-                }
-            }
-        },
-        {
-            "type": "rect",
-            "properties": {
-                "enter": {
-                    "x": {"value": 0},
-                    "x2": {"value": 200},
-                    "y": {"scale": "y", "value": {{ fdr25 }}},
-                    "y2": {"scale": "y", "value": {{ fdr25 }}, "offset": 1},
+                    "y": {"value": 150},
+                    "y2": {"scale": "y", "field": "data.cdf"},
+                    "x": {"scale": "x", "field": "data.p-value"},
+                    "x2": {"scale": "x", "field": "data.p-value", "offset": 1},
                     "stroke": {"value": "grey"},
                     "strokeWidth": {"value": 1},
                     "strokeDash": {"value": [2,1]}
@@ -93,27 +85,17 @@
         },
         {
             "type": "text",
+            "from": {"data": "fdrs"},
             "properties": {
                 "enter": {
-                    "x": {"value": 200},
-                    "y": {"scale": "y", "value": {{ fdr5 }}},
-                    "dy": {"value": -2},
-                    "text": {"value": "{{ fdr5label }}"},
-                    "align": {"value": "right"},
-                    "fill": {"value": "grey"}
-                }
-            }
-        },
-        {
-            "type": "text",
-            "properties": {
-                "enter": {
-                    "x": {"value": 200},
-                    "y": {"scale": "y", "value": {{ fdr25 }}},
-                    "dy": {"value": -2},
-                    "text": {"value": "{{ fdr25label }}"},
-                    "align": {"value": "right"},
-                    "fill": {"value": "grey"}
+                    "y": {"value": 150},
+                    "x": {"scale": "x", "field": "data.p-value"},
+                    "dx": {"value": 2},
+                    "text": {"field": "data.label"},
+                    "align": {"value": "left"},
+                    "fill": {"value": "grey"},
+                    "angle": {"value": -90},
+                    "baseline": {"value": "top"}
                 }
             }
         }

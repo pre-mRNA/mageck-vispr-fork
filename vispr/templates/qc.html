@@ -9,7 +9,7 @@
 
 {% if fastqc %}
 <div class="qc-level readcount">
-    <h4>Sequence level</h4>
+    <h4 class="panel">Sequence level</h4>
     <div class="text-center" class="qc-level seq">
         <div id="base-quality" class="plot" data-toggle="popover" data-desc="{{ captions["base-quality"] }}"></div>
         <div id="seq-quality" class="plot" data-toggle="popover" data-placement="left" data-desc="{{ captions["seq-quality"] }}"></div>
@@ -20,7 +20,7 @@
 
 {% if mapstats %}
 <div class="qc-level readcount">
-    <h4>Read count level</h4>
+    <h4 class="panel">Read count level</h4>
     <div class="text-center">
         <div id="mapped-unmapped" class="plot" data-toggle="popover" data-desc="{{ captions["mapped-unmapped"] }}"></div>
         <div id="zerocounts" class="plot" data-toggle="popover" data-desc="{{ captions["zerocounts"] }}"></div>
@@ -30,7 +30,7 @@
 {% endif %}
 
 <div class="qc-level sample">
-    <h4>Sample level</h4>
+    <h4 class="panel">Sample level</h4>
     <div class="text-center">
         <div id="pca-pc1-pc2" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
         <div id="pca-pc1-pc3" class="plot" data-toggle="popover" data-desc="{{ captions["pca"] }}"></div>
