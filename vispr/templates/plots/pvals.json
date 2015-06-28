@@ -1,6 +1,6 @@
 {
-    "width": 150,
-    "height": 150,
+    "width": 200,
+    "height": 200,
     "data": [
         {
             "name": "pvals",
@@ -73,7 +73,7 @@
             "from": {"data": "fdrs"},
             "properties": {
                 "enter": {
-                    "y": {"value": 150},
+                    "y": {"value": 200},
                     "y2": {"scale": "y", "field": "data.cdf"},
                     "x": {"scale": "x", "field": "data.p-value"},
                     "x2": {"scale": "x", "field": "data.p-value", "offset": 1},
@@ -88,7 +88,7 @@
             "from": {"data": "fdrs"},
             "properties": {
                 "enter": {
-                    "y": {"value": 150},
+                    "y": {"value": 200},
                     "x": {"scale": "x", "field": "data.p-value"},
                     "dx": {"value": 2},
                     "text": {"field": "data.label"},
