@@ -23,6 +23,11 @@ with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
     CAPTIONS = yaml.load(f)
 
 
+@app.route("/ping")
+def ping():
+    return ""
+
+
 @app.route("/")
 def index():
     screen = next(iter(app.screens))
