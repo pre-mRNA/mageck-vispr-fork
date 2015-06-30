@@ -169,10 +169,14 @@ def tbl_targets(screen, condition, selection,
     records = records.apply(fmt_col)
 
     if add_locus and screen.rnas.info is not None:
-        records["locus"] = [
-            "{}:{}-{}".format(*screen.rnas.target_locus(target))
-            for target in records["target"]
-        ]
+
+        def get_locus(target):
+            locus = screen.rnas.target_locus(target)
+            if locus is None:
+                return ""
+            return "{}:{}-{}".format(*locus)
+
+        records["locus"] = list(map(get_locus, records["target"]))
 
     return records, filter_count, total_count
 

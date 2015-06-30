@@ -23,7 +23,7 @@
                     or download an installable instance.
                 </p>
                 <p>
-                    Once an IGV instance is open, you can select to load the current results.
+                    Once an IGV instance is open, you can select to load the current results with the "Load data" button below.
                     Finally, you can jump to each target via the
                     <span class="glyphicon glyphicon-equalizer"></span> buttons.
                 </p>
@@ -31,7 +31,7 @@
             <div class="modal-footer">
                 <div class="btn-group">
                     <a href="http://www.broadinstitute.org/igv/projects/current/igv.php" class="btn btn-default">Open via JAVA Web Start</a>
-                    <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default">Download</a>
+                    <a href="https://www.broadinstitute.org/igv/download" class="btn btn-default" target="_blank">Download</a>
                     <a id="load-igv" href="http://127.0.0.1:60151/load?file={{ request.url_root }}igv/session/{{ screen.name }}.xml" class="btn btn-default">Load data</a>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -103,7 +103,7 @@
                     <div class="dropdown">
                         <button class="btn btn-default dropdown-toggle" data-placeholder="false" type="button" id="table-menu" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon-menu-hamburger glyphicon"></span> <span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="table-menu">
-                        {% if screen.is_genes %}
+                        {% if screen.is_genes and control_targets %}
                             <li role="presentation" class="dropdown-header">Control genes</li>
                             <li role="presentation"><input type="radio" id="control-hide" name="controls" value="hide"><label for="control-hide">hide</label></li>
                             <li role="presentation"><input type="radio" id="control-show" name="controls" value="show" checked><label for="control-show">show</label></li>
@@ -293,23 +293,27 @@ dt.on("dynatable:afterUpdate", function() {
 
     $("#targets tr td:last-child").each(function(idx, cell) {
         var target = $(cell).parent().children(":first").children(":first").html();
+        $(cell).html('<div class="btn-group" role="group"></div>');
+
+        var group = $(cell).find('.btn-group')
+            .append('<button type="button" class="btn btn-default btn-plt-rnas" ' +
+                `name="${target}" data-toggle="tooltip" title="Show RNA counts.">` +
+                '<span class="glyphicon glyphicon-stats"></span></button>')
+            .append('<button type="button" class="btn btn-default btn-select-target"' +
+                `name="${target}" data-toggle="tooltip" title="Select target ` +
+                'and highlight in p-value plot.">' +
+                '<span class="glyphicon glyphicon-ok"></span></button>');
+
+        {% if has_rna_info %}
         var locus = $(cell).parent().children(":eq(1)").html();
-        $(cell).html(
-            '<div class="btn-group" role="group">' +
-            {% if has_rna_info %}
-            '<a class="btn btn-default btn-show-igv" data-toggle="tooltip" ' +
-            'title="Show in IGV (an instance of IGV can be opened in the menu at the top of this column)." ' +
-            'href="http://127.0.0.1:60151/goto?locus=' +
-            locus + '"><span class="glyphicon glyphicon-equalizer"></span></a>' +
-            {% endif %}
-            '<button type="button" class="btn btn-default btn-plt-rnas" name="' +
-            target + '" data-toggle="tooltip" title="Show RNA counts.">' +
-            '<span class="glyphicon glyphicon-stats"></span></button>' +
-            '<button type="button" class="btn btn-default btn-select-target" name="' +
-            target + '" data-toggle="tooltip" title="Select target and highlight in p-value plot.">' +
-            '<span class="glyphicon glyphicon-ok"></span></button>' +
-            '</div>'
-        );
+        if(locus) {
+            group.prepend('<a class="btn btn-default btn-show-igv" ' +
+                'data-toggle="tooltip" title="Show in IGV (an instance ' +
+                'of IGV can be opened in the menu at the top of this column)." ' +
+                `href="http://127.0.0.1:60151/goto?locus=${locus}">` +
+                '<span class="glyphicon glyphicon-equalizer"></span></a>');
+        }
+        {% endif %}
     });
 
     highlight_targets_init();

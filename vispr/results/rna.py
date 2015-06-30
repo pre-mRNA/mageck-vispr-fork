@@ -6,7 +6,6 @@ __copyright__ = "Copyright 2015, Johannes Köster, Liu lab"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
-
 import json
 from functools import partial
 
@@ -23,18 +22,19 @@ from vispr.results.common import lru_cache, AbstractResults, templates
 class Results(AbstractResults):
     def __init__(self, dataframe, info=None):
         super(Results, self).__init__(dataframe)
-        # reorder columns lexicographically
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
         self.df.columns = ["rna", "target"] + list(self.samples)
         self.df.index = self.df["target"]
         self.info = None
         if info is not None:
-            self.info = pd.read_table(
-                info,
-                na_filter=False,
-                index_col=3,
-                names=["chrom", "start", "stop", "score"])
+            self.info = pd.read_table(info,
+                                      na_filter=False,
+                                      index_col=3,
+                                      header=None).iloc[:, :5]
+            self.info.columns = ["chrom", "start", "stop", "score",
+                                 "strand"][:len(self.info.columns)]
+            self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
 
     @property
     def samples(self):
@@ -55,24 +55,25 @@ class Results(AbstractResults):
         return data
 
     def track(self):
-        data = self.df.ix[:, self.df.columns != "target"]
-        data["desc"] = [
-            "na|@chr{}:{}-{}|".format(*row) for _, row in
-            self.info.ix[data["rna"], ["chrom", "start", "stop"]].iterrows()
-        ]
-        data["score"] = np.asarray(self.info.ix[data["rna"], "score"])
+        exp = self.df.ix[:, self.df.columns != "target"]
+        info = self.info.ix[:, ["chrom", "start", "stop", "score"]]
+        data = pd.merge(info, exp, how="left", left_index=True, right_on="rna")
+        data["desc"] = data.apply(lambda row: "na|@{rna[chrom]}:{rna[start]}-{rna[stop]}|".format(rna=row), axis=1)
         gct = "#1.2\n{rnas}\t{samples}\n{data}".format(
             rnas=data.shape[0],
-            samples=data.shape[1] - 2,
+            samples=data.shape[1] - 3,
             data=data.to_csv(sep="\t",
                              index=False,
                              columns=["rna", "desc", "score"] + self.samples,
-                             header=["Name", "Description", "Efficiency"] + self.samples))
+                             header=["Name", "Description",
+                                     "efficiency"] + self.samples))
         return gct
 
     def target_locus(self, target):
         loci = self.info.ix[self.df.ix[target, "rna"], ["chrom", "start",
                                                         "stop"]]
+        if loci["chrom"].hasnans():
+            return None
         return loci["chrom"][0], loci["start"].min(), loci["stop"].max()
 
     def plot_normalization(self):
@@ -91,24 +92,24 @@ class Results(AbstractResults):
         })
         width = 20 * counts.shape[1]
         return templates.get_template("plots/normalization.json").render(
-                               data=data.to_json(orient="records"),
-                               width=width)
+            data=data.to_json(orient="records"),
+            width=width)
 
     def plot_readcount_cdf(self):
         counts = np.log10(self.counts() + 1)
 
         data = []
         for sample in counts.columns:
-            d = counts[sample].value_counts(normalize=True, sort=False, bins=100).cumsum()
-            data.append(pd.DataFrame({
-                "density": d,
-                "count": d.index,
-                "sample": sample
-            }))
+            d = counts[sample].value_counts(normalize=True,
+                                            sort=False,
+                                            bins=100).cumsum()
+            data.append(pd.DataFrame(
+                {"density": d,
+                 "count": d.index,
+                 "sample": sample}))
         data = pd.concat(data)
         return templates.get_template("plots/readcounts.json").render(
-                               data=data.to_json(orient="records"))
-
+            data=data.to_json(orient="records"))
 
     def counts(self):
         return self.df.ix[:, 2:]
@@ -135,10 +136,10 @@ class Results(AbstractResults):
         })
 
         plt = templates.get_template("plots/pca.json").render(
-                              data=data.to_json(orient="records"),
-                              xlabel=pca.columns[comp_x - 1],
-                              ylabel=pca.columns[comp_y - 1],
-                              legend=legend)
+            data=data.to_json(orient="records"),
+            xlabel=pca.columns[comp_x - 1],
+            ylabel=pca.columns[comp_y - 1],
+            legend=legend)
         return plt
 
     @lru_cache()
@@ -170,6 +171,6 @@ class Results(AbstractResults):
         size = max(min(50 * len(labels), 700), 300)
 
         plt = templates.get_template("plots/correlation.json").render(
-                              data=json.dumps(data),
-                              size=size)
+            data=json.dumps(data),
+            size=size)
         return plt
