@@ -72,9 +72,9 @@ class Results(AbstractResults):
     def target_locus(self, target):
         loci = self.info.ix[self.df.ix[target, "rna"], ["chrom", "start",
                                                         "stop"]]
-        if loci["start"].isnull().any():
+        if loci.loc[:, "start"].isnull().any():
             return None
-        return loci["chrom"][0], loci["start"].min(), loci["stop"].max()
+        return loci.loc[:, "chrom"][0], loci.loc[:, "start"].min(), loci.loc[:, "stop"].max()
 
     def plot_normalization(self):
         _, leaves, _ = self.clustering()
