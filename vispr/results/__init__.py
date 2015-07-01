@@ -16,6 +16,7 @@ from vispr.results import target
 from vispr.results import rna
 from vispr.results import fastqc
 from vispr.results import mapstats
+from vispr.results import target_overlap
 
 
 class Screens(object):
@@ -45,17 +46,13 @@ class Screens(object):
             for screen, condition, selection in items
         }
 
-    def plot_overlap_chord(self, fdr=0.05, items=None):
-        return target.plot_overlap_chord(**self._overlap_targets(fdr=fdr,
-                                                                 items=items))
-
     def plot_overlap_venn(self, fdr=0.05, items=None):
-        plt = target.plot_overlap_venn(**self._overlap_targets(fdr=fdr,
+        plt = target_overlap.plot_overlap_venn(**self._overlap_targets(fdr=fdr,
                                                                items=items))
         return plt
 
     def overlap(self, fdr=0.05, items=None):
-        return target.overlap(*self._overlap_targets(fdr=fdr,
+        return target_overlap.overlap(*self._overlap_targets(fdr=fdr,
                                                      items=items).values())
 
 

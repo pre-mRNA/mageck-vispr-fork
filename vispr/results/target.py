@@ -7,10 +7,6 @@ __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
 
-import json
-from itertools import combinations
-from operator import itemgetter
-
 from flask import render_template
 import pandas as pd
 import numpy as np
@@ -97,50 +93,3 @@ class Results(AbstractResults):
 
     def __len__(self):
         return self.df.shape[0]
-
-
-def overlap(*targets):
-    isect = set(targets[0])
-    for other in targets[1:]:
-        isect &= other
-    return isect
-
-
-def overlaps(order, **targets):
-    """
-    Arguments
-    order   -- 1: single condition, 2: overlap of 3 conditions, 3: overlap of 3 conditions...
-    targets -- labels and targets to compare
-    """
-    for c in combinations(targets.items(), order):
-        isect = overlap(*map(itemgetter(1), c))
-        labels = list(map(itemgetter(0), c))
-        yield labels, len(isect)
-
-
-def plot_overlap_chord(**targets):
-    ids = {label: i for i, label in enumerate(targets)}
-    data = []
-    for s in range(2, len(targets) + 1):
-        for labels, isect in overlaps(s, **targets):
-            data.append([{"group": ids[label],
-                          "value": isect} for label in labels])
-    for label, t in targets.items():
-        excl = set(t)
-        for l, t in targets.items():
-            if l != label:
-                excl -= t
-        data.append([{"group": ids[label], "value": len(excl)}])
-    return json.dumps({
-        "connections": data,
-        "labels": {i: label
-                   for label, i in ids.items()}
-    })
-
-
-def plot_overlap_venn(**targets):
-    data = []
-    for s in range(1, len(targets) + 1):
-        for labels, isect in overlaps(s, **targets):
-            data.append({"sets": labels, "size": isect})
-    return json.dumps(data)
