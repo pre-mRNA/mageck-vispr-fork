@@ -72,7 +72,7 @@ class Results(AbstractResults):
     def target_locus(self, target):
         loci = self.info.ix[self.df.ix[target, "rna"], ["chrom", "start",
                                                         "stop"]]
-        if loci["chrom"].hasnans():
+        if loci["start"].isnull().any():
             return None
         return loci["chrom"][0], loci["start"].min(), loci["stop"].max()
 

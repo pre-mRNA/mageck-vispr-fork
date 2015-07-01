@@ -21,12 +21,12 @@ from vispr.results.common import lru_cache, AbstractResults, templates
 class Results(AbstractResults):
     """Keep and display target results."""
 
-    def __init__(self, dataframe):
+    def __init__(self, dataframe, table_filter=None):
         """
         Arguments
 
         dataframe -- path to file containing MAGeCK target (gene) summary. Alternatively, a dataframe.
-        controls  -- path to file containing control genes. Alternatively, a dataframe.
+        table_filter  -- an optional function (taking a results row and returning bool) to filter the stored results. This will not affect p-value distribution plots. Default: None
         """
         self.df = dataframe
         self.df.sort("p-value", inplace=True)
@@ -39,6 +39,14 @@ class Results(AbstractResults):
         pval_cdf.index = np.maximum(0, pval_cdf.index)
         self.pval_cdf = pd.DataFrame({"p-value": pval_cdf.index, "cdf": pval_cdf})
 
+        edges = np.arange(0, 1.01, 0.05)
+        counts, _ = np.histogram(self.df["p-value"], bins=edges)
+        bins = edges[1:]
+        self.pval_hist = pd.DataFrame({"bin": bins, "count": counts})
+
+        if table_filter is not None:
+            self.df = self.df[self.df.apply(table_filter, axis=1)]
+
     def get_pval_cdf_points(self, pvals):
         idx = self.pval_cdf["p-value"].searchsorted(pvals, side="right") - 1
         d = self.pval_cdf.iloc[idx]
@@ -50,9 +58,7 @@ class Results(AbstractResults):
         Plot the gene ranking in form of their p-values as CDF plot.
         """
 
-        fdr_idx = self.df["fdr"].searchsorted([0.05, 0.25], side="right")
-
-        #import pdb; pdb.set_trace()
+        fdr_idx = self.df["fdr"].searchsorted([0.01, 0.05, 0.25], side="right")
         fdrs = pd.DataFrame(self.get_pval_cdf_points(self.df.iloc[fdr_idx]["log10-p-value"]))
         fdrs.loc[:, "label"] = self.df.iloc[fdr_idx]["fdr"].apply("{:.0%} FDR".format).values
 
@@ -82,19 +88,8 @@ class Results(AbstractResults):
         return data
 
     def plot_pval_hist(self):
-        edges = np.arange(0, 1.01, 0.05)
-        counts, _ = np.histogram(self.df["p-value"], bins=edges)
-        bins = edges[1:]
-
-        hist = pd.DataFrame({"bin": bins, "count": counts})
         return templates.get_template("plots/pval_hist.json").render(
-            hist=hist.to_json(orient="records"))
-
-    def plot_pval_qq(self):
-        data = self.df[["log10-p-value"]]
-        data["nulldist"] = -np.log10(np.arange(1, len(self) + 1) / len(self))
-        return templates.get_template("plots/pval_qq.json").render(
-            data=data.to_json(orient="records"))
+            hist=self.pval_hist.to_json(orient="records"))
 
     def ids(self, fdr):
         valid = self.df["fdr"] <= fdr

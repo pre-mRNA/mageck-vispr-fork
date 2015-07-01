@@ -108,16 +108,19 @@ def parse_target_results(path,
                                      "positive selection"]):
     results = pd.read_table(path, na_filter=False)
     paths = [col.split("|") for col in results.columns]
+    is_mle = "beta" in [path[1] for path in paths if len(path) > 1]
 
-    max_depth = max(map(len, paths))
-    if max_depth == 3:
+    if is_mle:
         # MLE format
         def get_results(condition, selection):
-            res = results[[results.columns[0]] + "{cond}|beta {cond}|{sel}|p-value {cond}|{sel}|fdr".format(
-                cond=condition,
-                sel=selection[:3]).split()]
+            res = results[[results.columns[0]] + "{cond}|beta {cond}|p-value {cond}|fdr".format(
+                cond=condition).split()]
             res.columns = ["target", "score", "p-value", "fdr"]
-            return target.Results(res.copy())
+            if selection == "negative selection":
+                table_filter = lambda row: row["score"] <= 0
+            else:
+                table_filter = lambda row: row["score"] >= 0
+            return target.Results(res.copy(), table_filter=table_filter)
 
         conditions = [path[0] for path in paths if len(path) > 1]
         targets = {
@@ -127,7 +130,7 @@ def parse_target_results(path,
              for condition in conditions
         }
 
-    elif max_depth == 2:
+    else:
         # RRA format
         def get_results(selection):
             res = results[[results.columns[0]] + "{sel}|score {sel}|p-value {sel}|fdr".format(
@@ -141,6 +144,4 @@ def parse_target_results(path,
                 for selection in selections
             }
         }
-    else:
-        raise IOError("Invalid target results format.")
     return targets
