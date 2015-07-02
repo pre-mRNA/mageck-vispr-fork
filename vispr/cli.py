@@ -27,7 +27,6 @@ from vispr.server import app
 from vispr.version import __version__
 from vispr.archive import archive as _archive
 
-
 appdirs = AppDirs("VISPR", "liulab")
 
 
@@ -64,7 +63,7 @@ def test_server(port=5000, update=False):
                 "https://bitbucket.org/liulab/"
                 "vispr/downloads/{}.testdata.tar.bz2".format(dataset)),
                                     mode="r|bz2")
-            testdata.extractall(os.path.join(testdir, dataset))
+            testdata.extractall(testdir)
     init_server(*[os.path.join(testdir, dataset, "vispr.yaml")
                   for dataset in datasets],
                 port=port)
@@ -156,8 +155,10 @@ def main():
                       default=5000,
                       type=int,
                       help="Port to listen for client connection.")
-    test.add_argument("--update", action="store_true", help="Update test data. "
-        "This will redownload all test data.")
+    test.add_argument("--update",
+                      action="store_true",
+                      help="Update test data. "
+                      "This will redownload all test data.")
 
     archive = subparsers.add_parser(
         "archive",
