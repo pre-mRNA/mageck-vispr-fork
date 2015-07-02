@@ -8,7 +8,7 @@ targets:
     controls: ribosomal_genes.txt  # list of targets to hide per default
 sgrnas:
     counts: myexperiment.normalized.txt  # normalized read counts (mageck count)
-    info: myexperiment.sgrna.bed  # position and score (e.g. efficiency score) for each sgRNA
+    annotation: myexperiment.sgrna.bed  # position and score (e.g. efficiency score) for each sgRNA
     mapstats: myexperiment.countsummary.txt  # mapping statistics (mageck count)
 fastqc:
     sample1:
