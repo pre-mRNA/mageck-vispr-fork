@@ -190,7 +190,6 @@ def main():
         elif args.subcommand == "plot":
             plots(args.config, args.prefix)
         elif args.subcommand == "archive":
-            print(args.tarfile)
             _archive(args.config, args.tarfile)
         else:
             parser.print_help()

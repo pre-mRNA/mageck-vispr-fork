@@ -17,7 +17,7 @@ def archive(config, out):
     with open(config) as config:
         config = yaml.load(config)
 
-    def get_out(name):
+    def get_tar_path(name):
         return os.path.join(config["experiment"], name)
 
     mode = None
@@ -35,34 +35,34 @@ def archive(config, out):
                 new[sample] = []
                 for i, f in enumerate(fastqs):
                     out = "{}.{}.fastqc_data.txt".format(sample, i)
-                    tar.add(get_path(f), out)
+                    tar.add(get_path(f), get_tar_path(out))
                     new[sample].append(out)
             config["fastqc"] = new
 
-        out = get_out("all.count.normalized.txt")
-        tar.add(get_path(config["sgrnas"]["counts"]), out)
+        out = "all.count.normalized.txt"
+        tar.add(get_path(config["sgrnas"]["counts"]), get_tar_path(out))
         config["sgrnas"]["counts"] = out
 
         if "mapstats" in config["sgrnas"]:
-            out = get_out("all.countsummary.txt")
-            tar.add(get_path(config["sgrnas"]["mapstats"]), out)
+            out = "all.countsummary.txt"
+            tar.add(get_path(config["sgrnas"]["mapstats"]), get_tar_path(out))
             config["sgrnas"]["mapstats"] = out
 
         if "annotation" in config["sgrnas"]:
-            out = get_out("sgnra_annotation.bed")
-            tar.add(get_path(config["sgrnas"]["annotation"]), out)
+            out = "sgnra_annotation.bed"
+            tar.add(get_path(config["sgrnas"]["annotation"]), get_tar_path(out))
             config["sgrnas"]["annotation"] = out
 
-        out = get_out("all.gene_summary.txt")
-        tar.add(get_path(config["targets"]["results"]), out)
+        out = "all.gene_summary.txt"
+        tar.add(get_path(config["targets"]["results"]), get_tar_path(out))
         config["targets"]["results"] = out
 
         if "controls" in config["targets"]:
-            out = get_out("all.controls.txt")
-            tar.add(get_path(config["targets"]["controls"]), out)
+            out = "all.controls.txt"
+            tar.add(get_path(config["targets"]["controls"]), get_tar_path(out))
             config["targets"]["controls"] = out
 
         newconfig = yaml.dump(config, default_flow_style=False)
-        tarinfo = tarfile.TarInfo(get_out("vispr.yaml"))
+        tarinfo = tarfile.TarInfo(get_tar_path("vispr.yaml"))
         tarinfo.size = len(newconfig)
         tar.addfile(tarinfo, fileobj=BytesIO(newconfig.encode()))
