@@ -8,6 +8,7 @@ import yaml
 
 def archive(config, out):
     parentdir = os.path.dirname(config)
+
     def get_path(relpath):
         if relpath.startswith("http"):
             return relpath
