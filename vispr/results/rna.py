@@ -13,7 +13,7 @@ from flask import render_template
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
-from scipy.cluster.hierarchy import complete, leaves_list
+from scipy.cluster.hierarchy import complete, leaves_list, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
 from vispr.results.common import lru_cache, AbstractResults, templates
@@ -77,7 +77,7 @@ class Results(AbstractResults):
         return loci.loc[:, "chrom"][0], loci.loc[:, "start"].min(), loci.loc[:, "stop"].max()
 
     def plot_normalization(self):
-        _, leaves, _ = self.clustering()
+        _, leaves, _, _ = self.clustering()
 
         counts = np.log10(self.counts() + 1)
         # sort columns by clustering results
@@ -96,10 +96,11 @@ class Results(AbstractResults):
             width=width)
 
     def plot_readcount_cdf(self):
+        _, leaves, _, _ = self.clustering()
         counts = np.log10(self.counts() + 1)
 
         data = []
-        for sample in counts.columns:
+        for sample in counts.columns[leaves]:
             d = counts[sample].value_counts(normalize=True,
                                             sort=False,
                                             bins=100).cumsum()
@@ -116,6 +117,8 @@ class Results(AbstractResults):
 
     @lru_cache()
     def pca(self, n_components=3):
+        _, leaves, _, _ = self.clustering()
+
         counts = np.log10(self.counts().transpose() + 1)
         pca = PCA(n_components=3)
         data = pd.DataFrame(pca.fit_transform(counts))
@@ -125,6 +128,7 @@ class Results(AbstractResults):
                   for i, expl_var in enumerate(pca.explained_variance_ratio_)]
         data.columns = fields
         data["sample"] = counts.index
+        data = data.ix[leaves, :]
         return data
 
     def plot_pca(self, comp_x=1, comp_y=2, legend=True):
@@ -145,32 +149,44 @@ class Results(AbstractResults):
     @lru_cache()
     def clustering(self):
         counts = np.log10(self.counts().transpose() + 1)
+        labels = counts.index.values
         # calculate correlation
         corr = 1 - pdist(counts, 'correlation')
         # calculate distance from absolute correlation
         dist = 1 - np.abs(corr)
         # cluster
         clustering = complete(dist)
-        leaves = leaves_list(clustering)
+        #import matplotlib.pyplot as plt
+        d = dendrogram(clustering, labels=labels, get_leaves=True, no_plot=True)
+        #plt.savefig("/tmp/ddg.pdf")
+        leaves = d["leaves"]
 
         # calculate correlation matrix
         corr = np.round(squareform(corr), 2)
         # fix diagonal, that will contain zeros because squareform expects a dist
         np.fill_diagonal(corr, 1)
-        labels = counts.index.values
-        return corr, leaves, labels
+        return corr, leaves, labels, d
 
     def plot_correlation(self):
-        corr, leaves, labels = self.clustering()
+        corr, leaves, labels, dendrogram = self.clustering()
 
         # convert to json records
         data = [{"a": labels[i],
                  "b": labels[j],
                  "value": corr[i, j]} for i in leaves for j in leaves]
 
+        xmin = min(min(xk) for xk in dendrogram["icoord"])
+        links = []
+        for k, (xk, yk) in enumerate(zip(dendrogram["icoord"], dendrogram["dcoord"])):
+            for xki, yki in zip(xk, yk):
+                links.append({"x": xki - xmin, "y": yki, "k": k})
+
+
         size = max(min(50 * len(labels), 700), 300)
 
         plt = templates.get_template("plots/correlation.json").render(
             data=json.dumps(data),
-            size=size)
+            dendrogram=json.dumps(links),
+            size=size,
+            dendrogram_offset=size / len(labels) / 2)
         return plt
