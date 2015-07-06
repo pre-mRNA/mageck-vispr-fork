@@ -13,6 +13,9 @@ With miniconda installed, you can issue
     conda install -c liulab vispr
 
 to install or update VISPR with all dependencies.
+If you are using an old version of MacOS X and the `conda` command is not available after installation of Miniconda, you have to change your shell to `bash`. To do this permanently, issue
+
+    chsh -s /bin/bash
 
 Usage
 -----
