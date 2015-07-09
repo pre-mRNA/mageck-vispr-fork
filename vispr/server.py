@@ -87,10 +87,10 @@ def targets(screen, condition, selection):
                            version=__version__)
 
 
-@app.route("/clustering/<screen>")
-def clustering(screen):
-    # TODO
-    return ""
+@app.route("/target-clustering/<screen>")
+def target_clustering(screen):
+    screen = app.screens[screen]
+    return render_template("target_clustering.html", screen=screen, captions=CAPTIONS)
 
 
 @app.route("/qc/<screen>")
@@ -323,6 +323,13 @@ def plt_gini_index(screen):
 def plt_readcounts(screen):
     screen = app.screens[screen]
     plt = screen.rnas.plot_readcount_cdf()
+    return plt
+
+
+@app.route("/plt/target-clustering/<screen>")
+def plt_target_clustering(screen):
+    screen = app.screens[screen]
+    plt = screen.target_clustering.plot_clustering(4)
     return plt
 
 

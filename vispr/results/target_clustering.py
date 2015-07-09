@@ -22,19 +22,18 @@ class TargetClustering:
         clustering = pd.DataFrame(fcluster(self.linkage, k,
                                            criterion="maxclust"),
                                   columns=["cluster"])
-        print(clustering)
         clustering.index = self.df.index[clustering.index]
-        print(clustering)
-        data = pd.merge(self.df, clustering)
+        data = pd.merge(self.df, clustering, left_index=True, right_index=True)
         data.sort("cluster", inplace=True)
         data["target"] = data.index
 
         conditions = []
-        for condition in conditions:
+        for condition in self.df.columns:
             d = data[["cluster", "target", condition]]
             d.columns = ["cluster", "target", "beta"]
             d["condition"] = condition
             conditions.append(d)
+        print(conditions)
         data = pd.concat(conditions)
         plt = templates.get_template("plots/target_clustering.json").render(
             data=data.to_json(orient="records"))
