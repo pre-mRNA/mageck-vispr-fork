@@ -57,12 +57,15 @@ def test_server(port=5000, update=False):
     testdir = os.path.join(appdirs.user_cache_dir, "testdata")
     datasets = "ESC-MLE Leukemia-MLE Melanoma-MLE".split()
     for dataset in datasets:
-        if update or not os.path.exists(os.path.join(testdir, dataset)):
+        exists = os.path.exists(os.path.join(testdir, dataset))
+        if update or not exists:
             logging.info("Downloading {} test data.".format(dataset))
             testdata = tarfile.open(fileobj=urlopen(
                 "https://bitbucket.org/liulab/"
                 "vispr/downloads/{}.testdata.tar.bz2".format(dataset)),
                                     mode="r|bz2")
+            if exists:
+                shutil.rmtree(os.path.join(testdir, dataset))
             testdata.extractall(testdir)
     init_server(*[os.path.join(testdir, dataset, "vispr.yaml")
                   for dataset in datasets],
