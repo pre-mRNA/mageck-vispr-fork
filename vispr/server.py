@@ -329,7 +329,7 @@ def plt_readcounts(screen):
 @app.route("/plt/target-clustering/<screen>")
 def plt_target_clustering(screen):
     screen = app.screens[screen]
-    plt = screen.target_clustering.plot_clustering(4)
+    plt = screen.target_clustering.plot_clustering(7)
     return plt
 
 
