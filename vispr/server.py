@@ -88,7 +88,7 @@ def targets(screen, condition, selection):
 
 
 @app.route("/clustering/<screen>")
-def targets(screen):
+def clustering(screen):
     # TODO
     return ""
 
