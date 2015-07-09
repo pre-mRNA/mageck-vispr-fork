@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block breadcrumbs %}
+<li>{{ screen.name }}</li>
+<li class="active">clustering</li>
+{% endblock %}
+{% block content %}
+<div id="target-clustering">
+    <h4 class="panel">Clustering</h4>
+    <form action="" class="form-inline text-right" id="config-clustering">
+    </form>
+    <div class="text-center">
+        <div id="target-clustering-plot" class="plot" data-toggle="popover" data-desc="{{ captions["target-clustering"] }}"></div>
+    </div>
+</div>
+
+<script>
+vg.parse.spec("/plt/target-clustering/{{ screen.name }}", function(chart) {
+    vega_draw(chart, "#clustering-plot");
+});
+</script>
+{% endblock %}
