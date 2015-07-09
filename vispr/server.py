@@ -87,6 +87,12 @@ def targets(screen, condition, selection):
                            version=__version__)
 
 
+@app.route("/clustering/<screen>")
+def targets(screen):
+    # TODO
+    return ""
+
+
 @app.route("/qc/<screen>")
 def qc(screen):
     screen = app.screens[screen]
