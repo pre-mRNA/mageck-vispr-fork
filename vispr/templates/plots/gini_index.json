@@ -12,7 +12,7 @@
       "name": "x",
       "type": "ordinal",
       "range": "width",
-      "domain": {"data": "mapstats", "field": "data.label"},
+      "domain": {"data": "mapstats", "field": "label"},
       "padding": {{ padding }}
     },
     {
@@ -20,7 +20,7 @@
       "type": "linear",
       "range": "height",
       "nice": true,
-      "domain": {"data": "mapstats", "field": "data.giniindex"}
+      "domain": {"data": "mapstats", "field": "giniindex"}
     }
   ],
   "axes": [
@@ -52,7 +52,7 @@
       "type": "group",
       "from": {
         "data": "mapstats",
-        "transform": [{"type": "facet", "keys": ["data.label"]}]
+        "transform": [{"type": "facet", "keys": ["label"]}]
       },
       "properties": {
         "enter": {
@@ -64,7 +64,7 @@
         {
           "name": "file",
           "range": "width",
-          "domain": {"field": "data.file"},
+          "domain": {"field": "file"},
           "type": "ordinal"
         }
       ],
@@ -73,9 +73,9 @@
           "type": "rect",
           "properties": {
             "enter": {
-              "x": {"scale": "file", "field": "data.file"},
+              "x": {"scale": "file", "field": "file"},
               "width": {"scale": "file", "band": true, "offset": -1},
-              "y": {"scale": "y", "field": "data.giniindex"},
+              "y": {"scale": "y", "field": "giniindex"},
               "y2": {"scale": "y", "value": 0},
               "fill": {"value": "steelblue"}
             }

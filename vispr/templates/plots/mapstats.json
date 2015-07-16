@@ -12,7 +12,7 @@
       "name": "x",
       "type": "ordinal",
       "range": "width",
-      "domain": {"data": "mapstats", "field": "data.label"},
+      "domain": {"data": "mapstats", "field": "label"},
       "padding": {{ padding }}
     },
     {
@@ -20,7 +20,7 @@
       "type": "linear",
       "range": "height",
       "nice": true,
-      "domain": {"data": "mapstats", "field": "data.reads"}
+      "domain": {"data": "mapstats", "field": "reads"}
     },
     {
       "name": "color",
@@ -58,7 +58,7 @@
       "type": "group",
       "from": {
         "data": "mapstats",
-        "transform": [{"type": "facet", "keys": ["data.label"]}]
+        "transform": [{"type": "facet", "keys": ["label"]}]
       },
       "properties": {
         "enter": {
@@ -70,7 +70,7 @@
         {
           "name": "file",
           "range": "width",
-          "domain": {"field": "data.file"},
+          "domain": {"field": "file"},
           "type": "ordinal"
         }
       ],
@@ -79,9 +79,9 @@
           "type": "rect",
           "properties": {
             "enter": {
-              "x": {"scale": "file", "field": "data.file"},
+              "x": {"scale": "file", "field": "file"},
               "width": {"scale": "file", "band": true, "offset": -1},
-              "y": {"scale": "y", "field": "data.reads"},
+              "y": {"scale": "y", "field": "reads"},
               "y2": {"scale": "y", "value": 0},
               "fill": {"scale": "color", "value": "unmapped"}
             }
@@ -91,9 +91,9 @@
           "type": "rect",
           "properties": {
             "enter": {
-              "x": {"scale": "file", "field": "data.file"},
+              "x": {"scale": "file", "field": "file"},
               "width": {"scale": "file", "band": true, "offset": -1},
-              "y": {"scale": "y", "field": "data.mapped"},
+              "y": {"scale": "y", "field": "mapped"},
               "y2": {"scale": "y", "value": 0},
               "fill": {"scale": "color", "value": "mapped"}
             }
@@ -103,13 +103,13 @@
           "type": "text",
           "properties": {
             "enter": {
-              "x": {"scale": "file", "field": "data.file"},
+              "x": {"scale": "file", "field": "file"},
               "dy": {"scale": "file", "band": true, "mult": 0.5},
-              "y": {"scale": "y", "field": "data.mapped", "offset": -2},
+              "y": {"scale": "y", "field": "mapped", "offset": -2},
               "align": {"value": "left"},
               "baseline": {"value": "middle"},
               "fill": {"value": "#000"},
-              "text": {"field": "data.unmapped_percentage"},
+              "text": {"field": "unmapped_percentage"},
               "angle": {"value": -90}
             }
           }

@@ -12,13 +12,13 @@
             "name": "x",
             "type": "linear",
             "range": "width",
-            "domain": {"data": "basequal", "field": "data.base"}
+            "domain": {"data": "basequal", "field": "base"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
-            "domain": {"data": "basequal", "field": "data.q90"}
+            "domain": {"data": "basequal", "field": "q90"}
         }
     ],
     "axes": [
@@ -31,9 +31,9 @@
             "from": {"data": "basequal"},
             "properties": {
                 "enter": {
-                    "y": {"scale": "y", "field": "data.q10"},
-                    "y2": {"scale": "y", "field": "data.q90"},
-                    "x": {"scale": "x", "field": "data.base"},
+                    "y": {"scale": "y", "field": "q10"},
+                    "y2": {"scale": "y", "field": "q90"},
+                    "x": {"scale": "x", "field": "base"},
                     "width": {"value": 1},
                     "fill": {"value": "black"}
                 }
@@ -44,8 +44,8 @@
             "from": {"data": "basequal"},
             "properties": {
                 "enter": {
-                    "y": {"scale": "y", "field": "data.q10"},
-                    "x": {"scale": "x", "field": "data.base"},
+                    "y": {"scale": "y", "field": "q10"},
+                    "x": {"scale": "x", "field": "base"},
                     "width": {"value": 3},
                     "height": {"value": 1},
                     "fill": {"value": "black"}
@@ -57,8 +57,8 @@
             "from": {"data": "basequal"},
             "properties": {
                 "enter": {
-                    "y": {"scale": "y", "field": "data.q90"},
-                    "x": {"scale": "x", "field": "data.base"},
+                    "y": {"scale": "y", "field": "q90"},
+                    "x": {"scale": "x", "field": "base"},
                     "width": {"value": 3},
                     "height": {"value": 1},
                     "fill": {"value": "black"}
@@ -72,9 +72,9 @@
             },
             "properties": {
                 "enter": {
-                    "y": {"scale": "y", "field": "data.lo"},
-                    "y2": {"scale": "y", "field": "data.hi"},
-                    "x": {"scale": "x", "field": "data.base"},
+                    "y": {"scale": "y", "field": "lo"},
+                    "y2": {"scale": "y", "field": "hi"},
+                    "x": {"scale": "x", "field": "base"},
                     "width": {"scale": "x", "band": true, "offset": -1},
                     "fill": {"value": "steelblue"},
                     "stroke": {"value": "transparent"}
@@ -86,9 +86,9 @@
             "from": {"data": "basequal"},
             "properties": {
                 "enter": {
-                    "y": {"scale": "y", "field": "data.median"},
+                    "y": {"scale": "y", "field": "median"},
                     "height": {"value": 1},
-                    "x": {"scale": "x", "field": "data.base"},
+                    "x": {"scale": "x", "field": "base"},
                     "width": {"scale": "x", "band": true, "offset": -1},
                     "fill": {"value": "black"}
                 }

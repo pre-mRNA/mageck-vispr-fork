@@ -12,18 +12,18 @@
             "name": "x",
             "type": "linear",
             "range": "width",
-            "domain": {"data": "pca", "field": "data.x"}
+            "domain": {"data": "pca", "field": "x"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
-            "domain": {"data": "pca", "field": "data.y"}
+            "domain": {"data": "pca", "field": "y"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "pca", "field": "data.label"},
+            "domain": {"data": "pca", "field": "label"},
             "range": "category20"
         }
     ],
@@ -58,9 +58,9 @@
             "from": {"data": "pca"},
             "properties": {
                 "enter": {
-                    "x": {"scale": "x", "field": "data.x"},
-                    "y": {"scale": "y", "field": "data.y"},
-                    "fill": {"scale": "c", "field": "data.label"},
+                    "x": {"scale": "x", "field": "x"},
+                    "y": {"scale": "y", "field": "y"},
+                    "fill": {"scale": "c", "field": "label"},
                     "stroke": {"value": "transparent"},
                     "size": {"value": 50}
                 }

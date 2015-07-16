@@ -21,7 +21,7 @@
             "type": "linear",
             "range": "width",
             "zero": false,
-            "domain": {"data": "pvals", "field": "data.p-value"}
+            "domain": {"data": "pvals", "field": "p-value"}
         },
         {
             "name": "y",
@@ -29,12 +29,12 @@
             "range": "height",
             "nice": true,
             "zero": false,
-            "domain": {"data": "pvals", "field": "data.cdf"}
+            "domain": {"data": "pvals", "field": "cdf"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "highlight", "field": "data.target"},
+            "domain": {"data": "highlight", "field": "target"},
             "range": "category20"
         }
     ],
@@ -48,8 +48,8 @@
             "from": {"data": "pvals"},
             "properties": {
                 "enter": {
-                    "x": {"scale": "x", "field": "data.p-value"},
-                    "y": {"scale": "y", "field": "data.cdf"},
+                    "x": {"scale": "x", "field": "p-value"},
+                    "y": {"scale": "y", "field": "cdf"},
                     "stroke": {"value": "steelblue"},
                     "strokeWidth": {"value": 2}
                 }
@@ -60,9 +60,9 @@
             "from": {"data": "highlight"},
             "properties": {
                 "enter": {
-                    "x": {"scale": "x", "field": "data.p-value"},
-                    "y": {"scale": "y", "field": "data.cdf"},
-                    "fill": {"scale": "c", "field": "data.target"},
+                    "x": {"scale": "x", "field": "p-value"},
+                    "y": {"scale": "y", "field": "cdf"},
+                    "fill": {"scale": "c", "field": "target"},
                     "stroke": {"value": "transparent"},
                     "size": {"value": 50}
                 }
@@ -74,9 +74,9 @@
             "properties": {
                 "enter": {
                     "y": {"value": 200},
-                    "y2": {"scale": "y", "field": "data.cdf"},
-                    "x": {"scale": "x", "field": "data.p-value"},
-                    "x2": {"scale": "x", "field": "data.p-value", "offset": 1},
+                    "y2": {"scale": "y", "field": "cdf"},
+                    "x": {"scale": "x", "field": "p-value"},
+                    "x2": {"scale": "x", "field": "p-value", "offset": 1},
                     "stroke": {"value": "grey"},
                     "strokeWidth": {"value": 1},
                     "strokeDash": {"value": [2,1]}
@@ -89,9 +89,9 @@
             "properties": {
                 "enter": {
                     "y": {"value": 200},
-                    "x": {"scale": "x", "field": "data.p-value"},
+                    "x": {"scale": "x", "field": "p-value"},
                     "dx": {"value": 2},
-                    "text": {"field": "data.label"},
+                    "text": {"field": "label"},
                     "align": {"value": "left"},
                     "fill": {"value": "grey"},
                     "angle": {"value": -90},

@@ -14,19 +14,19 @@
             "range": "width",
             "nice": true,
             "zero": false,
-            "domain": {"data": "seqqual", "field": "data.qual"}
+            "domain": {"data": "seqqual", "field": "qual"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
             "nice": true,
-            "domain": {"data": "seqqual", "field": "data.density"}
+            "domain": {"data": "seqqual", "field": "density"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "seqqual", "field": "data.sample"},
+            "domain": {"data": "seqqual", "field": "sample"},
             "range": "category20"
         }
     ],
@@ -39,17 +39,17 @@
             "type": "group",
             "from": {
                 "data": "seqqual",
-                "transform": [{"type": "facet", "keys": ["data.filename"]}]
+                "transform": [{"type": "facet", "keys": ["filename"]}]
             },
             "marks": [
                 {
                     "type": "line",
                     "properties": {
                         "enter": {
-                            "x": {"scale": "x", "field": "data.qual"},
-                            "y": {"scale": "y", "field": "data.density"},
+                            "x": {"scale": "x", "field": "qual"},
+                            "y": {"scale": "y", "field": "density"},
                             "opacity": {"value": 0.5},
-                            "stroke": {"scale": "c", "field": "data.sample"},
+                            "stroke": {"scale": "c", "field": "sample"},
                             "strokeWidth": {"value": 2}
                         }
                     }
