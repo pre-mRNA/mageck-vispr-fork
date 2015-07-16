@@ -36,6 +36,56 @@
         }
     ],
     "marks": [
+
+        {
+            "type": "group",
+            "properties": {
+                "enter": {
+                    "x": {"scale": "layout_x", "value": 0.9},
+                    "y": {"scale": "layout_y", "value": 0, "offset": {{ dendrogram_offset }}},
+                    "width": {"scale": "layout_x", "value": 0.1},
+                    "height": {"scale": "layout_y", "band": true, "offset": {{ - 2 * dendrogram_offset }}}
+                }
+            },
+            "scales": [
+                {
+                    "name": "dx",
+                    "type": "linear",
+                    "range": "height",
+                    "reverse": true,
+                    "round": true,
+                    "domain": {"data": "dendrogram", "field": "x"}
+                },
+                {
+                    "name": "dy",
+                    "type": "linear",
+                    "range": "width",
+                    "domain": {"data": "dendrogram", "field": "y"}
+                }
+            ],
+            "marks": [
+                {
+                    "type": "group",
+                    "from": {
+                        "data": "dendrogram",
+                        "transform": [{"type": "facet", "groupby": ["k"]}]
+                    },
+                    "marks": [
+                        {
+                            "type": "line",
+                            "properties": {
+                                "enter": {
+                                    "y": {"scale": "dx", "field": "x"},
+                                    "x": {"scale": "dy", "field": "y"},
+                                    "strokeWidth": {"value": 1},
+                                    "stroke": {"value": "black"}
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
         {
             "type": "group",
             "properties": {
@@ -141,55 +191,6 @@
                             "fontSize": {"value": 9}
                         }
                     }
-                }
-            ]
-        },
-        {
-            "type": "group",
-            "properties": {
-                "enter": {
-                    "x": {"scale": "layout_x", "value": 0.9},
-                    "y": {"scale": "layout_y", "value": 0, "offset": {{ dendrogram_offset }}},
-                    "width": {"scale": "layout_x", "value": 0.1},
-                    "height": {"scale": "layout_y", "band": true, "offset": {{ - 2 * dendrogram_offset }}}
-                }
-            },
-            "scales": [
-                {
-                    "name": "dx",
-                    "type": "linear",
-                    "range": "height",
-                    "reverse": true,
-                    "round": true,
-                    "domain": {"data": "dendrogram", "field": "x"}
-                },
-                {
-                    "name": "dy",
-                    "type": "linear",
-                    "range": "width",
-                    "domain": {"data": "dendrogram", "field": "y"}
-                }
-            ],
-            "marks": [
-                {
-                    "type": "group",
-                    "from": {
-                        "data": "dendrogram",
-                        "transform": [{"type": "facet", "keys": ["k"]}]
-                    },
-                    "marks": [
-                        {
-                            "type": "line",
-                            "properties": {
-                                "enter": {
-                                    "y": {"scale": "dx", "field": "x"},
-                                    "x": {"scale": "dy", "field": "y"},
-                                    "strokeWidth": {"value": 1},
-                                    "stroke": {"value": "black"}
-                                }
-                            }
-                        }
-                    ]
                 }
             ]
         }

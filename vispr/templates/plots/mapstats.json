@@ -58,7 +58,7 @@
       "type": "group",
       "from": {
         "data": "mapstats",
-        "transform": [{"type": "facet", "keys": ["label"]}]
+        "transform": [{"type": "facet", "groupby": ["label"]}]
       },
       "properties": {
         "enter": {
