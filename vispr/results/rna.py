@@ -42,7 +42,7 @@ class Results(AbstractResults):
 
     def by_target(self, target):
         first_sample = self.df.columns[2]
-        data = self.df.ix[target, self.df.columns != "target"]
+        data = self.df.ix[[target], self.df.columns != "target"]
 
         data.sort(first_sample, inplace=True)
         if self.info is not None:
@@ -70,7 +70,7 @@ class Results(AbstractResults):
         return gct
 
     def target_locus(self, target):
-        loci = self.info.ix[self.df.ix[target, "rna"], ["chrom", "start",
+        loci = self.info.ix[self.df.ix[[target], "rna"], ["chrom", "start",
                                                         "stop"]]
         if loci.loc[:, "start"].isnull().any():
             return None
