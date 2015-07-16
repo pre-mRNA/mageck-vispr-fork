@@ -12,19 +12,19 @@
             "name": "x",
             "type": "linear",
             "range": "width",
-            "domain": {"data": "dist", "field": "count"}
+            "domain": {"data": "dist", "field": "data.count"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
             "nice": true,
-            "domain": {"data": "dist", "field": "density"}
+            "domain": {"data": "dist", "field": "data.density"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "dist", "field": "sample"},
+            "domain": {"data": "dist", "field": "data.sample"},
             "range": "category20"
         }
     ],
@@ -51,17 +51,17 @@
             "type": "group",
             "from": {
                 "data": "dist",
-                "transform": [{"type": "facet", "keys": ["sample"]}]
+                "transform": [{"type": "facet", "keys": ["data.sample"]}]
             },
             "marks": [
                 {
                     "type": "line",
                     "properties": {
                         "enter": {
-                            "x": {"scale": "x", "field": "count"},
-                            "y": {"scale": "y", "field": "density"},
+                            "x": {"scale": "x", "field": "data.count"},
+                            "y": {"scale": "y", "field": "data.density"},
                             "opacity": {"value": 0.5},
-                            "stroke": {"scale": "c", "field": "sample"},
+                            "stroke": {"scale": "c", "field": "data.sample"},
                             "strokeWidth": {"value": 2}
                         }
                     }

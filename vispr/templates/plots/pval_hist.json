@@ -12,19 +12,19 @@
             "name": "x",
             "type": "ordinal",
             "range": "width",
-            "domain": {"data": "hist", "field": "bin"}
+            "domain": {"data": "hist", "field": "data.bin"}
         },
         {
             "name": "xl",
             "type": "linear",
             "range": "width",
-            "domain": {"data": "hist", "field": "bin"}
+            "domain": {"data": "hist", "field": "data.bin"}
         },
         {
             "name": "y",
             "range": "height",
             "nice": true,
-            "domain": {"data": "hist", "field": "count"}
+            "domain": {"data": "hist", "field": "data.count"}
         }
     ],
     "axes": [
@@ -49,9 +49,9 @@
             "from": {"data": "hist"},
             "properties": {
                 "enter": {
-                    "x": {"scale": "x", "field": "bin"},
+                    "x": {"scale": "x", "field": "data.bin"},
                     "width": {"scale": "x", "band": true, "offset": -1},
-                    "y": {"scale": "y", "field": "count"},
+                    "y": {"scale": "y", "field": "data.count"},
                     "y2": {"scale": "y", "value": 0},
                     "fill": {"value": "steelblue"}
                 }

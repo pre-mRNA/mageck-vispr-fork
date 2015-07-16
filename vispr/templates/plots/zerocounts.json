@@ -12,7 +12,7 @@
       "name": "x",
       "type": "ordinal",
       "range": "width",
-      "domain": {"data": "mapstats", "field": "label"},
+      "domain": {"data": "mapstats", "field": "data.label"},
       "padding": {{ padding }}
     },
     {
@@ -20,7 +20,7 @@
       "type": "linear",
       "range": "height",
       "nice": true,
-      "domain": {"data": "mapstats", "field": "zerocounts"}
+      "domain": {"data": "mapstats", "field": "data.zerocounts"}
     }
   ],
   "axes": [
@@ -51,7 +51,7 @@
       "type": "group",
       "from": {
         "data": "mapstats",
-        "transform": [{"type": "facet", "keys": ["label"]}]
+        "transform": [{"type": "facet", "keys": ["data.label"]}]
       },
       "properties": {
         "enter": {
@@ -63,7 +63,7 @@
         {
           "name": "file",
           "range": "width",
-          "domain": {"field": "file"},
+          "domain": {"field": "data.file"},
           "type": "ordinal"
         }
       ],
@@ -72,9 +72,9 @@
           "type": "rect",
           "properties": {
             "enter": {
-              "x": {"scale": "file", "field": "file"},
+              "x": {"scale": "file", "field": "data.file"},
               "width": {"scale": "file", "band": true, "offset": -1},
-              "y": {"scale": "y", "field": "zerocounts"},
+              "y": {"scale": "y", "field": "data.zerocounts"},
               "y2": {"scale": "y", "value": 0},
               "fill": {"value": "steelblue"}
             }

@@ -12,19 +12,19 @@
             "name": "x",
             "type": "linear",
             "range": "width",
-            "domain": {"data": "basequal", "field": "base"}
+            "domain": {"data": "basequal", "field": "data.base"}
         },
         {
             "name": "y",
             "type": "linear",
             "range": "height",
             "nice": true,
-            "domain": {"data": "basequal", "field": "median"}
+            "domain": {"data": "basequal", "field": "data.median"}
         },
         {
             "name": "c",
             "type": "ordinal",
-            "domain": {"data": "basequal", "field": "sample"},
+            "domain": {"data": "basequal", "field": "data.sample"},
             "range": "category20"
         }
     ],
@@ -37,17 +37,17 @@
             "type": "group",
             "from": {
                 "data": "basequal",
-                "transform": [{"type": "facet", "keys": ["filename"]}]
+                "transform": [{"type": "facet", "keys": ["data.filename"]}]
             },
             "marks": [
                 {
                     "type": "line",
                     "properties": {
                         "enter": {
-                            "x": {"scale": "x", "field": "base"},
-                            "y": {"scale": "y", "field": "median"},
+                            "x": {"scale": "x", "field": "data.base"},
+                            "y": {"scale": "y", "field": "data.median"},
                             "opacity": {"value": 0.5},
-                            "stroke": {"scale": "c", "field": "sample"},
+                            "stroke": {"scale": "c", "field": "data.sample"},
                             "strokeWidth": {"value": 2}
                         }
                     }

@@ -31,7 +31,7 @@
             "range": "height",
             "domain": {
                 "data": "correlation",
-                "field": "b"
+                "field": "data.b"
             }
         }
     ],
@@ -53,7 +53,7 @@
                     "range": "width",
                     "domain": {
                         "data": "correlation",
-                        "field": "a"
+                        "field": "data.a"
                     }
                 },
                 {
@@ -62,7 +62,7 @@
                     "range": ["white", "steelblue"],
                     "domain": {
                         "data": "correlation",
-                        "field": "value"
+                        "field": "data.value"
                     }
                 }
             ],
@@ -101,7 +101,7 @@
                         "enter": {
                             "x": {
                                 "scale": "x",
-                                "field": "a"
+                                "field": "data.a"
                             },
                             "width": {
                                 "scale": "x",
@@ -109,7 +109,7 @@
                             },
                             "y": {
                                 "scale": "y",
-                                "field": "b"
+                                "field": "data.b"
                             },
                             "height": {
                                 "scale": "y",
@@ -117,7 +117,7 @@
                             },
                             "fill": {
                                 "scale": "c",
-                                "field": "value"
+                                "field": "data.value"
                             },
                             "stroke": {
                                 "value": "transparent"
@@ -130,14 +130,14 @@
                     "from": {"data": "correlation"},
                     "properties": {
                         "enter": {
-                            "x": {"scale": "x", "field": "a"},
+                            "x": {"scale": "x", "field": "data.a"},
                             "dx": {"scale": "x", "band": true, "mult": 0.5},
-                            "y": {"scale": "y", "field": "b"},
+                            "y": {"scale": "y", "field": "data.b"},
                             "dy": {"scale": "y", "band": true, "mult": 0.5},
                             "align": {"value": "center"},
                             "baseline": {"value": "middle"},
                             "fill": {"value": "#000"},
-                            "text": {"field": "value"},
+                            "text": {"field": "data.value"},
                             "fontSize": {"value": 9}
                         }
                     }
@@ -161,13 +161,13 @@
                     "range": "height",
                     "reverse": true,
                     "round": true,
-                    "domain": {"data": "dendrogram", "field": "x"}
+                    "domain": {"data": "dendrogram", "field": "data.x"}
                 },
                 {
                     "name": "dy",
                     "type": "linear",
                     "range": "width",
-                    "domain": {"data": "dendrogram", "field": "y"}
+                    "domain": {"data": "dendrogram", "field": "data.y"}
                 }
             ],
             "marks": [
@@ -175,15 +175,15 @@
                     "type": "group",
                     "from": {
                         "data": "dendrogram",
-                        "transform": [{"type": "facet", "keys": ["k"]}]
+                        "transform": [{"type": "facet", "keys": ["data.k"]}]
                     },
                     "marks": [
                         {
                             "type": "line",
                             "properties": {
                                 "enter": {
-                                    "y": {"scale": "dx", "field": "x"},
-                                    "x": {"scale": "dy", "field": "y"},
+                                    "y": {"scale": "dx", "field": "data.x"},
+                                    "x": {"scale": "dy", "field": "data.y"},
                                     "strokeWidth": {"value": 1},
                                     "stroke": {"value": "black"}
                                 }
