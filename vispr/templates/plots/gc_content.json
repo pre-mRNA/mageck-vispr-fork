@@ -37,7 +37,7 @@
             "type": "group",
             "from": {
                 "data": "gc",
-                "transform": [{"type": "facet", "groupby": ["filename"]}]
+                "transform": [{"type": "facet", "keys": ["filename"]}]
             },
             "marks": [
                 {

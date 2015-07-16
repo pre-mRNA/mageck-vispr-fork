@@ -51,7 +51,7 @@
             "type": "group",
             "from": {
                 "data": "dist",
-                "transform": [{"type": "facet", "groupby": ["sample"]}]
+                "transform": [{"type": "facet", "keys": ["sample"]}]
             },
             "marks": [
                 {

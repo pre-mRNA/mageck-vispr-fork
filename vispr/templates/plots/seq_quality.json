@@ -39,7 +39,7 @@
             "type": "group",
             "from": {
                 "data": "seqqual",
-                "transform": [{"type": "facet", "groupby": ["filename"]}]
+                "transform": [{"type": "facet", "keys": ["filename"]}]
             },
             "marks": [
                 {
