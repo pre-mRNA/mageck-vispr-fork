@@ -52,10 +52,7 @@ For further help, explore all command line options of VISPR with
 Author
 ------
 
-Johannes Köster (koester@jimmy.harvard.edu),
-Liu lab,
-Department of Biostatistics and Computational Biology,
-Dana-Farber Cancer Institute
+* Johannes Köster <koester@jimmy.harvard.edu>
 
 License
 -------
