@@ -45,6 +45,10 @@ Then, even on a different workstation, the results can be extracted and visualiz
     tar -xf myexperiment.tar.bz2
     vispr server myexperiment/vispr.yaml
 
+For further help, explore all command line options of VISPR with
+
+    vispr --help
+
 Author
 ------
 
