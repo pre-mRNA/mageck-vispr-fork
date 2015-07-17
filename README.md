@@ -52,7 +52,7 @@ For further help, explore all command line options of VISPR with
 Author
 ------
 
-* Johannes Köster <koester@jimmy.harvard.edu>
+Johannes Köster <koester@jimmy.harvard.edu>
 
 License
 -------
