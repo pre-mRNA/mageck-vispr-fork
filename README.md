@@ -25,8 +25,8 @@ After successful installation, you can test VISPR with example data by executing
     vispr test
 
 in a terminal. VISPR takes [MAGeCK](http://liulab.dfci.harvard.edu/Mageck) and [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc) results as input. These are provided along with additional parameters as config files. One config file defines one set of results (i.e. one experiment).
-VISPR can be invoked with multiple config files (i.e. multiple experiments), allowing to select and compare experiments via the user interface. The easiest way to generate your own data for visualization in VISPR is to use the [MAGeCK-VISPR](https://bitbucket.org/liulab/mageck-vispr) workflow.
-For manual creation of a VISPR config  you can issue
+VISPR can be invoked with multiple config files (i.e. multiple experiments), allowing to select and compare experiments via the user interface. The easiest way to generate your own data and create vispr config files is to use the [MAGeCK-VISPR](https://bitbucket.org/liulab/mageck-vispr) workflow.
+If you don't want to use the workflow, you can manually create a VISPR config by issueing
 
     vispr config
 
