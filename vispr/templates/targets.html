@@ -88,7 +88,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-5">
         <h4 class="panel-heading">Target results</h4>
         <table id="targets" class="table table-striped">
             <thead>
@@ -96,7 +96,7 @@
                 {% if has_rna_info %}
                 <th style="display: none" data-dynatable-column="locus">Locus</th>
                 {% endif %}
-                <th data-dynatable-column="score">score</th>
+                <th data-dynatable-column="score">{{ "beta-score" if screen.is_mle else "score" }}</th>
                 <th data-dynatable-column="p-value">p-value</th>
                 <th data-dynatable-column="fdr">FDR</th>
                 <th style="text-align: right;" data-dynatable-no-sort="true">
@@ -105,21 +105,21 @@
                         <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="table-menu">
                         {% if screen.is_genes and control_targets %}
                             <li role="presentation" class="dropdown-header">Control genes</li>
-                            <li role="presentation"><input type="radio" id="control-hide" name="controls" value="hide"><label for="control-hide">hide</label></li>
-                            <li role="presentation"><input type="radio" id="control-show" name="controls" value="show" checked><label for="control-show">show</label></li>
-                            <li role="presentation"><input type="radio" id="control-show-only" name="controls" value="show-only"><label for="control-show-only">show only</label></li>
+                            <li role="presentation" class="submenu"><input type="radio" id="control-hide" name="controls" value="hide"><label for="control-hide">hide</label></li>
+                            <li role="presentation" class="submenu"><input type="radio" id="control-show" name="controls" value="show" checked><label for="control-show">show</label></li>
+                            <li role="presentation" class="submenu"><input type="radio" id="control-show-only" name="controls" value="show-only"><label for="control-show-only">show only</label></li>
                         {% endif %}
                             <li role="presentation" class="dropdown-header">Table</li>
-                            <li role="presentaiton"><a role="menuitem" tabindex="-1" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection.replace(" ", "-") }}.txt">Download</a></li>
+                            <li role="presentaiton" class="submenu"><a role="menuitem" tabindex="-1" href="/tbl/targets/txt/{{ screen.name }}/{{ condition }}/{{ selection }}?{{ table_args|safe }}" download="{{ screen.name }}.{{ condition }}.{{ selection.replace(" ", "-") }}.txt">Download</a></li>
                         {% if gorilla %}
-                            <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-gorilla" href="#">GO enrichment</a></li>
+                            <li role="presentation" class="submenu"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-gorilla" href="#">GO enrichment</a></li>
                         {% endif %}
                         {% if has_rna_info %}
-                            <li role="presentation"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">IGV</a></li>
+                            <li role="presentation" class="submenu"><a role="menuitem" tabindex="-1" data-toggle="modal" data-target="#modal-igv" href="#">IGV</a></li>
                         {% endif %}
                             <li role="presentation" class="dropdown-header">Selection</li>
-                            <li role="presentation"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
-                            <li role="presentation"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
+                            <li role="presentation" class="submenu"><a id="btn-genemania" role="menuitem" tabindex="-1" href="#">Show in GeneMANIA</a></li>
+                            <li role="presentation" class="submenu"><a id="btn-deselect" role="menuitem" tabindex="-1" href="#">Deselect all</a></li>
                         </ul>
                     </div>
                 </th>
@@ -128,7 +128,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-7">
         <div class="row">
             <div class="col-md-12">
                 <h4 class="panel-heading">Distributions</h4>

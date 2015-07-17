@@ -101,7 +101,7 @@ class Screen(object):
                               na_filter=False))
 
         self.target_clustering = None
-        if self.is_mle and len(self.targets) > 1:
+        if self.is_mle:
             # provide clustering on score
             self.target_clustering = target_clustering.TargetClustering(self.targets)
 

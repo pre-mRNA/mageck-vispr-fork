@@ -16,9 +16,9 @@ class TargetClustering:
                                  for targets in selections.values()])
             self.df[condition] = targets
         self.conditions = self.df.columns
-        variance_to_mean = self.df.abs().mean(axis=1) #self.df.var(axis=1) #/ self.df.mean(axis=1)
-        variance_to_mean.sort(ascending=False)
-        self.df = self.df.ix[variance_to_mean[:topn].index]
+        mean = self.df.abs().mean(axis=1)
+        mean.sort(ascending=False)
+        self.df = self.df.ix[mean[:topn].index]
         self.linkage = linkage(self.df, method="ward", metric="euclidean")
 
     def plot_clustering(self, k):

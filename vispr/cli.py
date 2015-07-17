@@ -49,6 +49,7 @@ def init_server(*configs, port=5000):
     logging.info("")
     logging.info(
         "Open:  go to http://127.0.0.1:{} in your browser.".format(port))
+    logging.info("Note: Safari and Internet Explorer are currently unsupported.")
     logging.info("Close: hit Ctrl-C in this terminal.")
     app.run(port=port)
 

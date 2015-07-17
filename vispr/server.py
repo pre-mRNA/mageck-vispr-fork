@@ -90,7 +90,11 @@ def targets(screen, condition, selection):
 @app.route("/target-clustering/<screen>")
 def target_clustering(screen):
     screen = app.screens[screen]
-    return render_template("target_clustering.html", screen=screen, captions=CAPTIONS)
+    return render_template("target_clustering.html",
+                           screens=app.screens,
+                           screen=screen,
+                           captions=CAPTIONS,
+                           version=__version__)
 
 
 @app.route("/qc/<screen>")

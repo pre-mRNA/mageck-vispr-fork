@@ -68,3 +68,7 @@ h4.panel-heading {
 .shadow-svg {
     display: block;
 }
+
+li.submenu {
+    padding-left: 1em;
+}

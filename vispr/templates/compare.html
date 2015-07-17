@@ -29,7 +29,8 @@
             </div>
         </form>
         <div class="text-center">
-            <div id="experiment-overlap" class="plot" data-toggle="popover" data-desc="{{ captions["overlap"] }}"></div>
+            <div id="experiment-overlap" class="plot" data-toggle="popover" data-desc="{{ captions["overlap"] }}">
+            </div>
         </div>
 </div>
 
@@ -42,6 +43,13 @@ var venn_chart = venn.VennDiagram()
 function plot_overlap() {
     var config = $("#config-overlap").serializeArray();
     var fdr = $("#choose-fdr").val();
+    if(!$("#select-overlap-items").val()) {
+        $("#experiment-overlap").html("Please select experiments to compare.");
+        return;
+    }
+    else {
+        $("#experiment-overlap").html("");
+    }
 
     $.get("/plt/overlap_venn", config, function(json, status) {
         var div = d3.select("#experiment-overlap");

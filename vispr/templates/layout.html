@@ -111,7 +111,7 @@ setInterval(function() {
                         <li role="presentation" class="dropdown-header">{{ condition }}</li>
                         {% endif %}
                         {% for selection in ["positive selection", "negative selection"] %}
-                        <li role="presentation"><a href="/targets/{{ screen.name }}/{{ condition }}/{{ selection }}">{{ selection }}</a></li>
+                        <li role="presentation" {{ 'class=submenu' if condition != "default" else '' }}><a href="/targets/{{ screen.name }}/{{ condition }}/{{ selection }}">{{ selection }}</a></li>
                         {% endfor %}
                     {% endfor %}
                     </ul>
