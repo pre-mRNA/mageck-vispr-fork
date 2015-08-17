@@ -142,12 +142,13 @@
             <div class="col-md-12">
                 <h4 class="panel-heading">gRNAs</h4>
                     <div class="form-group form-inline text-right">
-                        <label for="choose-samples">Samples</label>
+                        <label id="choose-samples-label" for="choose-samples">Samples</label>
                         <select id="choose-samples" class="selectpicker" multiple>
                             {% for sample in samples %}
                             <option selected>{{ sample }}</option>
                             {% endfor %}
                         </select>
+                        <button type="button" class="btn btn-default" id="deselect-samples">Deselect all</button>
                     </div>
                     <div id="rna-plot" class="parcoords" style="width: 100%; height: 300px;"></div>
             </div>
@@ -213,6 +214,7 @@ function update_dimensions() {
     $("#choose-samples option:selected").each(function() {
         sel.push($(this).text());
     });
+
     var new_dimensions = [];
     rna_dimensions.forEach(function(d) {
         if(sel.indexOf(d) != -1 || rna_dimensions_aux.indexOf(d) != -1) {
@@ -345,7 +347,8 @@ dt.on("dynatable:afterUpdate", function() {
                 .margin({ top: 80, left: 80, bottom: 12, right: 0 })
                 .height(Math.max(data.length * 12, 300))
                 .color(function(record) { return colors(record.rna) })
-                .render();
+                .render()
+                .types({"rna": "string"});
 
             if(rna_dimensions == null) {
                 rna_dimensions = plt_rna.dimensions();
@@ -428,7 +431,10 @@ $("#btn-deselect").click(function() {
 });
 
 $("#choose-samples").change(update_dimensions);
-
+$("#deselect-samples").click(function() {
+    $("#choose-samples").selectpicker("deselectAll");
+    update_dimensions();
+});
 
 
 </script>

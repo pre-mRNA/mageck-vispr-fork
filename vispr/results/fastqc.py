@@ -23,6 +23,7 @@ class Results(object):
         self.gc_content = []
         self.base_quality = []
         self.seq_quality = []
+        self.n_samples = len(fastqc_data)
         for sample, paths in fastqc_data.items():
             for path in paths:
                 filename = parse_fastqc_filename(path)
@@ -45,19 +46,23 @@ class Results(object):
         self.seq_quality = pd.concat(self.seq_quality)
 
     def plot_gc_content(self):
-        plt = templates.get_template("plots/gc_content.json").render(data=self.gc_content.to_json(orient="records"))
+        plt = templates.get_template("plots/gc_content.json").render(
+            data=self.gc_content.to_json(orient="records"),
+            show_legend=self.n_samples <= 20)
         return plt
 
     def plot_base_quality(self):
         plt = templates.get_template(
             "plots/base_quality.json").render(
-            data=self.base_quality.to_json(orient="records"))
+            data=self.base_quality.to_json(orient="records"),
+            show_legend=self.n_samples <= 20)
         return plt
 
     def plot_seq_quality(self):
         plt = templates.get_template(
             "plots/seq_quality.json").render(
-            data=self.seq_quality.to_json(orient="records"))
+            data=self.seq_quality.to_json(orient="records"),
+            show_legend=self.n_samples <= 20)
         return plt
 
 

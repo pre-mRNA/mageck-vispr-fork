@@ -67,7 +67,7 @@
             }
         }
     ]
-    {% if legend %}
+    {% if show_legend %}
     ,"legends": [
         {
             "fill": "c",

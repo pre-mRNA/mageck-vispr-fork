@@ -72,3 +72,9 @@ h4.panel-heading {
 li.submenu {
     padding-left: 1em;
 }
+
+.scrollable-menu {
+    height: auto;
+    max-height: 500px;
+    overflow-x: hidden;
+}

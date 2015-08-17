@@ -13,7 +13,7 @@ from flask import render_template
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
-from scipy.cluster.hierarchy import complete, leaves_list, dendrogram
+from scipy.cluster.hierarchy import average, leaves_list, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
 from vispr.results.common import lru_cache, AbstractResults, templates
@@ -98,6 +98,7 @@ class Results(AbstractResults):
     def plot_readcount_cdf(self):
         _, leaves, _, _ = self.clustering()
         counts = np.log10(self.counts() + 1)
+        n_samples = counts.shape[1]
 
         data = []
         for sample in counts.columns[leaves]:
@@ -110,7 +111,8 @@ class Results(AbstractResults):
                  "sample": sample}))
         data = pd.concat(data)
         return templates.get_template("plots/readcounts.json").render(
-            data=data.to_json(orient="records"))
+            data=data.to_json(orient="records"),
+            show_legend=n_samples <= 20)
 
     def counts(self):
         return self.df.ix[:, 2:]
@@ -133,6 +135,7 @@ class Results(AbstractResults):
 
     def plot_pca(self, comp_x=1, comp_y=2, legend=True):
         pca = self.pca(3)
+        n_samples = pca.shape[0]
         data = pd.DataFrame({
             "label": pca["sample"],
             "x": pca[pca.columns[comp_x - 1]],
@@ -143,19 +146,20 @@ class Results(AbstractResults):
             data=data.to_json(orient="records"),
             xlabel=pca.columns[comp_x - 1],
             ylabel=pca.columns[comp_y - 1],
-            legend=legend)
+            show_legend=legend and n_samples <= 20)
         return plt
 
     @lru_cache()
     def clustering(self):
         counts = np.log10(self.counts().transpose() + 1)
         labels = counts.index.values
-        # calculate correlation
-        corr = 1 - pdist(counts, 'correlation')
-        # calculate distance from absolute correlation
-        dist = 1 - np.abs(corr)
+        # calculate correlation distance
+        dist = pdist(counts, 'correlation')
+        # calculate correlation from distance
+        corr = 1 - dist
+        dist = np.clip(dist, 0, 1)
         # cluster
-        clustering = complete(dist)
+        clustering = average(dist)
         #import matplotlib.pyplot as plt
         d = dendrogram(clustering, labels=labels, get_leaves=True, no_plot=True)
         #plt.savefig("/tmp/ddg.pdf")
@@ -188,5 +192,6 @@ class Results(AbstractResults):
             data=json.dumps(data),
             dendrogram=json.dumps(links),
             size=size,
-            dendrogram_offset=size / len(labels) / 2)
+            dendrogram_offset=size / len(labels) / 2,
+            show_labels=len(labels) <= 50)
         return plt
