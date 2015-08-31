@@ -35,11 +35,16 @@ vg.config.legend.labelFont = font;
 vg.config.legend.titleFont = font;
 
 function add_caption(el) {
+    $(el).tooltip({
+        container: "body",
+        title: "Click for caption and download.",
+        placement: "top"
+    });
     $(el).popover({
         container: "body",
         html: true,
-        trigger: "hover",
-        delay: { "show": 100, "hide": 1000 },
+        trigger: "click",
+        delay: { "show": 50, "hide": 50 },
         content: function() {
             $(el).find("svg").attr("version", 1.1)
                            .attr("xmlns", "http://www.w3.org/2000/svg")
