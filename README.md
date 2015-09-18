@@ -1,3 +1,7 @@
+[![PyPI](https://img.shields.io/pypi/pyversions/vispr.svg?style=flat-square)]()
+[![PyPI](https://img.shields.io/pypi/v/vispr.svg?style=flat-square)](https://pypi.python.org/pypi/vispr)
+[![Conda](https://anaconda.org/liulab/vispr/badges/installer/conda.svg)](https://anaconda.org/liulab/vispr)
+
 VISPR - A visualization framework for CRISPR data.
 ==================================================
 
