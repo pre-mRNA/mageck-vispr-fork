@@ -53,6 +53,11 @@ def archive(config, out):
             tar.add(get_path(config["sgrnas"]["annotation"]), get_tar_path(out))
             config["sgrnas"]["annotation"] = out
 
+        if "results" in config["sgrnas"]:
+            out = "all.sgrna_summary.txt"
+            tar.add(get_path(config["sgrnas"]["results"]), get_tar_path(out))
+            config["sgrnas"]["results"] = out
+
         out = "all.gene_summary.txt"
         tar.add(get_path(config["targets"]["results"]), get_tar_path(out))
         config["targets"]["results"] = out

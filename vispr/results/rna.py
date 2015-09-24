@@ -20,13 +20,14 @@ from vispr.results.common import lru_cache, AbstractResults, templates
 
 
 class Results(AbstractResults):
-    def __init__(self, dataframe, info=None):
+    def __init__(self, dataframe, info=None, posterior_efficiency=None):
         super(Results, self).__init__(dataframe)
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
         self.df.columns = ["rna", "target"] + list(self.samples)
         self.df.index = self.df["target"]
         self.info = None
+        self.posterior_efficiency = None
         if info is not None:
             self.info = pd.read_table(info,
                                       na_filter=False,
@@ -35,6 +36,13 @@ class Results(AbstractResults):
             self.info.columns = ["chrom", "start", "stop", "score",
                                  "strand"][:len(self.info.columns)]
             self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
+        if posterior_efficiency is not None:
+            self.posterior_efficiency = pd.read_table(posterior_efficiency,
+                                                      na_filter=False,
+                                                      index_col=["sgRNA"],
+                                                      usecols=["sgRNA", "eff"],
+                                                      squeeze=True)
+
 
     @property
     def samples(self):
@@ -45,13 +53,16 @@ class Results(AbstractResults):
         data = self.df.ix[[target], self.df.columns != "target"]
 
         data.sort(first_sample, inplace=True)
+        data.index = data["rna"]
         if self.info is not None:
-            data.index = data["rna"]
             info = self.info.ix[data["rna"]]
             if not info["score"].hasnans() and not info["start"].hasnans():
-                data.insert(1, "efficiency", info["score"])
+                data.insert(1, "prior efficiency", info["score"])
                 data["chrom pos"] = info["start"]
-                data.sort("efficiency", inplace=True)
+                data.sort("prior efficiency", inplace=True)
+        if self.posterior_efficiency is not None:
+            efficiency = self.posterior_efficiency.ix[data["rna"]]
+            data["posterior efficiency"] = efficiency
         return data
 
     def track(self):
