@@ -37,11 +37,13 @@ class Results(AbstractResults):
                                  "strand"][:len(self.info.columns)]
             self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
         if posterior_efficiency is not None:
-            self.posterior_efficiency = pd.read_table(posterior_efficiency,
-                                                      na_filter=False,
-                                                      index_col=["sgRNA"],
-                                                      usecols=["sgRNA", "eff"],
-                                                      squeeze=True)
+            posterior_efficiency = pd.read_table(posterior_efficiency,
+                                                 na_filter=False,
+                                                 index_col=["sgRNA"],
+                                                 usecols=["sgRNA", "eff"],
+                                                 squeeze=True)
+            if not (posterior_efficiency == 1).all():
+                self.posterior_efficiency = posterior_efficiency
 
 
     @property
