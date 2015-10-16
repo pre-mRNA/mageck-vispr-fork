@@ -39,9 +39,9 @@ class Results(AbstractResults):
         if posterior_efficiency is not None:
             posterior_efficiency = pd.read_table(posterior_efficiency,
                                                  na_filter=False,
-                                                 index_col=["sgRNA"],
-                                                 usecols=["sgRNA", "eff"],
-                                                 squeeze=True)
+                                                 index_col=1)
+            posterior_efficiency.columns = ["gene", "eff"]
+            posterior_efficiency = posterior_efficiency["eff"]
             if not (posterior_efficiency == 1).all():
                 self.posterior_efficiency = posterior_efficiency
 
