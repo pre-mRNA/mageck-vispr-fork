@@ -7,9 +7,6 @@ VISPR - A visualization framework for CRISPR data.
 
 VISPR is a web-based, interactive visualization framework for CRISPR/Cas9 knockout screen experiments.
 
-News
-----
-
 Release | Description
 ------- | -----------
 0.4.7 | Improved documentation of the example VISPR config file obtained with ``vispr config``.
