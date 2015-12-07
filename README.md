@@ -1,6 +1,6 @@
 [![PyPI](https://img.shields.io/pypi/pyversions/vispr.svg?style=flat-square)]()
 [![PyPI](https://img.shields.io/pypi/v/vispr.svg?style=flat-square)](https://pypi.python.org/pypi/vispr)
-[![Conda](https://anaconda.org/liulab/vispr/badges/installer/conda.svg)](https://anaconda.org/liulab/vispr)
+[![bioconda-badge](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io)
 
 VISPR - A visualization framework for CRISPR data.
 ==================================================
@@ -11,12 +11,12 @@ Installation
 ------------
 
 The easiest way to install VISPR is to use the Miniconda Python distribution (http://conda.pydata.org/miniconda.html). 
-We recommend to use the Python 3.4 variant.
+We recommend to use the Python 3 variant.
 With miniconda installed, you can issue
 
-    conda install -c liulab vispr
+    conda install --channel bioconda vispr
 
-in a **terminal** to install or update VISPR with all dependencies.
+in a **terminal** to install or update VISPR with all dependencies using the [Bioconda channel](http://bioconda.github.io).
 If you are using an old version of MacOS X and the `conda` command is not available after installation of Miniconda, you have to change your shell to `bash`. To do this permanently, issue
 
     chsh -s /bin/bash
