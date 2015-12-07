@@ -9,7 +9,10 @@ VISPR is a web-based, interactive visualization framework for CRISPR/Cas9 knocko
 
 News
 ----
-* **Release 0.4.7 of VISPR**: This release provides an improved documentation of the example VISPR config file obtained with ``vispr config``.
+
+Release | Description
+------- | -----------
+0.4.7 | Improved documentation of the example VISPR config file obtained with ``vispr config``.
 
 Installation
 ------------
