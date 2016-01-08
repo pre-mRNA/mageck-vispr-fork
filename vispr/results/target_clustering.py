@@ -14,7 +14,7 @@ class TargetClustering:
         for condition, selections in sorted(target_results.items(), key=itemgetter(0)):
             targets = pd.concat([targets[:]["score"]
                                  for targets in selections.values()])
-            self.df[condition] = targets
+            self.df[condition] = targets[~targets.index.duplicated()]
         self.conditions = self.df.columns
         mean = self.df.abs().mean(axis=1)
         mean.sort_values(ascending=False, inplace=True)

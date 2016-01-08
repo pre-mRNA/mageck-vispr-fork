@@ -99,7 +99,8 @@ class Screen(object):
                 pd.read_table(get_path(config["targets"]["controls"]),
                               header=None,
                               squeeze=True,
-                              na_filter=False))
+                              na_filter=False,
+                              low_memory=False))
 
         self.target_clustering = None
         if self.is_mle:
@@ -114,7 +115,7 @@ class Screen(object):
 def parse_target_results(path,
                          selections=["negative selection",
                                      "positive selection"]):
-    results = pd.read_table(path, na_filter=False)
+    results = pd.read_table(path, na_filter=False, low_memory=False)
     paths = [col.split("|") for col in results.columns]
     is_mle = "beta" in [path[1] for path in paths if len(path) > 1]
 

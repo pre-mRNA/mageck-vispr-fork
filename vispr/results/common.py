@@ -31,7 +31,7 @@ class AbstractResults(object):
         Arguments:
         dataframe -- a pandas data frame or its path consisting of per gene results as produced by MAGeCK
         """
-        self.df = pd.read_table(dataframe, na_filter=False)
+        self.df = pd.read_table(dataframe, na_filter=False, low_memory=False)
 
     def __getitem__(self, slice):
         return self.df.__getitem__(slice)

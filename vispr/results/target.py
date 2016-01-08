@@ -25,6 +25,8 @@ class Results(AbstractResults):
         table_filter  -- an optional function (taking a results row and returning bool) to filter the stored results. This will not affect p-value distribution plots. Default: None
         """
         self.df = dataframe
+        if self.df.index.duplicated().any():
+            raise ValueError("Target results contain duplicated gene names.")
         self.df.sort_values("p-value", inplace=True)
         self.df.reset_index(drop=True, inplace=True)
         self.df["log10-p-value"] = -np.log10(self.df["p-value"])

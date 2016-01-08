@@ -83,5 +83,5 @@ def parse_fastqc_data(path, pattern=re.compile(r"\n\>\>(?P<name>[\w ]+)\t(pass|f
                 d = StringIO(d)
             except TypeError:
                 d = StringIO(unicode(d))
-            data = pd.read_table(d)
+            data = pd.read_table(d, low_memory=False)
             yield match.group("name"), data

@@ -32,14 +32,16 @@ class Results(AbstractResults):
             self.info = pd.read_table(info,
                                       na_filter=False,
                                       index_col=3,
-                                      header=None).iloc[:, :5]
+                                      header=None,
+                                      low_memory=False).iloc[:, :5]
             self.info.columns = ["chrom", "start", "stop", "score",
                                  "strand"][:len(self.info.columns)]
             self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
         if posterior_efficiency is not None:
             posterior_efficiency = pd.read_table(posterior_efficiency,
                                                  na_filter=False,
-                                                 index_col=1)
+                                                 index_col=1,
+                                                 low_memory=False)
             posterior_efficiency.columns = ["gene", "eff"]
             posterior_efficiency = posterior_efficiency["eff"]
             if not (posterior_efficiency == 1).all():
