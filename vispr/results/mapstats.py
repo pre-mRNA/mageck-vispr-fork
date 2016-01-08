@@ -19,7 +19,7 @@ class Results(AbstractResults):
         super(Results, self).__init__(dataframe)
         self.df.columns = self.df.columns.str.lower()
         self.df["file"] = self.df["file"].apply(os.path.basename).apply(lambda filename: os.path.splitext(os.path.splitext(filename)[0])[0])
-        self.df.sort(["file"], inplace=True)
+        self.df.sort_values("file", inplace=True)
         self.has_replicates = self.df["label"].value_counts()[0] > 1
 
     def plot_mapstats(self):

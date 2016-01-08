@@ -17,7 +17,7 @@ class TargetClustering:
             self.df[condition] = targets
         self.conditions = self.df.columns
         mean = self.df.abs().mean(axis=1)
-        mean.sort(ascending=False)
+        mean.sort_values(ascending=False, inplace=True)
         self.df = self.df.ix[mean[:topn].index]
         self.linkage = linkage(self.df, method="ward", metric="euclidean")
 
@@ -28,12 +28,12 @@ class TargetClustering:
                                   columns=["cluster"])
         clustering.index = self.df.index[clustering.index]
         data = pd.merge(self.df, clustering, left_index=True, right_index=True)
-        data.sort("cluster", inplace=True)
+        data.sort_values("cluster", inplace=True)
         data["target"] = data.index
 
         conditions = []
         for condition in self.df.columns:
-            d = data[["cluster", "target", condition]]
+            d = data.loc[:, ["cluster", "target", condition]]
             d.columns = ["cluster", "target", "beta"]
             d.loc[:, "condition"] = condition
             conditions.append(d)

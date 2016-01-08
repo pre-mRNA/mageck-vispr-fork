@@ -30,7 +30,7 @@ setup(
     packages=["vispr", "vispr.results"],
     include_package_data=True,
     zip_safe=False,
-    install_requires=["flask", "numpy", "pandas", "pyyaml", "scikit-learn", "scipy", "appdirs"],
+    install_requires=["flask", "numpy", "pandas>=0.17.0", "pyyaml", "scikit-learn", "scipy", "appdirs"],
     entry_points={"console_scripts": ["vispr = vispr.cli:main"]},
     classifiers=[
         "Development Status :: 4 - Beta",

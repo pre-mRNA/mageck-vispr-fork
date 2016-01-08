@@ -54,14 +54,14 @@ class Results(AbstractResults):
         first_sample = self.df.columns[2]
         data = self.df.ix[[target], self.df.columns != "target"]
 
-        data.sort(first_sample, inplace=True)
+        data.sort_values(first_sample, inplace=True)
         data.index = data["rna"]
         if self.info is not None:
             info = self.info.ix[data["rna"]]
-            if not info["score"].hasnans() and not info["start"].hasnans():
+            if not info["score"].isnull().any() and not info["start"].isnull().any():
                 data.insert(1, "prior efficiency", info["score"])
                 data["chrom pos"] = info["start"]
-                data.sort("prior efficiency", inplace=True)
+                data.sort_values("prior efficiency", inplace=True)
         if self.posterior_efficiency is not None:
             efficiency = self.posterior_efficiency.ix[data["rna"]]
             data["posterior efficiency"] = efficiency
