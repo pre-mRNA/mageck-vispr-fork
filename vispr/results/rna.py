@@ -208,5 +208,5 @@ class Results(AbstractResults):
             dendrogram=json.dumps(links),
             size=size,
             dendrogram_offset=size / len(labels) / 2,
-            show_labels=len(labels) <= 50)
+            show_labels=len(labels) <= 25)
         return plt

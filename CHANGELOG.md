@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.9] - 2016-01-13
+### Changed
+- hide labels in correlation plot in case of two many samples.
+
 ## [0.4.8] - 2016-01-08
 ### Changed
 - Fixed a bug when displaying sgRNA counts in the results screen.
