@@ -20,7 +20,7 @@ from vispr.results.common import lru_cache, AbstractResults, templates
 
 
 class Results(AbstractResults):
-    def __init__(self, dataframe, info=None, posterior_efficiency=None):
+    def __init__(self, dataframe, info=None, posterior_results=None):
         super(Results, self).__init__(dataframe)
         columns = list(self.df.columns[:2]) + sorted(self.df.columns[2:])
         self.df = self.df[columns]
@@ -37,11 +37,15 @@ class Results(AbstractResults):
             self.info.columns = ["chrom", "start", "stop", "score",
                                  "strand"][:len(self.info.columns)]
             self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
-        if posterior_efficiency is not None:
-            posterior_efficiency = pd.read_table(posterior_efficiency,
+        if posterior_results is not None:
+            posterior_efficiency = pd.read_table(posterior_results,
                                                  na_filter=False,
                                                  index_col=1,
                                                  low_memory=False)
+            if posterior_efficiency.shape[1] != 2:
+                raise IOError("Unexpected number of columns in sgrna results. "
+                              "The *.sgrna_summary.txt output of mageck MLE "
+                              "(3 columns) is expected.")
             posterior_efficiency.columns = ["gene", "eff"]
             posterior_efficiency = posterior_efficiency["eff"]
             if not (posterior_efficiency == 1).all():

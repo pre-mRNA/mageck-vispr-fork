@@ -41,28 +41,43 @@ class Results(object):
                         self.seq_quality.append(data)
                     data["sample"] = sample
                     data["filename"] = filename
-        self.gc_content = pd.concat(self.gc_content)
-        self.base_quality = pd.concat(self.base_quality)
-        self.seq_quality = pd.concat(self.seq_quality)
+        if self.gc_content:
+            self.gc_content = pd.concat(self.gc_content)
+        else:
+            self.gc_content = None
+        if self.base_quality:
+            self.base_quality = pd.concat(self.base_quality)
+        else:
+            self.base_quality = None
+        if self.seq_quality:
+            self.seq_quality = pd.concat(self.seq_quality)
+        else:
+            self.seq_quality = None
 
     def plot_gc_content(self):
-        plt = templates.get_template("plots/gc_content.json").render(
-            data=self.gc_content.to_json(orient="records"),
-            show_legend=self.n_samples <= 20)
+        plt = ""
+        if self.gc_content is not None:
+            plt = templates.get_template("plots/gc_content.json").render(
+                data=self.gc_content.to_json(orient="records"),
+                show_legend=self.n_samples <= 20)
         return plt
 
     def plot_base_quality(self):
-        plt = templates.get_template(
-            "plots/base_quality.json").render(
-            data=self.base_quality.to_json(orient="records"),
-            show_legend=self.n_samples <= 20)
+        plt = ""
+        if self.base_quality is not None:
+            plt = templates.get_template(
+                "plots/base_quality.json").render(
+                data=self.base_quality.to_json(orient="records"),
+                show_legend=self.n_samples <= 20)
         return plt
 
     def plot_seq_quality(self):
-        plt = templates.get_template(
-            "plots/seq_quality.json").render(
-            data=self.seq_quality.to_json(orient="records"),
-            show_legend=self.n_samples <= 20)
+        plt = ""
+        if self.seq_quality is not None:
+            plt = templates.get_template(
+                "plots/seq_quality.json").render(
+                data=self.seq_quality.to_json(orient="records"),
+                show_legend=self.n_samples <= 20)
         return plt
 
 
