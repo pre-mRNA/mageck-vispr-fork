@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.9] - 2016-01-16
+## [0.4.10] - 2016-01-16
 ### Changed
 - Hide labels in correlation plot in case of two many samples.
 - Be robust to missing FastQC information.
