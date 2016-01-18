@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.11] - 2016-01-18
+### Changed
+- Provide a proper error message in case of a KeyError with vispr archive.
+
 ## [0.4.10] - 2016-01-16
 ### Changed
 - Hide labels in correlation plot in case of two many samples.
