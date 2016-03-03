@@ -16,8 +16,9 @@ import shutil
 import tarfile
 try:
     from urllib.request import urlopen
+    from urllib.error import HTTPError
 except ImportError:
-    from urllib import urlopen
+    from urllib2 import urlopen, HTTPError
 
 import yaml
 from appdirs import AppDirs
@@ -61,10 +62,14 @@ def test_server(port=5000, update=False):
         exists = os.path.exists(os.path.join(testdir, dataset))
         if update or not exists:
             logging.info("Downloading {} test data.".format(dataset))
-            testdata = tarfile.open(fileobj=urlopen(
-                "https://bitbucket.org/liulab/"
-                "vispr/downloads/{}.testdata.tar.bz2".format(dataset)),
-                                    mode="r|bz2")
+            try:
+                testdata = tarfile.open(fileobj=urlopen(
+                    "https://bitbucket.org/liulab/"
+                    "vispr/downloads/{}.testdata.tar.bz2".format(dataset)),
+                                        mode="r|bz2")
+            except HTTPError as e:
+                logging.error("Unable to download test data. This is most likely a temporary problem with bitbucket.org.")
+                logging.error(str(e))
             if exists:
                 shutil.rmtree(os.path.join(testdir, dataset))
             testdata.extractall(testdir)
