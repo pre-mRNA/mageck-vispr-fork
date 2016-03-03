@@ -180,7 +180,7 @@ def main():
     logging.basicConfig(format="%(message)s",
                         level=logging.DEBUG if args.debug else logging.INFO,
                         stream=sys.stderr)
-    logging.getLogger('werkzeug').setLevel(logging.ERROR)
+    logging.getLogger('werkzeug').setLevel(logging.DEBUG if args.debug else logging.ERROR)
 
     try:
         if args.version:
