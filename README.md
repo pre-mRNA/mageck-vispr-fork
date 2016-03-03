@@ -11,9 +11,8 @@ For recent changes, see the [change log](CHANGELOG.md).
 Installation
 ------------
 
-The easiest way to install VISPR is to use the Miniconda Python distribution (http://conda.pydata.org/miniconda.html). 
-We recommend to use the Python 3 variant.
-With miniconda installed, you can issue
+The easiest way to install VISPR is to use the **Miniconda3** Python distribution (http://conda.pydata.org/miniconda.html). Make sure you install the Python 3 variant.
+On Linux or Mac OSX, you can then issue
 
     conda install --channel bioconda vispr
 
