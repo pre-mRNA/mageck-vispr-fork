@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.12] - 2016-03-10
+### Changed
+- Improve robustness of pvalue CDF in case of problems with p-value precision.
+
 ## [0.4.11] - 2016-01-18
 ### Changed
 - Provide a proper error message in case of a KeyError with vispr archive.
