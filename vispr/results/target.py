@@ -33,7 +33,16 @@ class Results(AbstractResults):
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
-        pval_cdf = self.df.replace([np.inf, -np.inf], np.nan).dropna()["log10-p-value"].value_counts(normalize=True, sort=False, bins=1000).cumsum()
+        pvals = self.df["log10-p-value"]
+        noninf = pvals.replace([np.inf, -np.inf], np.nan).dropna()
+        if noninf.empty:
+            vmax = 0
+            vmin = 0
+        else:
+            vmax, vmin = noninf.max(), noninf.min()
+        pval_cdf = pvals.replace(np.inf, vmax) \
+                        .replace(-np.inf, vmin)
+        pval_cdf = pval_cdf.value_counts(normalize=True, sort=False, bins=1000).cumsum()
         pval_cdf.index = np.maximum(0, pval_cdf.index)
         self.pval_cdf = pd.DataFrame({"p-value": pval_cdf.index, "cdf": pval_cdf})
 
