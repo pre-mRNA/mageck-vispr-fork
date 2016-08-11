@@ -17,6 +17,7 @@ from vispr.results import fastqc
 from vispr.results import mapstats
 from vispr.results import target_overlap
 from vispr.results import target_clustering
+from vispr.common import VisprError
 
 
 class Screens(object):
@@ -95,12 +96,17 @@ class Screen(object):
 
         self.control_targets = set()
         if "controls" in config["targets"]:
-            self.control_targets = set(
-                pd.read_table(get_path(config["targets"]["controls"]),
-                              header=None,
-                              squeeze=True,
-                              na_filter=False,
-                              low_memory=False))
+            try:
+                self.control_targets = set(
+                    pd.read_table(get_path(config["targets"]["controls"]),
+                                  header=None,
+                                  squeeze=True,
+                                  na_filter=False,
+                                  low_memory=False))
+            except (Exception, BaseException) as e:
+                raise VisprError(
+                    "Failed to parse control targets "
+                    "(targets->controls in config): {}".format(e))
 
         self.target_clustering = None
         if self.is_mle:

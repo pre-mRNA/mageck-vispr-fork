@@ -16,6 +16,7 @@ from flask import render_template
 
 
 from vispr.results.common import templates
+from vispr.common import VisprError
 
 
 class Results(object):
@@ -98,5 +99,9 @@ def parse_fastqc_data(path, pattern=re.compile(r"\n\>\>(?P<name>[\w ]+)\t(pass|f
                 d = StringIO(d)
             except TypeError:
                 d = StringIO(unicode(d))
-            data = pd.read_table(d, low_memory=False)
+            try:
+                data = pd.read_table(d, low_memory=False)
+            except (Exception, BaseException) as e:
+                raise VisprError(
+                    "Failed to parse FastQC results: {}".format(e))
             yield match.group("name"), data

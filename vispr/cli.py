@@ -23,7 +23,8 @@ except ImportError:
 import yaml
 from appdirs import AppDirs
 
-from vispr import Screens, VisprError, Screen
+from vispr import Screens, Screen
+from vispr.common import VisprError
 from vispr.server import app
 from vispr.version import __version__
 from vispr.archive import archive as _archive

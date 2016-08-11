@@ -5,6 +5,8 @@ from io import BytesIO
 
 import yaml
 
+from vispr.common import VisprError
+
 
 def archive(config, out):
     parentdir = os.path.dirname(config)

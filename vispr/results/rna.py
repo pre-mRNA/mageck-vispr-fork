@@ -11,12 +11,14 @@ from functools import partial
 
 from flask import render_template
 import pandas as pd
+from pandas.io.common import EmptyDataError
 import numpy as np
 from sklearn.decomposition import PCA
 from scipy.cluster.hierarchy import average, leaves_list, dendrogram
 from scipy.spatial.distance import pdist, squareform
 
 from vispr.results.common import lru_cache, AbstractResults, templates
+from vispr.common import VisprError
 
 
 class Results(AbstractResults):
@@ -29,19 +31,33 @@ class Results(AbstractResults):
         self.info = None
         self.posterior_efficiency = None
         if info is not None:
-            self.info = pd.read_table(info,
-                                      na_filter=False,
-                                      index_col=3,
-                                      header=None,
-                                      low_memory=False).iloc[:, :5]
-            self.info.columns = ["chrom", "start", "stop", "score",
-                                 "strand"][:len(self.info.columns)]
-            self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
+            try:
+                self.info = pd.read_table(info,
+                                          na_filter=False,
+                                          index_col=3,
+                                          header=None,
+                                          low_memory=False).iloc[:, :5]
+                self.info.columns = ["chrom", "start", "stop", "score",
+                                     "strand"][:len(self.info.columns)]
+                self.info.loc[:, "chrom"] = self.info.loc[:, "chrom"].str.lower()
+            except EmptyDataError:
+                # if annotation file is empty, assume that no info was given
+                pass
+            except (Exception, BaseException) as e:
+                raise VisprError(
+                    "Failed to parse sgRNA annotation "
+                    "(sgrnas->annotation in config): {}".format(e))
         if posterior_results is not None:
-            posterior_efficiency = pd.read_table(posterior_results,
-                                                 na_filter=False,
-                                                 index_col=1,
-                                                 low_memory=False)
+            try:
+                posterior_efficiency = pd.read_table(posterior_results,
+                                                     na_filter=False,
+                                                     index_col=1,
+                                                     low_memory=False)
+            except (Exception, BaseException) as e:
+                raise VisprError(
+                    "Failed to parse sgRNA results "
+                    "(sgrnas->results in config): {}".format(e))
+
             if posterior_efficiency.shape[1] != 2:
                 raise IOError("Unexpected number of columns in sgrna results. "
                               "The *.sgrna_summary.txt output of mageck MLE "
@@ -50,7 +66,6 @@ class Results(AbstractResults):
             posterior_efficiency = posterior_efficiency["eff"]
             if not (posterior_efficiency == 1).all():
                 self.posterior_efficiency = posterior_efficiency
-
 
     @property
     def samples(self):
@@ -64,7 +79,8 @@ class Results(AbstractResults):
         data.index = data["rna"]
         if self.info is not None:
             info = self.info.ix[data["rna"]]
-            if not info["score"].isnull().any() and not info["start"].isnull().any():
+            if not info["score"].isnull().any() and not info["start"].isnull(
+            ).any():
                 data.insert(1, "prior efficiency", info["score"])
                 data["chrom pos"] = info["start"]
                 data.sort_values("prior efficiency", inplace=True)
@@ -77,23 +93,26 @@ class Results(AbstractResults):
         exp = self.df.ix[:, self.df.columns != "target"]
         info = self.info.ix[:, ["chrom", "start", "stop", "score"]]
         data = pd.merge(info, exp, how="left", left_index=True, right_on="rna")
-        data["desc"] = data.apply(lambda row: "na|@{rna[chrom]}:{rna[start]}-{rna[stop]}|".format(rna=row), axis=1)
+        data["desc"] = data.apply(
+            lambda row: "na|@{rna[chrom]}:{rna[start]}-{rna[stop]}|".format(rna=row),
+            axis=1)
         gct = "#1.2\n{rnas}\t{samples}\n{data}".format(
             rnas=data.shape[0],
             samples=data.shape[1] - 3,
             data=data.to_csv(sep="\t",
                              index=False,
                              columns=["rna", "desc", "score"] + self.samples,
-                             header=["Name", "Description",
-                                     "efficiency"] + self.samples))
+                             header=["Name", "Description", "efficiency"
+                                     ] + self.samples))
         return gct
 
     def target_locus(self, target):
         loci = self.info.ix[self.df.ix[[target], "rna"], ["chrom", "start",
-                                                        "stop"]]
+                                                          "stop"]]
         if loci.loc[:, "start"].isnull().any():
             return None
-        return loci.loc[:, "chrom"][0], loci.loc[:, "start"].min(), loci.loc[:, "stop"].max()
+        return loci.loc[:, "chrom"][0], loci.loc[:, "start"].min(
+        ), loci.loc[:, "stop"].max()
 
     def plot_normalization(self):
         _, leaves, _, _ = self.clustering()
@@ -124,10 +143,9 @@ class Results(AbstractResults):
             d = counts[sample].value_counts(normalize=True,
                                             sort=False,
                                             bins=100).cumsum()
-            data.append(pd.DataFrame(
-                {"density": d,
-                 "count": d.index,
-                 "sample": sample}))
+            data.append(pd.DataFrame({"density": d,
+                                      "count": d.index,
+                                      "sample": sample}))
         data = pd.concat(data)
         return templates.get_template("plots/readcounts.json").render(
             data=data.to_json(orient="records"),
@@ -180,7 +198,10 @@ class Results(AbstractResults):
         # cluster
         clustering = average(dist)
         #import matplotlib.pyplot as plt
-        d = dendrogram(clustering, labels=labels, get_leaves=True, no_plot=True)
+        d = dendrogram(clustering,
+                       labels=labels,
+                       get_leaves=True,
+                       no_plot=True)
         #plt.savefig("/tmp/ddg.pdf")
         leaves = d["leaves"]
 
@@ -200,10 +221,10 @@ class Results(AbstractResults):
 
         xmin = min(min(xk) for xk in dendrogram["icoord"])
         links = []
-        for k, (xk, yk) in enumerate(zip(dendrogram["icoord"], dendrogram["dcoord"])):
+        for k, (xk, yk) in enumerate(zip(dendrogram["icoord"], dendrogram[
+                "dcoord"])):
             for xki, yki in zip(xk, yk):
                 links.append({"x": xki - xmin, "y": yki, "k": k})
-
 
         size = max(min(50 * len(labels), 700), 300)
 

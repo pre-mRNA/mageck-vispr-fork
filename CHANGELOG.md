@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.13] - 2016-08-11
+### Changed
+- Better error messages when parsing files.
+- Allow empty sgrnas->annotation file.
+
+
 ## [0.4.12] - 2016-03-10
 ### Changed
 - Improve robustness of pvalue CDF in case of problems with p-value precision.

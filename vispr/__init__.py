@@ -10,7 +10,3 @@ __license__ = "MIT"
 from vispr.version import __version__
 
 from vispr.results import Screens, Screen
-
-
-class VisprError(Exception):
-    pass
