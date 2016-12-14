@@ -32,7 +32,7 @@ from vispr.archive import archive as _archive
 appdirs = AppDirs("VISPR", "liulab")
 
 
-def init_server(*configs, port=5000):
+def init_server(*configs, host="127.0.0.1", port=5000):
     app.screens = Screens()
     print("Loading data.")
     for path in configs:
@@ -50,13 +50,13 @@ def init_server(*configs, port=5000):
     logging.info("Starting server.")
     logging.info("")
     logging.info(
-        "Open:  go to http://127.0.0.1:{} in your browser.".format(port))
+        "Open:  go to " + host + ":{} in your browser.".format(port))
     logging.info("Note: Safari and Internet Explorer are currently unsupported.")
     logging.info("Close: hit Ctrl-C in this terminal.")
-    app.run(port=port)
+    app.run(host=host, port=port)
 
 
-def test_server(port=5000, update=False):
+def test_server(host="127.0.0.1",port=5000, update=False):
     testdir = os.path.join(appdirs.user_cache_dir, "testdata")
     datasets = "ESC-MLE Leukemia-MLE Melanoma-MLE".split()
     for dataset in datasets:
@@ -76,6 +76,7 @@ def test_server(port=5000, update=False):
             testdata.extractall(testdir)
     init_server(*[os.path.join(testdir, dataset, "vispr.yaml")
                   for dataset in datasets],
+                host=host,
                 port=port)
 
 
@@ -144,6 +145,12 @@ def main():
         nargs="+",
         help="YAML config files. Each file points to the results of one "
         "MAGeCK run.")
+
+    server.add_argument("--host",
+                        default="127.0.0.1",
+                        type=str,
+                        help="Host ip location to listen for client connection.")
+
     server.add_argument("--port",
                         default=5000,
                         type=int,
@@ -161,6 +168,10 @@ def main():
     test = subparsers.add_parser(
         "test",
         description="Start the VISPR server with test data.")
+    test.add_argument("--host",
+                        default="127.0.0.1",
+                        type=str,
+                        help="Host ip location to listen for client connection.")
     test.add_argument("--port",
                       default=5000,
                       type=int,
@@ -193,9 +204,9 @@ def main():
             print(__version__)
             exit(0)
         if args.subcommand == "server":
-            init_server(*args.config, port=args.port)
+            init_server(*args.config, host=args.host, port=args.port)
         elif args.subcommand == "test":
-            test_server(port=args.port, update=args.update)
+            test_server(port=args.port, host=args.host, update=args.update)
         elif args.subcommand == "config":
             print_example_config()
         elif args.subcommand == "plot":

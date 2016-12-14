@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.14]
+### Changed
+- Allow remote access of VISPR server by adding a --host option
+
 ## [0.4.13] - 2016-08-11
 ### Changed
 - Better error messages when parsing files.

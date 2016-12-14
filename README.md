@@ -74,10 +74,27 @@ For further help, explore all command line options of VISPR with
 
     vispr --help
 
+### Step 4: Running VISPR on remote server
+
+The latest version of VISPR now allows users to visit VISPR server from a remote machine (thanks to Wubing Zhang). 
+Simply  add use the "--host <your ip address>" option in server and test command to allow remote visit.
+For example, if your ip address is 192.168.86.164, you can run
+
+    vispr test --host 192.168.86.164 --port 5000
+
+in the server, and remotely access VISPR by typing 192.168.86.164:5000 in another computer's browser.
+
+Similarly, you can use
+
+    vispr server myexperiment/vispr.yaml --host 192.168.86.164 --port 5000
+
+to allow remote access of the content in myexperiment/vispr.yaml
+
 Author
 ------
 
 Johannes Köster <koester@jimmy.harvard.edu>
+Wei Li <li.david.wei@gmail.com>
 
 License
 -------
