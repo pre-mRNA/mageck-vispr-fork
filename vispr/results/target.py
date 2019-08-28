@@ -29,7 +29,12 @@ class Results(AbstractResults):
             raise ValueError("Target results contain duplicated gene names.")
         self.df.sort_values("p-value", inplace=True)
         self.df.reset_index(drop=True, inplace=True)
-        self.df["log10-p-value"] = -np.log10(self.df["p-value"])
+        z=np.array(self.df["p-value"])
+        minnz=np.min([zi for zi in z if zi>0])
+        #self.df["p-value"][self.df["p-value"]==0]=minnz
+        zud=(z==0)*minnz + (z!=0)*z
+        #self.df["log10-p-value"] = -np.log10(self.df["p-value"])
+        self.df["log10-p-value"] = -np.log10(zud)
         self.df["idx"] = self.df.index
         self.df.index = self.df["target"]
 
@@ -43,7 +48,7 @@ class Results(AbstractResults):
         pval_cdf = pvals.replace(np.inf, vmax) \
                         .replace(-np.inf, vmin)
         pval_cdf = pval_cdf.value_counts(normalize=True, sort=False, bins=1000).cumsum()
-        pval_cdf.index = np.maximum(0, pval_cdf.index)
+        #pval_cdf.index = np.maximum(0, pval_cdf.index)
         self.pval_cdf = pd.DataFrame({"p-value": pval_cdf.index, "cdf": pval_cdf})
 
         edges = np.arange(0, 1.01, 0.05)
