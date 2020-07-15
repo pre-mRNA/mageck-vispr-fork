@@ -73,25 +73,25 @@ class Results(AbstractResults):
 
     def by_target(self, target):
         first_sample = self.df.columns[2]
-        data = self.df.ix[[target], self.df.columns != "target"]
+        data = self.df.loc[[target], self.df.columns != "target"]
 
         data.sort_values(first_sample, inplace=True)
         data.index = data["rna"]
         if self.info is not None:
-            info = self.info.ix[data["rna"]]
+            info = self.info.loc[data["rna"]]
             if not info["score"].isnull().any() and not info["start"].isnull(
             ).any():
                 data.insert(1, "prior efficiency", info["score"])
                 data["chrom pos"] = info["start"]
                 data.sort_values("prior efficiency", inplace=True)
         if self.posterior_efficiency is not None:
-            efficiency = self.posterior_efficiency.ix[data["rna"]]
+            efficiency = self.posterior_efficiency.loc[data["rna"]]
             data["posterior efficiency"] = efficiency
         return data
 
     def track(self):
-        exp = self.df.ix[:, self.df.columns != "target"]
-        info = self.info.ix[:, ["chrom", "start", "stop", "score"]]
+        exp = self.df.loc[:, self.df.columns != "target"]
+        info = self.info.loc[:, ["chrom", "start", "stop", "score"]]
         data = pd.merge(info, exp, how="left", left_index=True, right_on="rna")
         data["desc"] = data.apply(
             lambda row: "na|@{rna[chrom]}:{rna[start]}-{rna[stop]}|".format(rna=row),
@@ -107,7 +107,7 @@ class Results(AbstractResults):
         return gct
 
     def target_locus(self, target):
-        loci = self.info.ix[self.df.ix[[target], "rna"], ["chrom", "start",
+        loci = self.info.loc[self.df.loc[[target], "rna"], ["chrom", "start",
                                                           "stop"]]
         if loci.loc[:, "start"].isnull().any():
             return None
@@ -119,7 +119,8 @@ class Results(AbstractResults):
 
         counts = np.log10(self.counts() + 1)
         # sort columns by clustering results
-        counts = counts.ix[:, leaves]
+        print(leaves)
+        counts = counts.iloc[:, leaves]
         data = pd.DataFrame({
             "label": counts.columns,
             "median": counts.median(),
@@ -152,7 +153,7 @@ class Results(AbstractResults):
             show_legend=n_samples <= 20)
 
     def counts(self):
-        return self.df.ix[:, 2:]
+        return self.df.iloc[:, 2:]
 
     @lru_cache()
     def pca(self, n_components=3):
@@ -167,7 +168,8 @@ class Results(AbstractResults):
                   for i, expl_var in enumerate(pca.explained_variance_ratio_)]
         data.columns = fields
         data["sample"] = counts.index
-        data = data.ix[leaves, :]
+        #print(leaves)
+        data = data.loc[leaves, :]
         return data
 
     def plot_pca(self, comp_x=1, comp_y=2, legend=True):
@@ -189,7 +191,7 @@ class Results(AbstractResults):
     @lru_cache()
     def clustering(self):
         counts = np.log10(self.counts().transpose() + 1)
-        labels = counts.index.values
+        labels = counts.index.values.tolist()
         # calculate correlation distance
         dist = pdist(counts, 'correlation')
         # calculate correlation from distance
@@ -198,10 +200,14 @@ class Results(AbstractResults):
         # cluster
         clustering = average(dist)
         #import matplotlib.pyplot as plt
+        #d=None
         d = dendrogram(clustering,
+                       #labels=None,
                        labels=labels,
                        get_leaves=True,
                        no_plot=True)
+        #print(clustering)
+        #print(labels)
         #plt.savefig("/tmp/ddg.pdf")
         leaves = d["leaves"]
 

@@ -85,7 +85,7 @@ class Results(AbstractResults):
                                                 control_targets)
                 top5 = top5[valid]
         top5targets = top5[:5]
-        top5 = pd.DataFrame(self.get_pval_cdf_points(self.df.ix[top5targets, "log10-p-value"]))
+        top5 = pd.DataFrame(self.get_pval_cdf_points(self.df.loc[top5targets, "log10-p-value"]))
         top5.loc[:, "target"] = top5targets.values
 
         plt = templates.get_template("plots/pvals.json").render(
@@ -95,7 +95,7 @@ class Results(AbstractResults):
         return plt
 
     def get_pvals_highlight_targets(self, highlight_targets):
-        data = pd.DataFrame(self.get_pval_cdf_points(self.df.ix[highlight_targets, "log10-p-value"]))
+        data = pd.DataFrame(self.get_pval_cdf_points(self.df.loc[highlight_targets, "log10-p-value"]))
         data.loc[:, "target"] = highlight_targets
         return data
 
@@ -105,7 +105,7 @@ class Results(AbstractResults):
 
     def ids(self, fdr):
         valid = self.df["fdr"] <= fdr
-        return set(self.df.ix[valid, "target"])
+        return set(self.df.loc[valid, "target"])
 
     def __len__(self):
         return self.df.shape[0]
