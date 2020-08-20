@@ -11,7 +11,7 @@ from functools import partial
 
 from flask import render_template
 import pandas as pd
-from pandas.io.common import EmptyDataError
+from pandas.errors import EmptyDataError
 import numpy as np
 from sklearn.decomposition import PCA
 from scipy.cluster.hierarchy import average, leaves_list, dendrogram
