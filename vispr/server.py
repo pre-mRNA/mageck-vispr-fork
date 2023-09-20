@@ -10,7 +10,7 @@ import re, json, os
 
 import numpy as np
 from flask import Flask, render_template, request, session, abort
-from jinja2 import Markup
+from markupsafe import Markup
 import yaml
 
 from vispr import __version__
@@ -20,7 +20,7 @@ app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 
 with open(os.path.join(os.path.dirname(__file__), "captions.yaml")) as f:
-    CAPTIONS = yaml.load(f)
+    CAPTIONS = yaml.load(f, Loader=yaml.SafeLoader)
 
 
 @app.route("/ping")
