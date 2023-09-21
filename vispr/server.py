@@ -130,7 +130,7 @@ def tbl_targets(screen, condition, selection,
     total_count = records.shape[0]
     filter_count = total_count
 
-    filter = np.ones(total_count, dtype=np.bool)
+    filter = np.ones(total_count, dtype=bool)
 
     # restrict to overlap
     overlap_args = get_overlap_args()
